@@ -4,6 +4,7 @@ import requests
 import os
 import sys
 import ipaddress
+import time
 try:
     from userAction.actionInterface import actionInterface
 except:
@@ -11,16 +12,22 @@ except:
 
 AS_DB = pd.DataFrame()
 file_name = os.path.join("as.gz")
-try:
-    url = "https://iptoasn.com/data/ip2asn-v4-u32.tsv.gz"
-    response = requests.get(url, stream=True)
-    with open(file_name, 'wb') as f:
-        shutil.copyfileobj(response.raw,f)
-    del response
-    AS_DB = pd.read_csv(file_name, header=None, sep="\t", compression="gzip")
-    AS_DB.rename(columns={0:"min_ip",1:"max_ip",2:"as_num",3:"as_loc",4:"as_info"}, inplace=True)
-except Exception as e:
-    print("Error while retriving database from IpToASN")
+if os.path.exists(file_name):
+    file_time = os.path.getmtime(file_name) 
+    if (time.time() - file_time) / 3600 > 24*7:
+        try:
+            url = "https://iptoasn.com/data/ip2asn-v4-u32.tsv.gz"
+            response = requests.get(url, stream=True)
+            with open(file_name, 'wb') as f:
+                shutil.copyfileobj(response.raw,f)
+            del response
+        except Exception as e:
+            print("Error while retriving database from IpToASN")
+    try: 
+        AS_DB = pd.read_csv(file_name, header=None, sep="\t", compression="gzip")
+        AS_DB.rename(columns={0:"min_ip",1:"max_ip",2:"as_num",3:"as_loc",4:"as_info"}, inplace=True)
+    except Exception as e:
+        print("Error while loading AS database")
 
 
 class IpToAsAction(actionInterface):

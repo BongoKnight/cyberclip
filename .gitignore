@@ -5,3 +5,5 @@ tools.py
 as.gz
 __pycache__/
 *.pyc
+data/conf.yml
+log.log
