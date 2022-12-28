@@ -3,3 +3,5 @@ genericEnricher.py
 /enrich
 tools.py
 as.gz
+__pycache__/
+*.pyc
