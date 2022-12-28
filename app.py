@@ -93,7 +93,7 @@ class DataLoader(Static):
 
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader.""" 
-        yield Button("Update", id="update-button", variant="success")
+        yield Button("Reset", id="update-button", variant="success")
         yield Vertical(id="data-type-container")
 
 

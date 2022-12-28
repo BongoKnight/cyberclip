@@ -7,3 +7,7 @@ __pycache__/
 *.pyc
 data/conf.yml
 log.log
+userAction/private/*
+!userAction/private/__init__.py
+userTypeParser/private/*
+!userTypeParser/private/__init__.py

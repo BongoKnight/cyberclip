@@ -2,8 +2,11 @@
 
 from inspect import getmembers, isfunction, isclass, ismodule, iscode
 import userTypeParser
+import userTypeParser.private
+
 import userAction
-from userAction.actionInterface import actionInterface
+import userAction.private
+
 import os
 import logging
 from pathlib import Path
@@ -25,31 +28,31 @@ class clipParser():
         # add formatter to ch
         self.ch.setFormatter(self.formatter)
         self.log.addHandler(self.ch)
-        self.parserModuleImport = self.loadParser()
-        self.actionModuleImport = self.loadAction()
+        self.parserModuleImport = self.moduleLoader(userTypeParser, 'userTypeParser')
+        self.privateParserModuleImport = self.moduleLoader(userTypeParser.private, 'userTypeParser.private')
+        self.ActionModuleImport = self.moduleLoader(userAction, 'userAction')
+        self.privateActionModuleImport = self.moduleLoader(userAction.private, 'userAction.private')
         self.results = {}
 
-        
-    
-    
-    def loadParser(self):
+    def moduleLoader(self, module_instance, module_name):
         """
-        Load all Parser defined in `userTypeParser` directory.
+        Load all class defined in `module_name` directory.
     
         Returns
         -------
-         __import__('userTypeParser',fromlist=parserModules)
+         __import__('module_name',fromlist=parserModules)
     
         """
         parserModules = []
-        files = os.listdir(userTypeParser.__path__[0])
+        files = os.listdir(module_instance.__path__[0])
         for file in files :
             if file.endswith(".py") and file != "__init__.py":
                 parserModuleName = file.split(".")[0]
                 parserModules.append(parserModuleName)
                 self.log.debug("Importing {} parser".format(parserModuleName))
         # import all parser parserModule
-        parserModuleImport = __import__('userTypeParser',fromlist=parserModules)
+        parserModuleImport = __import__(f'{module_name}',fromlist=parserModules)
+
         return parserModuleImport
 
     def loadAction(self):
@@ -62,6 +65,7 @@ class clipParser():
         """
         actionModules = []
         files = os.listdir(userAction.__path__[0])
+        files+= os.listdir(userAction.private.__path__[0])
         for file in files :
             if file.endswith(".py") and file != "__init__.py":
                 actionModule = file.split(".")[0]
@@ -69,6 +73,7 @@ class clipParser():
                 self.log.debug("Importing {} parser".format(actionModule))
         # import all parser parserModule
         actionModuleImport = __import__('userAction',fromlist=actionModules)
+        actionModuleImport+= __import__('userAction.private',fromlist=actionModules)
         return actionModuleImport
         
     
@@ -90,6 +95,9 @@ class clipParser():
         # Load all parsers
         parserModules = dict((name, m) for name, m
                            in getmembers(self.parserModuleImport, ismodule))
+        privateParserModules = dict((name, m) for name, m
+                           in getmembers(self.privateParserModuleImport, ismodule))
+        parserModules.update(privateParserModules)
 
         for parserModule in parserModules.keys():
             classes = dict((name, c) for name, c 
@@ -106,7 +114,10 @@ class clipParser():
 
         # Load all actions
         actionModules = dict((name, m) for name, m
-                    in getmembers(self.actionModuleImport, ismodule))
+                    in getmembers(self.ActionModuleImport, ismodule))
+        privateActionModules = dict((name, m) for name, m
+                    in getmembers(self.privateActionModuleImport, ismodule))
+        actionModules.update(privateActionModules)
 
         for actionModule in actionModules.keys():
             classes = dict((name, c) for name, c 
@@ -123,10 +134,8 @@ class clipParser():
         return self.results
 if __name__=='__main__':
     a = clipParser()
+    a.log.level = logging.debug
     data = "127.0.0.1, 124.0.12.23 SARA-65890 simon@vade.com aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     print(a.parseData(data))
-    for action in a.actions:
-        print(action) 
-        print(a.actions.get("Extract all elements."))
 
 

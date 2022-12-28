@@ -34,7 +34,7 @@ Showed data can be exported to clipboard or to a file.
 	- [ ] For devs (how to write custom parsers/actions)
 - [ ] Add an help field to make a long description of action possible. (ie sort) 
 	- [ ] Use of  instance.execute/__str__.__doc__
-- [ ] Wrap custom actions and UserTypeParser in a `private` dir
+- [x] Wrap custom actions and UserTypeParser in a `private` dir
 - [ ] Write `public` actions :
 	- [x] TSV to Markdown Table
 	- [x] Domain and Url to base URL
