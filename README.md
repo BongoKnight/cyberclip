@@ -1,6 +1,37 @@
+# Use case
+
+## Demo
+
+![textual](https://user-images.githubusercontent.com/22347055/209771427-53017604-acfe-4543-9eb3-dad905229ce1.gif)
+
+## Features
+
+### Extract data
+
+![datatype](https://user-images.githubusercontent.com/22347055/209772810-81ba33a0-aba8-40d7-9487-1790bed7a984.gif)
+
+At the moment, these datatypes are handled :
+- Text
+- Url
+- Domain
+- TSV
+- md5 and SHA1
+- IP
+- Mitre TTP and Phones (need to be improved)
+
+### Filter actions by name and type
+![filter](https://user-images.githubusercontent.com/22347055/209774170-2f22c165-07a4-4134-a7e5-4ba044290b82.gif)
+
+### Save data
+
+Showed data can be exported to clipboard or to a file.
+
 # To do
 
 - [x] Make a gitignore
+- [ ] Write docs :
+	- [ ] For users
+	- [ ] For devs (how to write custom parsers/actions)
 - [ ] Add an help field to make a long description of action possible. (ie sort) 
 	- [ ] Use of  instance.execute/__str__.__doc__
 - [ ] Wrap custom actions and UserTypeParser in a `private` dir
@@ -20,7 +51,7 @@
 	- [ ] Search in MISP
 	- [ ] Search in OpenCTI
 	- [ ] Search in Yeti
-	- [ ] Select top N lines
+	- [x] Select top N lines
 	- [x] URL open
 	- [ ] Url redirect
 	- [ ] Url to Html
@@ -28,8 +59,15 @@
 - [ ] Custom parsers :
 	- [ ] For tabular data (CSV, TSV, Markdown)
 		- [ ] Import in pandas dataframe
-		- [ ] Connect with enrichment module
-	- [ ] For AS Number
+			-[ ] Ok for TSV
+		- [ ] (WIP) Allow enrichment of dataframe (Another UI for entering the conf?) (and so of it's visual representation)
+			- [ ] From SQLite
+			- [ ] From CSV
+			- [ ] From MISP
+			- [ ] From SQLite
+		- [ ] Update sort action for DataFrame
+		- [ ] Write filter and stats action for DataFrame (possibility to open dataframe in visidata?)
+	- [x] For AS Number
 		- [ ] AS to Regex
 		- [ ] AS range
 - [ ] Make a domain and a host Parser, improve the domain parsing
