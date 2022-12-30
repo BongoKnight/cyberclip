@@ -14,11 +14,12 @@ For example :
 """
 
 class baseUrlAction(actionInterface):    
-    def __init__(self, parsers = {}, supportedType = ["url","domain"]):
+    def __init__(self, parsers = {}, supportedType = {"url","domain"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "To base URL"
         self.results = {}
+        self.param = param_data
         
     def execute(self) -> object:
         """Execute the action."""

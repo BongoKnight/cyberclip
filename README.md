@@ -41,7 +41,7 @@ Showed data can be exported to clipboard or to a file.
 	- [x] Domain to IP
 	- [x] IP to ASN
 	- [ ] Markdown Table to TSV
-	- [ ] Mitre description
+	- [x] Mitre description
 	- [ ] Prepend per line
 	- [ ] Regex Highlighter
 	- [ ] Regex substitution

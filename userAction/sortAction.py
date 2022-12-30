@@ -13,7 +13,7 @@ A action module, to sort lines contained in the keyboard.
 
 
 class sortDedupAction(actionInterface):    
-    def __init__(self, parsers = {}, supportedType = ["text"]):
+    def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "Sort lines."

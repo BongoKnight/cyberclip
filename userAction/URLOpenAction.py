@@ -10,11 +10,12 @@ import os
 class URLOpenAction(actionInterface):
     """Parser Interface defines the minimum functions a parser needs to implement."""
     
-    def __init__(self, parsers ={}, supportedType = ["url"]):
+    def __init__(self, parsers ={}, supportedType = {"url"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "Open URL in browser."
         self.results = {}
+        self.param = param_data
         
     def execute(self) -> object:
         """Execute the action."""

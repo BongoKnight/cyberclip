@@ -11,7 +11,7 @@ A action module to filter lines on match regex
 
 
 class regexFilterAction(actionInterface):    
-    def __init__(self, parsers = {}, supportedType = ["text"], param_data=""):
+    def __init__(self, parsers = {}, supportedType = {"text"}, param_data=""):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "Filter with Regex"

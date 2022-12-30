@@ -14,7 +14,7 @@ A action module, to return reverse DNS for an IP, and DNS for a domain.
 """
 
 class DNSAction(actionInterface):    
-    def __init__(self, parsers = {}, supportedType = ["ip","domain"]):
+    def __init__(self, parsers = {}, supportedType = {"ip","domain"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "DNS/Reverse DNS"

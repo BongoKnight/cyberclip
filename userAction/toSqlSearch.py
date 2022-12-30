@@ -8,11 +8,12 @@ import os
 """A action module, to open transform lines to SQL IN querrie"""
 
 class sortAction(actionInterface):    
-    def __init__(self, parsers = {}, supportedType = ["text"]):
+    def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "To SQL search"
         self.results = {}
+        self.param = param_data
         
     def execute(self) -> object:
         """Execute the action."""

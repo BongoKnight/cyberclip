@@ -12,7 +12,7 @@ class toMarkdownAction(actionInterface):
     """
     A action module, to crop data to only the N first lines.
     """ 
-    def __init__(self, parsers = {}, supportedType = ["tsv"], param_data=""):
+    def __init__(self, parsers = {}, supportedType = {"tsv"}, param_data=""):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "TSV to Md."

@@ -5,7 +5,7 @@ from userAction.actionInterface import actionInterface
 class extractAction():
     """Parser Interface defines the minimum functions a parser needs to implement."""
     
-    def __init__(self, parsers = {}, supportedType = ["all","text"]):
+    def __init__(self, parsers = {}, supportedType = {"all","text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description="Extract all elements."

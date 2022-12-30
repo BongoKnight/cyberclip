@@ -12,11 +12,12 @@ class prependAction(actionInterface):
     A action module, to prepend data to a given text.
     Usefull for adding header to data.
     """ 
-    def __init__(self, parsers = {}, supportedType = ["text"]):
+    def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "Prepend text."
         self.results = {}
+        self.param = param_data
         
     def execute(self) -> object:
         """
@@ -40,5 +41,5 @@ if __name__=='__main__':
     from userTypeParser.TextParser import TextParser
     data = "b\nb\na"
     text_parser = TextParser(data)
-    a = str(sortAction([text_parser],["text"]))
+    a = str(prependAction([text_parser],["text"]))
     print(a)

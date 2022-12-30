@@ -18,6 +18,11 @@ class clipParser():
         self.actions = dict()
         self.parsers = dict()
         self.data = ""
+        self.parsers = dict()
+        self.actions = dict()
+        self.matches = {}
+        self.detectedType = set()
+
         logging.basicConfig(filename="log.log")
         self.log = logging.Logger("DataParser")
         self.ch = logging.StreamHandler()
@@ -89,8 +94,8 @@ class clipParser():
         self.data = data
         self.parsers = dict()
         self.actions = dict()
-        matches = {}
-        detectedType = []
+        self.matches = {}
+        self.detectedType = set()
 
         # Load all parsers
         parserModules = dict((name, m) for name, m
@@ -106,11 +111,11 @@ class clipParser():
                 if "Parser" in className:
                     instance = classes[className](data)
                     if instance.contains():
-                        matches.update({instance.parsertype: instance.extract()})
+                        self.matches.update({instance.parsertype: instance.extract()})
                         # Adding parser in a dict of all parsers relative to the input
                         self.parsers.update({instance.parsertype:instance})
                         self.log.debug("Paste contains {}".format(instance.parsertype))
-                        detectedType.append(instance.parsertype)
+                        self.detectedType.add(instance.parsertype)
 
         # Load all actions
         actionModules = dict((name, m) for name, m
@@ -130,8 +135,10 @@ class clipParser():
                         self.actions.update({instance.description : instance})
                         self.log.debug("Paste contains {}".format(instance.description))
 
-        self.results = {"matches" : matches, "detectedType" : detectedType, "actions": self.actions, "parsers":self.parsers}
+        self.results = {"matches" : self.matches, "detectedType" : self.detectedType, "actions": self.actions, "parsers":self.parsers}
         return self.results
+
+
 if __name__=='__main__':
     a = clipParser()
     a.log.level = logging.debug

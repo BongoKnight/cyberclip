@@ -10,7 +10,7 @@ from userTypeParser.ParserInterface import ParserInterface
 class actionInterface():
     """Parser Interface defines the minimum functions a parser needs to implement."""
     
-    def __init__(self, parsers={},supportedType= [], param_data: str =""):
+    def __init__(self, parsers={},supportedType= {}, param_data: str =""):
         """
         parsers is a list of objects that implements ParserInterface.
         supportedType is a list of type defined in the varaible `parsertype` that are supported by the current action.

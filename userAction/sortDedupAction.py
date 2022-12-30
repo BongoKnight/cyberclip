@@ -8,11 +8,12 @@ import os
 """A action module, to sort and deduplicates lines contained in the keyboard."""
 
 class sortDedupAction(actionInterface):    
-    def __init__(self, parsers = {}, supportedType = ["text"]):
+    def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "Sort and deduplicate lines."
         self.results = {}
+        self.param = param_data
         
     def execute(self) -> object:
         """Execute the action."""
