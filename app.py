@@ -61,11 +61,12 @@ class ContentView(Static):
                     action_button.visible = False
                     action_button.add_class("no-height")
 
-    def watch_text(self, old_text: str, new_text) -> None:
+    def watch_text(self, new_text: str) -> None:
         """Called when the text attribute changes."""   
-        self.query_one(Static).update(new_text)
         self.parser.parseData(new_text)
         parser_types = self.parser.detectedType
+        self.query_one(Static).update(new_text)
+        
 
         # Update detected type buttons
         buttons = self.ancestors[-1].query(DataTypeButton)
@@ -79,12 +80,16 @@ class ContentView(Static):
         for action in self.ancestors[-1].query(ActionButton):
             existing_action.add(action.action_name)
             # Reset action supported type
-            action.action.supportedType = action.action_supported_type
+            
 
         # Add inexisting action buttons
         for action_name, action in self.parser.actions.items():
             if  action_name not in existing_action:
                 self.ancestors[-1].query_one(ActionPannel).add_action(action)
+
+        for action in self.ancestors[-1].query(ActionButton):
+            action.action.supportedType = action.action_supported_type
+            action.action.parsers = self.parser.parsers
 
         # Filter action on existing active datatype
         self.filter_action()
@@ -163,7 +168,7 @@ class ActionButton(Static):
             if mainApp:
                 if self.parent.ancestors[-1].query_one("#param-input").value:
                     self.action.param = self.parent.ancestors[-1].query_one("#param-input").value
-                self.parent.ancestors[-1].query_one("#param-input").value = self.action_name
+                self.parent.ancestors[-1].query_one("#param-input").value = ""
                 mainApp.text = str(self.action)
 
 
