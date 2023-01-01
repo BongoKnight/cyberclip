@@ -5,6 +5,7 @@ tools.py
 as.gz
 mittre.json
 __pycache__/
+data/conf.yml
 *.pyc
 log.log
 userAction/private/*
