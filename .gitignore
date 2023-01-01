@@ -6,7 +6,6 @@ as.gz
 mittre.json
 __pycache__/
 *.pyc
-data/conf.yml
 log.log
 userAction/private/*
 !userAction/private/__init__.py

@@ -29,7 +29,7 @@ class sortDedupAction(actionInterface):
         if self.results.get("text"):
             lines = self.results.get("text")[0].splitlines()
             if set(["int","num","version"]) & set(self.param.split(",")):
-                lines = sorted(lines, key=lambda s: int(re.search(r'^\d', s).group()) if re.search(r'^\d', s) else 0)       
+                lines = sorted(lines, key=lambda s: int(re.search(r'^\d+', s).group()) if re.search(r'^\d+', s) else 0)       
             if set(["desc","rev","reverse"]) & set(self.param.split(",")):
                 lines.sort(reverse=True)
             else:

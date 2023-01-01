@@ -16,11 +16,12 @@ from rich.syntax import Syntax
 from rich.traceback import Traceback
 
 from textual import events
-from textual.app import App, ComposeResult
+from textual.app import App, ComposeResult, Screen
 from textual.containers import Container, Vertical, Horizontal
 from textual.reactive import var, reactive
 from textual.widgets import Footer, Header, Static, Placeholder, Button, Input, Checkbox
 from textual.widget import Widget
+from tui.ConfigScreen import ConfigScreen
 
 class ContentView(Static):
     text= reactive("Waiting for Update...")
@@ -210,15 +211,14 @@ class ActionPannel(Static):
 
 class ClipBrowser(App):
     """Textual clipboard browser app."""
-
+    SCREENS = {"conf": ConfigScreen()}
     CSS_PATH = "app.css"
     BINDINGS = [
         ("ctrl+s", "save", "Save actual view."),
         ("ctrl+q", "quit", "Quit"),
         ("ctrl+b", "copy", "Copy actual content to clipboard."),
         ("ctrl+r", "reset", "Reset content view to clipboard content."),
-
-
+        ("ctrl+e", "push_screen('conf')", "Edit config")
     ]
 
     def compose(self) -> ComposeResult:

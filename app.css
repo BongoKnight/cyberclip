@@ -76,3 +76,19 @@ Button{
     width: 100%;
     height:3;
 }
+
+ConfigScreen{
+    layout: vertical
+}
+
+ConfigInput {
+    height: 3;
+}
+
+#conf-name{
+    width: 20;
+}
+#conf-input{
+    min-width: 50%;
+    width: auto;
+}
