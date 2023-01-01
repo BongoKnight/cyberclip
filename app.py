@@ -38,7 +38,7 @@ class ContentView(Static):
         actionView = self.parent.ancestors[-1].query_one(ActionPannel)
         if actionView:
             actions = actionView.query(ActionButton)
-            actual_detected_type = self.parser.detectedType
+            actual_detected_type = set(self.parser.detectedType)
             for datatype_button in self.parent.ancestors[-1].query(DataTypeButton):
                 # Update actions supported_type and hide action buttons where no type are supported
                 if datatype_button.query(Checkbox):
@@ -49,7 +49,8 @@ class ContentView(Static):
                                 action_button.action.supportedType.add(datatype_button.parser_type)
                     else:
                         for action_button in actions:
-                            action_button.action.supportedType.discard(datatype_button.parser_type)
+                            if datatype_button.parser_type in action_button.action_supported_type:
+                                action_button.action.supportedType.discard(datatype_button.parser_type)
                 
             for action_button in actions:
                 if  (len(action_button.action.supportedType.intersection(actual_detected_type)) >=1
@@ -77,10 +78,10 @@ class ContentView(Static):
             self.ancestors[-1].query_one(DataLoader).add_dataType(type_of_data)
 
         existing_action = set()
-        for action in self.ancestors[-1].query(ActionButton):
-            existing_action.add(action.action_name)
-            # Reset action supported type
-            
+        for action_name, action in self.parser.actions.items():
+            for action_button in self.ancestors[-1].query(ActionButton):
+                if action_button.action_name == action_name:
+                    existing_action.add(action_name)            
 
         # Add inexisting action buttons
         for action_name, action in self.parser.actions.items():
@@ -88,7 +89,7 @@ class ContentView(Static):
                 self.ancestors[-1].query_one(ActionPannel).add_action(action)
 
         for action in self.ancestors[-1].query(ActionButton):
-            action.action.supportedType = action.action_supported_type
+            action.action.supportedType = set(action.action_supported_type)
             action.action.parsers = self.parser.parsers
 
         # Filter action on existing active datatype
@@ -189,9 +190,8 @@ class ActionPannel(Static):
 
     def on_input_changed(self, event: Input.Changed) -> None:
         actions = self.query(ActionButton)
+        mainApp = self.parent.ancestors[-1].query_one(ContentView).filter_action()
         for action in actions:
-            action.visible = True
-            action.remove_class("no-height")
             for word in event.value.split():
                 if not re.search(f"(?i){word}", action.action.description, re.IGNORECASE):
                     if not word in action.action.supportedType:
