@@ -1,6 +1,6 @@
 Misp:
-- auth: XOXOXXO
-- url: https://misp.com
+- auth: YOUR_API_KEY
+- url: YOUR_MISP_URL/attributes/restSearch
 Splunk:
 - url: https://splunk.internal/
 - base_search: fr-FR/app/search/search?dispatch.sample_ratio=1&q=

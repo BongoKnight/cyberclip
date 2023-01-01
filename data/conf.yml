@@ -1,6 +1,0 @@
-Misp:
-- auth: XOXOXXO
-- url: https://misp.com
-Splunk:
-- url: https://splunk.internal/
-- base_search: fr-FR/app/search/search?dispatch.sample_ratio=1&q=
