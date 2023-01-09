@@ -13,7 +13,10 @@ from dns import resolver
 A action module, to return reverse DNS for an IP, and DNS for a domain.
 """
 
-class DNSAction(actionInterface):    
+class DNSAction(actionInterface):
+    """
+    A action module, to return reverse DNS for an IP, and DNS for a domain.
+    """
     def __init__(self, parsers = {}, supportedType = {"ip","domain"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
@@ -37,7 +40,7 @@ class DNSAction(actionInterface):
 
     
     def __str__(self):
-        """Visual representation of the action"""
+        """Return result of DNS request for domain and of Reverse DNS for IP. For domain the type of NS reccord can be inputed as a parameter."""
         return  self.execute()
 
 if __name__=='__main__':

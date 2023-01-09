@@ -11,7 +11,7 @@ class sortDedupAction(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
-        self.description = "Sort and deduplicate lines."
+        self.description = "Deduplicate and sort lines."
         self.results = {}
         self.param = param_data
         
