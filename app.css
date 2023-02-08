@@ -8,19 +8,25 @@ Screen {
 }
 
 
+.small-button{
+    border: none;
+    height: auto;
+    width: auto;
+    min-width: 0;
+}
 
 #copy-button{
     layer: above;
     dock: right;
     align-vertical: top;
     background: rgb(0, 140, 255) 10%;
+    min-width: 18;
 }
 #next-button{
     layer: above;
     dock: right;
     align-vertical: top;
     margin-top: 3;
-    border: none;
     background: rgb(0, 140, 255) 10%;
 }
 #previous-button{
@@ -29,7 +35,6 @@ Screen {
     align-vertical: top;
     margin-top: 3;
     margin-right: 10;
-    border: none;
     background: rgb(0, 140, 255) 10%;
 }
 #filter-button{

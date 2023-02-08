@@ -34,8 +34,8 @@ class ContentView(Static):
         yield Vertical(
             Static(self.initial_text ,name="Content", id="clip-content"),
             Button("Copy", id="copy-button"),
-            Button(u"\u2190", id="previous-button"),
-            Button(u"\u2192", id="next-button"),
+            Button(u"\u2190 Undo", id="previous-button", classes="small-button"),
+            Button(u"Redo \u2192", id="next-button", classes="small-button"),
             Input(placeholder="Add data for custom action.",id="param-input")
         )
 
