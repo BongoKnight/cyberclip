@@ -8,8 +8,36 @@ Screen {
 }
 
 
-Button{
-    padding:0;
+
+#copy-button{
+    layer: above;
+    dock: right;
+    align-vertical: top;
+    background: rgb(0, 140, 255) 10%;
+}
+#next-button{
+    layer: above;
+    dock: right;
+    align-vertical: top;
+    margin-top: 3;
+    border: none;
+    background: rgb(0, 140, 255) 10%;
+}
+#previous-button{
+    layer: above;
+    dock: right;
+    align-vertical: top;
+    margin-top: 3;
+    margin-right: 10;
+    border: none;
+    background: rgb(0, 140, 255) 10%;
+}
+#filter-button{
+    width: 100%;
+}
+
+#copy-button:hover, #previous-button:hover, #next-button:hover {
+    background: rgb(0, 140, 255);
 }
 
 #content-view{

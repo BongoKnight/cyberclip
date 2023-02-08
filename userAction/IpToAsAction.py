@@ -58,9 +58,9 @@ class IpToAsAction(actionInterface):
                         infos = [str(info) for key, info in infos.items()]
                         infos = '\t'.join(infos)
                         lines.append(f"{ip}\t{infos}")
-                return "\n".join(lines)
+                return lines
             else:
-                return "\n".join(self.parsers.get("ip").objects)
+                return self.parsers.get("ip").objects
         else:
             return ""
 
@@ -68,7 +68,8 @@ class IpToAsAction(actionInterface):
     
     def __str__(self):
         """Visual representation of the action"""
-        return  self.execute()
+        lines = self.execute()
+        return "\n".join(lines)  
 
 if __name__=='__main__':
     from userTypeParser.IPParser import ipParser

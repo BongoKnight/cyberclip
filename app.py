@@ -27,11 +27,15 @@ class ContentView(Static):
     text= reactive("Waiting for Update...")
     parser = var(clipParser())
     initial_text = var(pyperclip.paste())
+    text_history = var([])
     
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader.""" 
         yield Vertical(
             Static(self.initial_text ,name="Content", id="clip-content"),
+            Button("Copy", id="copy-button"),
+            Button(u"\u2190", id="previous-button"),
+            Button(u"\u2192", id="next-button"),
             Input(placeholder="Add data for custom action.",id="param-input")
         )
 
@@ -65,11 +69,14 @@ class ContentView(Static):
 
     def watch_text(self, new_text: str) -> None:
         """Called when the text attribute changes."""   
+
+        if new_text not in self.text_history:
+            self.text_history.append(new_text)
+            self.text_history = self.text_history[-20:]
+        self.query_one("#clip-content").update(new_text)
+        
         self.parser.parseData(new_text)
         parser_types = self.parser.detectedType
-        self.query_one(Static).update(new_text)
-        
-
         # Update detected type buttons
         buttons = self.ancestors[-1].query(DataTypeButton)
         if buttons:             
@@ -96,7 +103,18 @@ class ContentView(Static):
         # Filter action on existing active datatype
         self.filter_action()
 
-    
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        button_id = event.button.id
+        if button_id == "copy-button":
+            pyperclip.copy(self.text)
+        elif button_id == "previous-button":
+            if self.text in self.text_history:
+                index = self.text_history.index(self.text)
+                self.text = self.text_history[max(0, index - 1)]
+        elif button_id == "next-button":
+            if self.text in self.text_history:
+                index = self.text_history.index(self.text)
+                self.text = self.text_history[min(len(self.text_history)-1, index + 1)]
 
 
 class DataTypeButton(Static):
@@ -134,13 +152,19 @@ class DataTypeButton(Static):
 
 class DataLoader(Static):
     """A dataLoader widget."""
+    select_all_datatype = var(True)
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Event handler called when a button is pressed."""
         if event.button.id == "update-button":
             self.data = pyperclip.paste()
             mainApp = self.ancestors[-1].query_one(ContentView)
             if mainApp: 
-                mainApp.text = self.data    
+                mainApp.text = self.data
+        if event.button.id == "filter-button":
+            self.select_all_datatype = not  self.select_all_datatype 
+            for checkbox in self.query(Checkbox):
+                checkbox.value = self.select_all_datatype
 
     def add_dataType(self, type_of_data: str) -> DataTypeButton:
         """An action to add a timer."""
@@ -150,9 +174,10 @@ class DataLoader(Static):
         new_datatype.parser_type = type_of_data 
 
     def compose(self) -> ComposeResult:
-        """Create child widgets of a dataLoader.""" 
+        """Create child widgets of a dataLoader."""
         yield Button("Reset", id="update-button", variant="success")
         yield Vertical(id="data-type-container")
+        yield Button("(Un)select all", id="filter-button", variant="primary")
 
 
 class ActionButton(Static):

@@ -30,12 +30,13 @@ class countAction(actionInterface):
         if self.results.get("text"):
             lines = self.results.get("text")[0].splitlines()
             counts = Counter(lines)
-            return "\n".join([f"{count}\t{line}" for line, count in counts.items()])
+            return counts
 
     
     def __str__(self):
         """Visual representation of the action"""
-        return  self.execute()
+        counts = self.execute()
+        return  "\n".join([f"{count}\t{line}" for line, count in counts.items()])
 
 if __name__=='__main__':
     from userTypeParser.TextParser import TextParser

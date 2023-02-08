@@ -20,9 +20,12 @@ class actionInterface():
         self.description = "Quick description of the action."
         self.param = param_data
         
-    def execute(self) -> object:
-        """Execute the action"""
-        return None
+    def execute(self) -> dict:
+        """Execute the action
+        
+        Return a dict of matches and values.
+        """
+        return {}
     
     def __str__(self):
         """Visual representation of the action"""

@@ -18,26 +18,28 @@ class baseUrlAction(actionInterface):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "To base URL"
-        self.results = {}
+        self.results = {} 
+        self.base_url = {}
         self.param = param_data
         
     def execute(self) -> object:
         """Execute the action."""
-        lines = []
+        self.base_url = {}
+        self.results = {}
         for parser_name, parser in self.parsers.items():
             if parser.parsertype in self.supportedType:
                 self.results[parser.parsertype]=parser.extract()
         if self.results.get("url"):
-            lines+= [f"https://{urllib.parse.urlparse(url).netloc}" for url in self.results.get("domain")]
+            self.base_url.update({url:f"https://{urllib.parse.urlparse(url).netloc}" for url in self.results.get("url")})
         if self.results.get("domain"):
-            lines+= [f"https://{domain}" for domain in self.results.get("domain")]
-        lines.sort()
-        return "\n".join([i for i in lines if i!=""])
+            self.base_url.update({domain:f"https://{domain}" for domain in self.results.get("domain")})
+        return self.base_url
 
     
     def __str__(self):
         """Visual representation of the action"""
-        return  self.execute()
+        self.execute()
+        return  "\n".join([value for key, value in self.base_url.items() if value!=""])
 
 if __name__=='__main__':
     from userTypeParser.domainParser import domainParser
