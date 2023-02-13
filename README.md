@@ -45,6 +45,7 @@ Showed data can be exported to clipboard or to a file.
 	- [x] Domain and Url to base URL
 	- [x] Domain to IP
 	- [x] IP to ASN
+	- [x] Extract elements from HTML
 	- [ ] Markdown Table to TSV
 	- [x] Mitre description
 	- [ ] Prepend per line

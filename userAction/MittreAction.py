@@ -31,7 +31,7 @@ except Exception as e:
 
 class MitreAction(actionInterface):
     """
-    A action module, to crop data to only the N first lines.
+    A action module, to explain Mitre Att&ck TTP Code.
     """
     def __init__(self, parsers = {}, supportedType = {"mitre"}, param_data=""):
         self.supportedType = supportedType

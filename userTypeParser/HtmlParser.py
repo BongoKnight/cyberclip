@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from userTypeParser.ParserInterface import ParserInterface
 
 
-class MitreParser(ParserInterface):
+class HtmlParser(ParserInterface):
     """Parser for Mitre Att&ck TTP."""
     
     
