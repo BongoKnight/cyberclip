@@ -29,12 +29,17 @@ Showed data can be exported to clipboard or to a file.
 # To do
 
 - [x] Make a gitignore
+- [x] Add an history (Undo et Redo buttons)
+- [x] Filtering of types :
+	- [x] Button to filter actions per type
+	- [x] Button to (un)select all types at once
 - [ ] Write docs :
 	- [ ] For users
 	- [ ] For devs (how to write custom parsers/actions)
 - [ ] Add an help field to make a long description of action possible. (ie sort) 
 	- [ ] Use of  instance.execute/__str__.__doc__
 - [x] Wrap custom actions and UserTypeParser in a `private` dir
+- [ ]
 - [ ] Write `public` actions :
 	- [x] TSV to Markdown Table
 	- [x] Domain and Url to base URL
@@ -57,6 +62,8 @@ Showed data can be exported to clipboard or to a file.
 	- [ ] Url to Html
 	- [ ] Code Highlight
 - [ ] Custom parsers :
+	- [x] For HTML
+	- [ ] For JSON
 	- [ ] For tabular data (CSV, TSV, Markdown)
 		- [ ] Import in pandas dataframe
 			-[ ] Ok for TSV
@@ -73,7 +80,7 @@ Showed data can be exported to clipboard or to a file.
 - [ ] Make a domain and a host Parser, improve the domain parsing
 - [ ] Assync action results
 - [ ] Requirement.txt
-- [ ] Save action with file input.
+- [ ] Save action with file input (need to implement modal, have to check textual discord).
 - [ ] Write python script/template to generate custom Parser/Action
 
 # Thanks to and similar project:

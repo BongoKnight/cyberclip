@@ -14,12 +14,12 @@ class URLOpenAction(actionInterface):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "Open URL in browser."
-        self.results = {}
         self.param = param_data
         
     def execute(self) -> object:
         """Execute the action."""
         lines = []
+        self.results = {}
         for parser_name, parser in self.parsers.items():
             if parser.parsertype in self.supportedType:
                 self.results[parser.parsertype]=parser.extract()

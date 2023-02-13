@@ -24,6 +24,7 @@ class countAction(actionInterface):
     def execute(self) -> object:
         """Execute the action."""
         lines = []
+        self.results = {}
         for parser_name, parser in self.parsers.items():
             if parser.parsertype in self.supportedType:
                 self.results[parser.parsertype]=parser.extract()

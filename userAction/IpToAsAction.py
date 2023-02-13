@@ -43,7 +43,7 @@ class IpToAsAction(actionInterface):
         
     def execute(self) -> object:
         """Execute the action."""
-        lines = []
+        self.results = {}
         if self.parsers.get("ip"):
             if len(AS_DB.columns):
                 ips = self.parsers.get("ip").extract()
@@ -55,10 +55,8 @@ class IpToAsAction(actionInterface):
                         infos.update({"min_ip": str(ipaddress.ip_address(infos.get("min_ip",0))),
                                 "max_ip": str(ipaddress.ip_address(infos.get("max_ip",0))),
                                 "as_num":"AS"+str(infos.get("as_num"))})
-                        infos = [str(info) for key, info in infos.items()]
-                        infos = '\t'.join(infos)
-                        lines.append(f"{ip}\t{infos}")
-                return lines
+                        self.results.update({ip:infos})
+                return self.results
             else:
                 return self.parsers.get("ip").objects
         else:
@@ -68,7 +66,11 @@ class IpToAsAction(actionInterface):
     
     def __str__(self):
         """Visual representation of the action"""
-        lines = self.execute()
+        results = self.execute()
+        lines = []
+        for ip, infos in results.items():
+            infos_str = "\t".join([str(info) for key, info in infos.items()])
+            lines.append(f"{ip}\t{infos_str}")
         return "\n".join(lines)  
 
 if __name__=='__main__':
