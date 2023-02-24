@@ -1,8 +1,8 @@
 """Implementation of ParserInterface for HTML strings.
 
 Code exemple ::
-    a = URLParser("dsfsd sdfsdf sdfsdhj j")
-    b = URLParser("Hello, <b>world</b>")
+    a = HtmlParser("dsfsd sdfsdf sdfsdhj j")
+    b = HtmlParser("Hello, <b>world</b>")
     print(a.extract(), a.contains())
     print(b.extract(), b.contains())
 
@@ -40,12 +40,16 @@ class HtmlParser(ParserInterface):
     
     def extract(self):
         """Return the whole text as object."""
-        self.objects = [self.text]
+        html_entries = BeautifulSoup(self.text, "html.parser").select("html")
+        if len(html_entries)>1:
+            self.objects = [str(html_entry) for html_entry in html_entries]
+        else:
+            self.objects = [self.text]
         return self.objects
         
         
 if __name__=="__main__":
-    a = MitreParser("dsfsd sdfsdf sdfsdhj j")
-    b = MitreParser("T1012, T1016, T1027, T1033, T1059, T1059.001, T1059.005, T1082,T1083, T1087, T1095, T1112, T1140, T1547.001, T1547.009, T1560, T1566.001).")
+    a = HtmlParser("dsfsd sdfsdf sdfsdhj j")
+    b = HtmlParser("Hello, <b>world</b>")
     print(a.extract(), a.contains())
     print(b.extract(), b.contains())

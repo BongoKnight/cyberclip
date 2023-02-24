@@ -8,7 +8,7 @@ class HtmlExtractAction(actionInterface):
     """
     A action module to extract data from an HTML document.
     """
-    def __init__(self, parsers = {}, supportedType = {"html"}, param_data=""):
+    def __init__(self, parsers = {}, supportedType = {"html"}, param_data="html"):
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "Extract from HTML with CSS selector"
