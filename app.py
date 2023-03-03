@@ -19,7 +19,7 @@ from textual import events
 from textual.app import App, ComposeResult, Screen
 from textual.containers import Container, Vertical, Horizontal
 from textual.reactive import var, reactive
-from textual.widgets import Footer, Header, Static, Placeholder, Button, Input, Checkbox
+from textual.widgets import Footer, Header, Static, Placeholder, Button, Input, Switch
 from textual.widget import Widget
 from tui.ConfigScreen import ConfigScreen
 
@@ -46,8 +46,8 @@ class ContentView(Static):
             actual_detected_type = set(self.parser.detectedType)
             for datatype_button in self.parent.ancestors[-1].query(DataTypeButton):
                 # Update actions supported_type and hide action buttons where no type are supported
-                if datatype_button.query(Checkbox):
-                    if datatype_button.query(Checkbox)[0].value:
+                if datatype_button.query(Switch):
+                    if datatype_button.query(Switch)[0].value:
                         for action_button in actions:
                             # Add the supported type if the default action support it.
                             if datatype_button.parser_type in action_button.action_supported_type:
@@ -125,7 +125,7 @@ class DataTypeButton(Static):
         """Create child widgets of a dataType.""" 
         yield Horizontal(
              Button(self.parser_type, id="datatype-button", classes=""),
-             Checkbox(value=True, id="datatype-active")
+             Switch(value=True, id="datatype-active")
              )
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -137,8 +137,8 @@ class DataTypeButton(Static):
                 mainApp.filter_action()
 
 
-    def on_checkbox_changed(self, event: Checkbox.Changed) -> None:
-        """Event handler called when checkbox is pressed."""
+    def on_switch_changed(self, event: Switch.Changed) -> None:
+        """Event handler called when Switch is pressed."""
         mainApp = self.parent.ancestors[-1].query_one(ContentView)
         mainApp.filter_action()
 
@@ -163,8 +163,8 @@ class DataLoader(Static):
                 mainApp.text = self.data
         if event.button.id == "filter-button":
             self.select_all_datatype = not  self.select_all_datatype 
-            for checkbox in self.query(Checkbox):
-                checkbox.value = self.select_all_datatype
+            for switch in self.query(Switch):
+                switch.value = self.select_all_datatype
 
     def add_dataType(self, type_of_data: str) -> DataTypeButton:
         """An action to add a timer."""

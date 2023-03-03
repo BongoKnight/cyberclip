@@ -1,10 +1,9 @@
 import yaml
 from yaml.loader import SafeLoader
-from textual import events
 from textual.app import App, ComposeResult, Screen
-from textual.containers import Container, Vertical, Horizontal
+from textual.containers import Horizontal
 from textual.reactive import var, reactive
-from textual.widgets import Footer, Header, Static, Placeholder, Button, Input, Checkbox
+from textual.widgets import Footer, Static, Input
 from pathlib import Path
 from rich.markdown import Markdown
 
