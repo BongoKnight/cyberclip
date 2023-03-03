@@ -55,16 +55,19 @@ Showed data can be exported to clipboard or to a file.
 	- [x] Stats/Counts per lines
 	- [x] Reverse sort 
 	- [ ] Search in MISP
-	- [ ] Search in OpenCTI
+	- [x] Search in OpenCTI
 	- [ ] Search in Yeti
 	- [x] Select top N lines
 	- [x] URL open
 	- [ ] Url redirect
-	- [ ] Url to Html
+	- [x] Url to Html
+	- [x] HTML filtering with CSS selectors
+	- [ ] JSON filtering with pyjq
 	- [ ] Code Highlight
 - [ ] Custom parsers :
 	- [x] For HTML
 	- [ ] For JSON
+	- [ ] For Yaml
 	- [ ] For tabular data (CSV, TSV, Markdown)
 		- [ ] Import in pandas dataframe
 			-[ ] Ok for TSV
@@ -78,7 +81,7 @@ Showed data can be exported to clipboard or to a file.
 	- [x] For AS Number
 		- [ ] AS to Regex
 		- [ ] AS range
-- [ ] Make a domain and a host Parser, improve the domain parsing
+- [x] Make a domain and a host Parser, improve the domain parsing
 - [ ] Assync action results
 - [ ] Requirement.txt
 - [ ] Save action with file input (need to implement modal, have to check textual discord).

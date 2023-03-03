@@ -12,15 +12,10 @@ import re
 
 from clipParser import clipParser
 from userAction.actionInterface import actionInterface
-from rich.syntax import Syntax
-from rich.traceback import Traceback
-
-from textual import events
-from textual.app import App, ComposeResult, Screen
-from textual.containers import Container, Vertical, Horizontal
+from textual.app import App, ComposeResult
+from textual.containers import  Vertical, Horizontal
 from textual.reactive import var, reactive
-from textual.widgets import Footer, Header, Static, Placeholder, Button, Input, Switch
-from textual.widget import Widget
+from textual.widgets import Footer, Static,  Button, Input, Switch
 from tui.ConfigScreen import ConfigScreen
 
 class ContentView(Static):
