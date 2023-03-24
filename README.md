@@ -39,7 +39,11 @@ Showed data can be exported to clipboard or to a file.
 - [ ] Add an help field to make a long description of action possible. (ie sort) 
 	- [ ] Use of  instance.execute/__str__.__doc__
 - [x] Wrap custom actions and UserTypeParser in a `private` dir
-- [ ]
+- [ ] As the view container is a Static, it could accept a renderable widget as action result... It might be a way to make scripts with more interractions :
+	- [ ] Action to render text as Markdown
+	- [ ] Action to render table in DataTable widget (with custom action to copy colum or row)
+	- [ ] Regex Highlight
+	- [ ] Code Highlight
 - [ ] Write `public` actions :
 	- [x] TSV to Markdown Table
 	- [x] Domain and Url to base URL
@@ -59,18 +63,17 @@ Showed data can be exported to clipboard or to a file.
 	- [ ] Search in Yeti
 	- [x] Select top N lines
 	- [x] URL open
-	- [ ] Url redirect
+	- [ ] Url redirect chain
 	- [x] Url to Html
 	- [x] HTML filtering with CSS selectors
-	- [ ] JSON filtering with pyjq
-	- [ ] Code Highlight
+	- [ ] JSON filtering with pyjq (installing not straightforward in Windows need to check for other options...)
 - [ ] Custom parsers :
 	- [x] For HTML
-	- [ ] For JSON
-	- [ ] For Yaml
+	- [x] For JSON
+	- [x] For Yaml
 	- [ ] For tabular data (CSV, TSV, Markdown)
 		- [ ] Import in pandas dataframe
-			-[ ] Ok for TSV
+			-[x] Ok for TSV
 		- [ ] (WIP) Allow enrichment of dataframe (Another UI for entering the conf?) (and so of it's visual representation)
 			- [ ] From SQLite
 			- [ ] From CSV
