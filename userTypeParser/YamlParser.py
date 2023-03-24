@@ -1,24 +1,24 @@
-"""Implementation of ParserInterface for JSON strings.
+"""Implementation of ParserInterface for Yaml strings.
 
 Code exemple ::
-    a = JsonParser("ccdf ")
-    b = JsonParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    a = YamlParser("ccdf ")
+    b = YamlParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     print(a.extract(), a.contains())
     print(b.extract(), b.contains())
 
 """
 import logging
-import json
+import yaml
 from userTypeParser.ParserInterface import ParserInterface
 
 
-class JSONParser(ParserInterface):
-    """Parser for Json, use json.loads"""
+class YamlParser(ParserInterface):
+    """Parser for Yaml, use yaml.safe_load"""
     
-    def __init__(self, text: str, parsertype="json", loglevel = logging.INFO):
+    def __init__(self, text: str, parsertype="yaml", loglevel = logging.INFO):
         self.text = text
-        self.parsertype = "json"
-        self.log = logging.Logger("json")
+        self.parsertype = "yaml"
+        self.log = logging.Logger("yaml")
         ch = logging.StreamHandler()
         ch.setLevel(loglevel)
         # create formatter
@@ -28,10 +28,10 @@ class JSONParser(ParserInterface):
         self.log.addHandler(ch)
         
     def contains(self):
-        """Return true if text contains JSON valid data"""
+        """Return true if text contains Yaml valid data"""
         try:
-            valid_json = json.loads(self.text)
-            if valid_json :
+            valid_yaml = yaml.safe_load(self.text)
+            if not isinstance(valid_yaml, str):
                 return True
         except :
             return False
@@ -41,14 +41,20 @@ class JSONParser(ParserInterface):
     def extract(self):
         """Return all JSON contained in text."""
         try:
-            self.objects = json.loads(self.text)
+            self.objects = yaml.safe_load(self.text)
+            if isinstance(self.objects, str):
+                self.objects = []
         except :
             self.objects = []
         return [str(self.objects)]
         
         
 if __name__=="__main__":
-    a = JSONParser('{"a":"1"}')
-    b = JSONParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    a = YamlParser("""
+- 'eric'
+- 'justin'
+- 'mary-kate'
+    """)
+    b = YamlParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     print(a.extract(), a.contains())
     print(b.extract(), b.contains())

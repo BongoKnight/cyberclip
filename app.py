@@ -27,7 +27,7 @@ class ContentView(Static):
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader.""" 
         yield Vertical(
-            Static(self.initial_text ,name="Content", id="clip-content"),
+            Static(self.initial_text ,name="Content", id="clip-content", markup=False),
             Button("Copy", id="copy-button"),
             Button(u"\u21A9 Undo", id="previous-button", classes="small-button"),
             Button(u"Redo \u21AA", id="next-button", classes="small-button"),
