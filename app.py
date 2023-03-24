@@ -68,7 +68,7 @@ class ContentView(Static):
         if new_text not in self.text_history:
             self.text_history.append(new_text)
             self.text_history = self.text_history[-20:]
-        self.query_one("#clip-content").update(new_text)
+        self.query_one("#clip-content").update(str(new_text))
         
         self.parser.parseData(new_text)
         parser_types = self.parser.detectedType

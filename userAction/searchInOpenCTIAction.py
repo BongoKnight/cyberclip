@@ -35,7 +35,11 @@ class searchInOpenCTIAction(actionInterface):
                 self.conf = dict(conf)
         api_url = self.conf.get("api_url","")
         api_key = self.conf.get("api_key","")
-        self.api = pycti.OpenCTIApiClient(api_url, api_key)
+        try:
+            self.api = pycti.OpenCTIApiClient(api_url, api_key)
+        except:
+            print("OpenCTI is not reachable.")
+            self.api = None
 
         
     def execute(self) -> object:
@@ -43,7 +47,7 @@ class searchInOpenCTIAction(actionInterface):
         
         Sample config:
 
-        Splunk:
+        OpenCTI:
         - api_url: https://opencti.internal/graphql
         - api_key: <UUID API Key>
         """
