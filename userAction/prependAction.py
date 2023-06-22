@@ -10,8 +10,9 @@ import os
 class prependAction(actionInterface):   
     """
     A action module, to prepend data to a given text.
-    Usefull for adding header to data.
-    """ 
+    Usefull for adding header to data. Add the text to add as a param.
+    """
+
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers

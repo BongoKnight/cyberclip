@@ -10,7 +10,7 @@ import re
 
 class toMarkdownAction(actionInterface):   
     """
-    A action module, to crop data to only the N first lines.
+    A action module, to transform a TSV data to a Markdown table.
     """ 
     def __init__(self, parsers = {}, supportedType = {"tsv"}, param_data=""):
         self.supportedType = supportedType

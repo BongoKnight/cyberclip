@@ -7,6 +7,11 @@ Screen {
     grid-gutter: 1;
 }
 
+#clip-content{
+    overflow-y: scroll;
+    height: 100%;
+    width: 100%;
+}
 
 .small-button{
     border: none;
@@ -50,6 +55,7 @@ Screen {
     column-span: 3;
     row-span: 5;
     height: 100%;
+
 }
 .no-height{
     height: 0;

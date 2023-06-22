@@ -3,7 +3,7 @@ from userAction.actionInterface import actionInterface
 """A sample action module, that extract match from all parsers."""
 
 class extractAction():
-    """Parser Interface defines the minimum functions a parser needs to implement."""
+    """Extract all the instance for the given parsers."""
     
     def __init__(self, parsers = {}, supportedType = {"all","text"}, param_data: str =""):
         self.supportedType = supportedType

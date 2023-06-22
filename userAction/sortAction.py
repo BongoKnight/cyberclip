@@ -3,16 +3,17 @@ try:
 except:
     from actionInterface import actionInterface
 
-import os
 import re
-"""
-A action module, to sort lines contained in the keyboard.
-    - if desc or reverse in param revert the order
-    - if num in param sort by number
-"""
 
 
-class sortDedupAction(actionInterface):    
+class sortAction(actionInterface):    
+    """
+    A action module, to sort lines of a text.
+    Parameter can be passed over : 
+        - if desc or reverse in param revert the order
+        - if num in param sort by number
+    """
+
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers

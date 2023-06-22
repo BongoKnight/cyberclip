@@ -7,7 +7,11 @@ from bs4 import BeautifulSoup
 class HtmlExtractAction(actionInterface):
     """
     A action module to extract data from an HTML document.
+    For example :
+        `td > b` : Extract all the bold text inside a table
+        `#password` : Extract all the HtmlTags with the #password id 
     """
+
     def __init__(self, parsers = {}, supportedType = {"html"}, param_data="html"):
         self.supportedType = supportedType
         self.parsers = parsers

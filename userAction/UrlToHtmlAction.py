@@ -7,7 +7,9 @@ import requests
 class UrlToHtmlAction(actionInterface):
     """
     A action module to recover HTML from an URL.
+    Perform a get request on the URL with a desktop-like User-Agent.
     """
+
     def __init__(self, parsers = {}, supportedType = {"url"}, param_data=""):
         self.supportedType = supportedType
         self.parsers = parsers

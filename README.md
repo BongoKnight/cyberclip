@@ -36,8 +36,8 @@ Showed data can be exported to clipboard or to a file.
 - [ ] Write docs :
 	- [ ] For users
 	- [ ] For devs (how to write custom parsers/actions)
-- [ ] Add an help field to make a long description of action possible. (ie sort) 
-	- [ ] Use of  instance.execute/__str__.__doc__
+- [x] Add an help field to make a long description of action possible. (ie sort) 
+	- [x] Use of  instance.execute/__str__.__doc__
 - [x] Wrap custom actions and UserTypeParser in a `private` dir
 - [ ] As the view container is a Static, it could accept a renderable widget as action result... It might be a way to make scripts with more interractions :
 	- [ ] Action to render text as Markdown
@@ -52,7 +52,9 @@ Showed data can be exported to clipboard or to a file.
 	- [x] Extract elements from HTML
 	- [ ] Markdown Table to TSV
 	- [x] Mitre description
-	- [ ] Prepend per line
+	- [x] Prepend per line
+	- [x] Append per line
+	- [x] Regex select or unselect
 	- [ ] Regex Highlighter
 	- [ ] Regex substitution
 	- [x] Remove empty lines (Filter with [^.])
@@ -60,7 +62,7 @@ Showed data can be exported to clipboard or to a file.
 	- [x] Reverse sort 
 	- [ ] Search in MISP
 	- [x] Search in OpenCTI
-	- [ ] Search in Yeti
+	- [x] Search in Yeti
 	- [x] Select top N lines
 	- [x] URL open
 	- [ ] Url redirect chain

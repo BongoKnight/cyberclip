@@ -2,15 +2,14 @@ try:
     from userAction.actionInterface import actionInterface
 except:
     from actionInterface import actionInterface
-
-import os
 import re
-"""
-A action module to filter lines on match regex
-"""
-
 
 class regexFilterAction(actionInterface):    
+    """
+    A action module to filter lines matching a regex.
+    Enter the regex as a param.
+    """
+
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data=""):
         self.supportedType = supportedType
         self.parsers = parsers

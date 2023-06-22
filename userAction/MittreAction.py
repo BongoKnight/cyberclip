@@ -32,7 +32,9 @@ except Exception as e:
 class MitreAction(actionInterface):
     """
     A action module, to explain Mitre Att&ck TTP Code.
+    Return the name, and the Mitre URL of a tactic.
     """
+
     def __init__(self, parsers = {}, supportedType = {"mitre"}, param_data=""):
         self.supportedType = supportedType
         self.parsers = parsers
@@ -49,10 +51,6 @@ class MitreAction(actionInterface):
             return Mitre_DB[Mitre_DB['mitre_id'].isin(mitre_techniques)]
         else:
             return pd.DataFrame(columns=["mitre_id","name","mitre_url"])
-
-
-
-
     
     def __str__(self):
         """Visual representation of the action"""

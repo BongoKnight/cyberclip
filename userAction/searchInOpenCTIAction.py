@@ -14,8 +14,14 @@ import pycti
 """A action module, to open search observables contained in a text in an OpenCTI instance."""
 
 class searchInOpenCTIAction(actionInterface):
-    """Parser Interface defines the minimum functions a parser needs to implement."""
+    """Search all type of observables with the openCTI API. The configuration is passed in the config file.
     
+    A configuration is neeeded : 
+
+    OpenCTI:
+    - api_url: https://opencti.internal/graphql
+    - api_key: <UUID API Key>
+    """    
     def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url","md5"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
@@ -43,14 +49,6 @@ class searchInOpenCTIAction(actionInterface):
 
         
     def execute(self) -> object:
-        """Search all type of observables with the openCTI API. The configuration is passed in the config file.
-        
-        Sample config:
-
-        OpenCTI:
-        - api_url: https://opencti.internal/graphql
-        - api_key: <UUID API Key>
-        """
         self.lines = []
         self.results = {}
         for parser_name, parser in self.parsers.items():

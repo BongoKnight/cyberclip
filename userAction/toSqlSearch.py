@@ -3,15 +3,16 @@ try:
 except:
     from actionInterface import actionInterface
 
-import os
+class toSqlSearch(actionInterface):    
+    """A action module, to transform lines to an Python list or an IN SQL querry.
+    For example if the text contain two lines with : a and b
+    It will return "a","b".
+    """
 
-"""A action module, to open transform lines to SQL IN querrie"""
-
-class sortAction(actionInterface):    
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
-        self.description = "To SQL search"
+        self.description = "Python List/To SQL search"
         self.results = {}
         self.param = param_data
         

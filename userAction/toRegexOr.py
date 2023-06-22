@@ -3,11 +3,12 @@ try:
 except:
     from actionInterface import actionInterface
 
-import os
-
-"""A action module, to open transform lines to SQL IN querrie"""
-
 class regexOrAction(actionInterface):    
+    """A action module, to transform lines to an OR regex
+    For example if the text contain two lines with : a and b
+    It will return a|b.
+    """
+
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers

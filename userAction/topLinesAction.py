@@ -12,6 +12,7 @@ class toplLinesAction(actionInterface):
     """
     A action module to crop data to only the N first lines.
     """
+    
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data="10"):
         self.supportedType = supportedType
         self.parsers = parsers

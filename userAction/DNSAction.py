@@ -9,10 +9,6 @@ import socket
 import dns
 from dns import resolver
 
-"""
-A action module, to return reverse DNS for an IP, and DNS for a domain.
-"""
-
 class DNSAction(actionInterface):
     """
     A action module, to return reverse DNS for an IP, and DNS for a domain.
@@ -26,7 +22,7 @@ class DNSAction(actionInterface):
         self.param = param_data
         
     def execute(self) -> object:
-        """Execute the action."""
+        """A action module, to return reverse DNS for an IP, and DNS for a domain."""
         self.results = {}
         self.dns_results = {}
         for parser_name, parser in self.parsers.items():

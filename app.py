@@ -13,12 +13,12 @@ import re
 from clipParser import clipParser
 from userAction.actionInterface import actionInterface
 from textual.app import App, ComposeResult
-from textual.containers import  Vertical, Horizontal
+from textual.containers import  Vertical, Horizontal, ScrollableContainer
 from textual.reactive import var, reactive
 from textual.widgets import Footer, Static,  Button, Input, Switch
 from tui.ConfigScreen import ConfigScreen
 
-class ContentView(Static):
+class ContentView(ScrollableContainer):
     text= reactive("Waiting for Update...")
     parser = var(clipParser())
     initial_text = var(pyperclip.paste())
@@ -137,14 +137,6 @@ class DataTypeButton(Static):
         mainApp = self.parent.ancestors[-1].query_one(ContentView)
         mainApp.filter_action()
 
-    
-
-                
-                        
-
-                
-
-
 class DataLoader(Static):
     """A dataLoader widget."""
     select_all_datatype = var(True)
@@ -183,6 +175,9 @@ class ActionButton(Static):
     def compose(self) -> ComposeResult:
         yield Button(self.action_name, id="action-button", classes="")
     
+    def on_mount(self) -> None:
+            self.query_one(Button).tooltip = self.action.__doc__
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Event handler called when a  button is pressed."""
         if event.button.id == "action-button":
@@ -200,10 +195,9 @@ class ActionPannel(Static):
         yield Vertical(id="action-container")   
 
     def add_action(self, action_module: actionInterface) -> ActionButton:
-        """An action to add a timer."""
         new_action = ActionButton()
         new_action.action = action_module
-        new_action.action_name = action_module.description    
+        new_action.action_name = action_module.description
         new_action.action_supported_type = set(action_module.supportedType)
         self.query_one("#action-container").mount(new_action)
         new_action.scroll_visible()
@@ -236,6 +230,7 @@ class ClipBrowser(App):
     BINDINGS = [
         ("ctrl+s", "save", "Save actual view."),
         ("ctrl+q", "quit", "Quit"),
+        ("ctrl+f", "filter", "Filter"),
         ("ctrl+b", "copy", "Copy actual content to clipboard."),
         ("ctrl+r", "reset", "Reset content view to clipboard content."),
         ("ctrl+e", "push_screen('conf')", "Edit config")
@@ -260,6 +255,9 @@ class ClipBrowser(App):
 
     def action_reset(self):
         self.query_one(ContentView).text = pyperclip.paste()
+
+    def action_filter(self):
+        self.query_one("#action-filter").focus()
         
 
 if __name__ == "__main__":

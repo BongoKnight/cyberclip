@@ -3,12 +3,8 @@ try:
 except:
     from actionInterface import actionInterface
 
-import os
-
-"""A action module, to open SARA item contained in the keyboard."""
-
 class URLOpenAction(actionInterface):
-    """Parser Interface defines the minimum functions a parser needs to implement."""
+    """Open all the URL with the default browser."""
     
     def __init__(self, parsers ={}, supportedType = {"url"}, param_data: str =""):
         self.supportedType = supportedType

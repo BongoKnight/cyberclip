@@ -5,9 +5,10 @@ except:
 
 import os
 
-"""A action module, to sort and deduplicates lines contained in the keyboard."""
 
-class sortDedupAction(actionInterface):    
+class sortDedupAction(actionInterface):
+    """A action module, to sort and deduplicates lines contained in the keyboard."""
+
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
