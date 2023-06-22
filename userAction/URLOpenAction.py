@@ -2,6 +2,7 @@ try:
     from userAction.actionInterface import actionInterface
 except:
     from actionInterface import actionInterface
+import os
 
 class URLOpenAction(actionInterface):
     """Open all the URL with the default browser."""
@@ -28,7 +29,6 @@ class URLOpenAction(actionInterface):
     def __str__(self):
         """Visual representation of the action"""
         return self.execute()
-
 
 if __name__=='__main__':
     from userTypeParser.URLParser import URLParser

@@ -5,15 +5,13 @@ except:
 
 from collections import Counter
 
-"""
-A action module, to count lines contained in a text.
-
-Return :
-    <number_of_occurences>\t<occurence>
-"""
-
-
 class countAction(actionInterface):    
+    """
+    A action module, to count lines contained in a text.
+
+    Return :
+        <number_of_occurences>\t<occurence>
+    """
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers

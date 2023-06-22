@@ -46,5 +46,5 @@ if __name__=='__main__':
     from userTypeParser.TextParser import TextParser
     data = "b\nb\na"
     text_parser = TextParser(data)
-    a = str(sortDedupAction({"text":text_parser},["text"]))
+    a = str(sortAction({"text":text_parser},["text"]))
     print(a)
