@@ -15,7 +15,7 @@ class appendEachLineAction(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
         self.supportedType = supportedType
         self.parsers = parsers
-        self.description = "Prepend text on each line."
+        self.description = "Append text on each line."
         self.results = {}
         self.param = param_data
         

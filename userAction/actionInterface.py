@@ -10,15 +10,18 @@ from userTypeParser.ParserInterface import ParserInterface
 class actionInterface():
     """Parser Interface defines the minimum functions a parser needs to implement."""
     
-    def __init__(self, parsers={},supportedType= {}, param_data: str =""):
+    def __init__(self, parsers={},supportedType= {}):
         """
         parsers is a list of objects that implements ParserInterface.
         supportedType is a list of type defined in the varaible `parsertype` that are supported by the current action.
+        param is a small textual parameter typically to pass to a simple script which is not mandatory, such as flags.
+        complex_param are used to generate a TUI to ask for them or can be entered as is, typically for file name, config, etc... 
         """
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "Quick description of the action."
-        self.param = param_data
+        self.param : str = ""
+        self.complex_param : dict = {} 
         
     def execute(self) -> dict:
         """Execute the action
@@ -30,3 +33,6 @@ class actionInterface():
     def __str__(self):
         """Visual representation of the action"""
         return self.execute()
+    
+    def get_complex_param():
+        pass

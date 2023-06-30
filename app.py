@@ -13,12 +13,12 @@ import re
 from clipParser import clipParser
 from userAction.actionInterface import actionInterface
 from textual.app import App, ComposeResult
-from textual.containers import  Vertical, Horizontal, ScrollableContainer
+from textual.containers import  Vertical, Horizontal, VerticalScroll, ScrollableContainer
 from textual.reactive import var, reactive
-from textual.widgets import Footer, Static,  Button, Input, Switch
+from textual.widgets import Footer, Static,  Button, Input, Switch, Label
 from tui.ConfigScreen import ConfigScreen
 
-class ContentView(ScrollableContainer):
+class ContentView(Static):
     text= reactive("Waiting for Update...")
     parser = var(clipParser())
     initial_text = var(pyperclip.paste())
@@ -27,11 +27,11 @@ class ContentView(ScrollableContainer):
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader.""" 
         yield Vertical(
-            Static(self.initial_text ,name="Content", id="clip-content", markup=False),
+            ScrollableContainer(Label(self.initial_text ,name="Content", id="clip-content", markup=False)),
             Button("Copy", id="copy-button"),
             Button(u"\u21A9 Undo", id="previous-button", classes="small-button"),
             Button(u"Redo \u21AA", id="next-button", classes="small-button"),
-            Input(placeholder="Add data for custom action.",id="param-input")
+            Input(placeholder="Add additional parameter for custom action.",id="param-input")
         )
 
     def filter_action(self):
@@ -163,7 +163,7 @@ class DataLoader(Static):
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader."""
         yield Button("Reset", id="update-button", variant="success")
-        yield Vertical(id="data-type-container")
+        yield VerticalScroll(id="data-type-container")
         yield Button("(Un)select all", id="filter-button", variant="primary")
 
 
@@ -192,7 +192,7 @@ class ActionButton(Static):
 class ActionPannel(Static):
     def compose(self) -> ComposeResult:
         yield Input(placeholder="Filter actions", id="action-filter")
-        yield Vertical(id="action-container")   
+        yield VerticalScroll(id="action-container")   
 
     def add_action(self, action_module: actionInterface) -> ActionButton:
         new_action = ActionButton()
@@ -226,7 +226,7 @@ class ActionPannel(Static):
 class ClipBrowser(App):
     """Textual clipboard browser app."""
     SCREENS = {"conf": ConfigScreen()}
-    CSS_PATH = "app.css"
+    CSS_PATH = "app.scss"
     BINDINGS = [
         ("ctrl+s", "save", "Save actual view."),
         ("ctrl+q", "quit", "Quit"),

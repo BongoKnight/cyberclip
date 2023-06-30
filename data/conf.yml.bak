@@ -7,3 +7,6 @@ Splunk:
 OpenCTI:
 - api_url: <OpenCTIUrl>/graphql
 - api_key: <AdminAPIKey UUID>
+Yeti:
+- url: http://127.0.0.1:5000
+- api-key: <api-key>
