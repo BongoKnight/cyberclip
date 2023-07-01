@@ -22,12 +22,9 @@ class searchInOpenCTIAction(actionInterface):
     - api_url: https://opencti.internal/graphql
     - api_key: <UUID API Key>
     """    
-    def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url","md5"}, param_data: str =""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+    def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url","md5"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Search all obsevables in OpenCTI."
-        self.results = {}
-        self.param = param_data
         self.lines = []
         self.config = {}
         with open(Path(__file__).parent / '../data/conf.yml', encoding="utf8") as f:
@@ -50,14 +47,11 @@ class searchInOpenCTIAction(actionInterface):
         
     def execute(self) -> object:
         self.lines = []
-        self.results = {}
-        for parser_name, parser in self.parsers.items():
-            if parser.parsertype in self.supportedType:
-                self.results[parser.parsertype]=parser.extract()
+        self.observables = self.get_observables()
         observables = []
         for obs_type in self.supportedType:
-            if self.results.get(obs_type,[]):
-                observables+= self.results.get(obs_type,[])
+            if self.observables.get(obs_type,[]):
+                observables+= self.observables.get(obs_type,[])
         results = self.api.stix_cyber_observable.list(filters=[{"values":observables, "key":"value"}])
         indexed_result = {result.get("value"):result for result in results}
         return indexed_result

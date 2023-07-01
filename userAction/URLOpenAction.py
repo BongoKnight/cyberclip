@@ -7,21 +7,17 @@ import os
 class URLOpenAction(actionInterface):
     """Open all the URL with the default browser."""
     
-    def __init__(self, parsers ={}, supportedType = {"url"}, param_data: str =""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+    def __init__(self, parsers ={}, supportedType = {"url"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)       
         self.description = "Open URL in browser."
-        self.param = param_data
         
     def execute(self) -> object:
         """Execute the action."""
         lines = []
-        self.results = {}
-        for parser_name, parser in self.parsers.items():
-            if parser.parsertype in self.supportedType:
-                self.results[parser.parsertype]=parser.extract()
-        if self.results.get("url"):
-            for url in set(self.results.get("url")):
+        self.observables = {}
+        self.observables = self.get_observables()
+        if self.observables.get("url"):
+            for url in set(self.observables.get("url")):
                 lines.append(f"Openning {url}")
                 os.startfile(f"{url}")
         return "\n".join([i for i in lines])

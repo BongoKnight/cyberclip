@@ -31,23 +31,19 @@ except Exception as e:
 
 class IpToAsAction(actionInterface):
     """
-    A action module, to crop data to only the N first lines.
+    Return Autonomous System information refering to an IP.
     """
     
-    def __init__(self, parsers = {}, supportedType = {"ip"}, param_data=""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+    def __init__(self, parsers = {}, supportedType = {"ip"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "IP to AS Number"
-        self.results = {}
-        self.param = param_data
-
         
     def execute(self) -> object:
         """Execute the action."""
-        self.results = {}
-        if self.parsers.get("ip"):
+        self.observables = self.get_observables()
+        if self.observables.get("ip", []):
             if len(AS_DB.columns):
-                ips = self.parsers.get("ip").extract()
+                ips = self.observables.get("ip", [])
                 for ip in ips:
                     int_ip = int(ipaddress.ip_address(ip))
                     response = AS_DB.loc[(AS_DB["min_ip"]<int_ip) & (AS_DB["max_ip"]>=int_ip)].to_dict(orient="row")
@@ -55,21 +51,19 @@ class IpToAsAction(actionInterface):
                         infos = response[0]
                         infos.update({"min_ip": str(ipaddress.ip_address(infos.get("min_ip",0))),
                                 "max_ip": str(ipaddress.ip_address(infos.get("max_ip",0))),
-                                "as_num":"AS"+str(infos.get("as_num"))})
+                                "as_num":"AS" + str(infos.get("as_num"))})
                         self.results.update({ip:infos})
                 return self.results
             else:
-                return self.parsers.get("ip").objects
+                return self.observables.get("ip", [])
         else:
-            return ""
+            return "dsdsqd"
 
-
-    
     def __str__(self):
         """Visual representation of the action"""
-        results = self.execute()
+        self.execute()
         lines = []
-        for ip, infos in results.items():
+        for ip, infos in self.results.items():
             infos_str = "\t".join([str(info) for key, info in infos.items()])
             lines.append(f"{ip}\t{infos_str}")
         return "\n".join(lines)  

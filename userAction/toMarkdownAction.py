@@ -12,12 +12,9 @@ class toMarkdownAction(actionInterface):
     """
     A action module, to transform a TSV data to a Markdown table.
     """ 
-    def __init__(self, parsers = {}, supportedType = {"tsv"}, param_data=""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+    def __init__(self, parsers = {}, supportedType = {"tsv"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "TSV to Md."
-        self.results = {}
-        self.param = param_data
         
     def execute(self) -> object:
         """Execute the action."""

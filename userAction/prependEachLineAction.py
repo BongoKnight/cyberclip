@@ -3,10 +3,6 @@ try:
 except:
     from actionInterface import actionInterface
 
-import os
-
-
-
 class prependEachLineAction(actionInterface):   
     """
     A action module, to prepend data to all the lines of a given text.
@@ -14,11 +10,8 @@ class prependEachLineAction(actionInterface):
     """ 
 
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+        super().__init__(parsers = parsers, supportedType = supportedType, param_data = param_data)
         self.description = "Prepend text on each line."
-        self.results = {}
-        self.param = param_data
         
     def execute(self) -> object:
         """
@@ -27,11 +20,9 @@ class prependEachLineAction(actionInterface):
         Return:
             text (str): Text with prepended data
         """
-        for parser_name, parser in self.parsers.items():
-            if parser.parsertype in self.supportedType:
-                self.results[parser.parsertype]=parser.extract()
-        if self.results.get("text"):
-            text = self.results.get("text")[0].splitlines()
+        self.observables = self.get_observables()
+        if self.observables.get("text"):
+            text = self.observables.get("text")[0].splitlines()
             return "\r\n".join([self.param.replace("\\t","\t") + line for line in text])
 
     

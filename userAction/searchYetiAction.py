@@ -16,14 +16,11 @@ Yeti:
 - api-key: <api-key>
     """
     
-    def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url"}, param_data: str =""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+    def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Search observables in YETI."
-        self.results = {}
-        self.param = param_data
         self.config = {}
-        with open(Path(__file__).parent / '../../data/conf.yml', encoding="utf8") as f:
+        with open(Path(__file__).parent / '../data/conf.yml', encoding="utf8") as f:
             self.config = yaml.load(f, Loader=SafeLoader)
             if self.config.get("Yeti"):
                 conf = {}
@@ -37,11 +34,9 @@ Yeti:
     def execute(self) -> object:
         """Execute the action."""
         self.lines = []
-        for parser_name, parser in self.parsers.items():
-            if parser.parsertype in self.supportedType:
-                self.results[parser.parsertype]=parser.extract()
+        self.observables = self.get_observables()
         for obs_type in self.supportedType:
-            obs = self.results.get(obs_type,[])
+            obs = self.observables.get(obs_type,[])
             if len(obs)>0:
                 headers = {'Accept': 'application/json'}
                 headers.update({"X-Api-Key": self.conf.get("api-key"), "Content-Type":"application/json"})

@@ -13,27 +13,21 @@ class baseUrlAction(actionInterface):
         - https://www.example.com/path/of/page returns https://www.example.com/
         - www.example.com returns https://www.example.com/
     """
-    def __init__(self, parsers = {}, supportedType = {"url","domain","ip"}, param_data: str =""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+    def __init__(self, parsers = {}, supportedType = {"url","domain","ip"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "To base URL"
-        self.results = {} 
         self.base_url = {}
-        self.param = param_data
         
     def execute(self) -> object:
         """Execute the action."""
         self.base_url = {}
-        self.results = {}
-        for parser_name, parser in self.parsers.items():
-            if parser.parsertype in self.supportedType:
-                self.results[parser.parsertype]=parser.extract()
-        if self.results.get("url"):
-            self.base_url.update({url:f"https://{urllib.parse.urlparse(url).netloc}" for url in self.results.get("url")})
-        if self.results.get("domain"):
-            self.base_url.update({domain:f"https://{domain}" for domain in self.results.get("domain")})
-        if self.results.get("ip"):
-            self.base_url.update({ip:f"https://{ip}" for ip in self.results.get("ip")})
+        self.observables = self.get_observables()
+        if self.observables.get("url"):
+            self.base_url.update({url:f"https://{urllib.parse.urlparse(url).netloc}" for url in self.observables.get("url")})
+        if self.observables.get("domain"):
+            self.base_url.update({domain:f"https://{domain}" for domain in self.observables.get("domain")})
+        if self.observables.get("ip"):
+            self.base_url.update({ip:f"https://{ip}" for ip in self.observables.get("ip")})
         return self.base_url
 
     

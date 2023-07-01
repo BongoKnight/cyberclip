@@ -36,17 +36,14 @@ class MitreAction(actionInterface):
     """
 
     def __init__(self, parsers = {}, supportedType = {"mitre"}, param_data=""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+        super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Mitre tactic to Mittre description."
-        self.results = {}
-        self.param = param_data
-
         
     def execute(self) -> object:
         """Execute the action."""
         lines = []
-        mitre_techniques = self.parsers.get("mitre").extract()
+        self.observables = self.get_observables()
+        mitre_techniques = self.observables.get("mitre")
         if mitre_techniques:
             return Mitre_DB[Mitre_DB['mitre_id'].isin(mitre_techniques)]
         else:

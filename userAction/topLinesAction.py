@@ -10,15 +10,12 @@ import re
 
 class toplLinesAction(actionInterface):
     """
-    A action module to crop data to only the N first lines.
+    A action module to crop data to only the N first lines. Default 10 lines.
     """
     
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data="10"):
-        self.supportedType = supportedType
-        self.parsers = parsers
+        super().__init__(parsers = parsers, supportedType = supportedType, param_data = param_data)
         self.description = "Top N lines."
-        self.results = {}
-        self.param = param_data
         
     def execute(self) -> object:
         """
@@ -28,11 +25,9 @@ class toplLinesAction(actionInterface):
             lines[0:n] (list(str)): The n first lines
         """
         lines = []
-        for parser_name, parser in self.parsers.items():
-            if parser.parsertype in self.supportedType:
-                self.results[parser.parsertype]=parser.extract()
-        if self.results.get("text"):
-            lines = self.results.get("text")[0].splitlines()
+        self.observables = self.get_observables()
+        if self.observables.get("text"):
+            lines = self.observables.get("text")[0].splitlines()
             return "\n".join([i for i in lines[:min(int(self.param), len(lines))]])
 
     

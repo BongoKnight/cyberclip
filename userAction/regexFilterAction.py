@@ -11,20 +11,15 @@ class regexFilterAction(actionInterface):
     """
 
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data=""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+        super().__init__(parsers = parsers, supportedType = supportedType, param_data = param_data)
         self.description = "Filter with Regex"
-        self.results = {}
-        self.param = param_data
         
     def execute(self) -> object:
         """Execute the action."""
         lines = []
-        for parser_name, parser in self.parsers.items():
-            if parser.parsertype in self.supportedType:
-                self.results[parser.parsertype]=parser.extract()
-        if self.results.get("text"):
-            lines = self.results.get("text")[0].splitlines()
+        self.observables = self.get_observables()
+        if self.observables.get("text"):
+            lines = self.observables.get("text")[0].splitlines()
             return "\n".join([i for i in lines if re.search(self.param, i)])
 
     

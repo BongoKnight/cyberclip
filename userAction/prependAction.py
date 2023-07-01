@@ -3,22 +3,16 @@ try:
 except:
     from actionInterface import actionInterface
 
-import os
-
-
-
 class prependAction(actionInterface):   
     """
     A action module, to prepend data to a given text.
     Usefull for adding header to data. Add the text to add as a param.
     """
 
-    def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+    def __init__(self, parsers = {}, supportedType = {"text"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Prepend text."
-        self.results = {}
-        self.param = param_data
+
         
     def execute(self) -> object:
         """
@@ -27,11 +21,9 @@ class prependAction(actionInterface):
         Return:
             text (str): Text with prepended data
         """
-        for parser_name, parser in self.parsers.items():
-            if parser.parsertype in self.supportedType:
-                self.results[parser.parsertype]=parser.extract()
-        if self.results.get("text"):
-            return self.param.replace("\\t","\t")+"\r\n"+self.results.get("text")[0]
+        self.observables = self.get_observables()
+        if self.observables.get("text"):
+            return self.param.replace("\\t","\t")+"\r\n"+self.observables.get("text")[0]
 
     
     def __str__(self):

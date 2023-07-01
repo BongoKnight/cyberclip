@@ -12,30 +12,25 @@ from dns import resolver
 class DNSAction(actionInterface):
     """
     A action module, to return reverse DNS for an IP, and DNS for a domain.
+    For a domain the type of DNS reccord can be specified (default A).
     """
     def __init__(self, parsers = {}, supportedType = {"ip","domain"}, param_data: str ="A"):
-        self.supportedType = supportedType
-        self.parsers = parsers
+        super().__init__(parsers = parsers, supportedType = supportedType, param_data= param_data)
         self.description = "DNS/Reverse DNS"
-        self.results = {}
         self.dns_results = {}
-        self.param = param_data
         
     def execute(self) -> object:
         """A action module, to return reverse DNS for an IP, and DNS for a domain."""
-        self.results = {}
         self.dns_results = {}
-        for parser_name, parser in self.parsers.items():
-            if parser.parsertype in self.supportedType:
-                self.results[parser.parsertype]=parser.extract()
-        if self.results.get("ip"):
-            for ip in self.results.get("ip"):
+        self.observables = self.get_observables()
+        if self.observables.get("ip"):
+            for ip in self.observables.get("ip"):
                 try:
                     self.dns_results.update({ip: ','.join(i[0] for i in [socket.getnameinfo((ip, 0), 0)])})
                 except:
                     pass
-        if self.results.get("domain"):
-            for domain in self.results.get("domain"):
+        if self.observables.get("domain"):
+            for domain in self.observables.get("domain"):
                 try:
                     self.dns_results.update({domain:",".join([ip.to_text() for ip in resolver.resolve(domain, self.param)]) })
                 except:

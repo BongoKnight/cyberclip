@@ -10,17 +10,12 @@ class UrlToHtmlAction(actionInterface):
     Perform a get request on the URL with a desktop-like User-Agent.
     """
 
-    def __init__(self, parsers = {}, supportedType = {"url"}, param_data=""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+    def __init__(self, parsers = {}, supportedType = {"url"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "URL to HTML"
-        self.results = {}
-        self.param = param_data
-
         
     def execute(self) -> object:
         """Execute the action."""
-        self.results = {}
         urls = set(self.parsers.get("url").extract())
         for url in urls:
             try:
@@ -28,10 +23,10 @@ class UrlToHtmlAction(actionInterface):
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0',
                 }
                 response = requests.get(url, headers=headers)
-                self.results.update({url:response.text})
+                self.observables.update({url:response.text})
             except:
-                self.results.update({url:""})
-        return self.results
+                self.observables.update({url:""})
+        return self.observables
     
     def __str__(self):
         """Visual representation of the action"""

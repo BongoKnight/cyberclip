@@ -10,7 +10,7 @@ from userTypeParser.ParserInterface import ParserInterface
 class actionInterface():
     """Parser Interface defines the minimum functions a parser needs to implement."""
     
-    def __init__(self, parsers={},supportedType= {}):
+    def __init__(self, parsers = {}, supportedType = {}, param_data : str = "", complex_param : dict = {}):
         """
         parsers is a list of objects that implements ParserInterface.
         supportedType is a list of type defined in the varaible `parsertype` that are supported by the current action.
@@ -20,8 +20,10 @@ class actionInterface():
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "Quick description of the action."
-        self.param : str = ""
-        self.complex_param : dict = {} 
+        self.param = param_data
+        self.complex_param = complex_param
+        self.observables = {}
+        self.results = {}
         
     def execute(self) -> dict:
         """Execute the action
@@ -30,6 +32,19 @@ class actionInterface():
         """
         return {}
     
+    def get_observables(self) -> dict:
+        """
+        Populate the observables with a dict of this form :
+            <Parser_type>:[<list of observables of this type>]
+        Reset the results variables.
+        """
+        self.observables = {}
+        self.results = {}
+        for parser_name, parser in self.parsers.items():
+            if parser.parsertype in self.supportedType:
+                self.observables[parser.parsertype]=parser.extract()
+        return self.observables
+
     def __str__(self):
         """Visual representation of the action"""
         return self.execute()

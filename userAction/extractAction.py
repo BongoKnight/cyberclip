@@ -1,21 +1,21 @@
 from userAction.actionInterface import actionInterface
+"""A sample action module, that extract match from all parsers.
+A list of exclusion can be passed, by default long observables as text, JSON, YAML and HTML are not returned.
+"""
 
-"""A sample action module, that extract match from all parsers."""
-
-class extractAction():
-    """Extract all the instance for the given parsers."""
+class extractAction(actionInterface):
+    """Extract all the observables."""
     
-    def __init__(self, parsers = {}, supportedType = {"all","text"}, param_data: str =""):
-        self.supportedType = supportedType
-        self.parsers = parsers
+    def __init__(self, parsers = {}, supportedType = {"all","text"}, exception = ["text","html", "json", "yaml"]):
+        super().__init__(parsers = parsers, supportedType = supportedType)
         self.description="Extract all elements."
-        self.results = {}
+        self.exception = exception
 
     def __str__(self):
         """Visual representation of the action"""
         self.execute()
         extracted_items = []
-        for key, value in self.results.items():
+        for key, value in self.observables.items():
             for i in value:
                 extracted_items.append(i)
         return "\n".join(extracted_items)
@@ -23,9 +23,9 @@ class extractAction():
     def execute(self) -> object:
         """Execute the action."""
         for parser_name, parser in self.parsers.items():
-            if parser_name != "text":
-                self.results.update({parser_name:parser.extract()})
-        return self.results
+            if parser_name not in self.exception:
+                self.observables.update({parser_name:parser.extract()})
+        return self.observables
     
 
 
