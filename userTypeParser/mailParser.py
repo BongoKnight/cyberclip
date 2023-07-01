@@ -30,14 +30,14 @@ class mailParser(ParserInterface):
         
     def contains(self):
         """Return true if text contains at least one mail."""
-        if re.search(r"\b[^\s@=;]+@[^\s@,=]+\.[^\s@,=]+\b",self.text) :
+        if re.search(r"\b[^\s@=;\)\(\[\]]+@[^\s@,=\)\(\[\]]+\.[^\s@,=\)\(\[\]]+\b",self.text) :
             return True
         else :
             return False
     
     def extract(self):
         """Return all mail contained in text."""
-        mailsIter = re.finditer(r"\b[^\s@=;]+@[^\s@,=]+\.[^\s@,=]+\b", self.text)
+        mailsIter = re.finditer(r"\b[^\s@=;\)\(\[\])]+@[^\s@,=\)\(\[\]]+\.[^\s@,=\)\(\[\]]+\b", self.text)
         mails = [mail.group() for mail in mailsIter]
         self.objects = mails
         self.log.debug(", ".join(self.objects))
