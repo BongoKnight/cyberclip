@@ -1,14 +1,7 @@
-"""
-Code browser example.
-
-Run with:
-
-    python app.py
-"""
-
 import sys
 import pyperclip
 from textual.app import App, ComposeResult
+from textual.containers import Grid
 from textual.widgets import Footer
 
 from tui.ConfigScreen import ConfigScreen
@@ -17,10 +10,12 @@ from tui.ContentView import ContentView
 from tui.ActionPannel import ActionPannel
 
 
+
 class ClipBrowser(App):
     """Textual clipboard browser app."""
-    SCREENS = {"conf": ConfigScreen()}
     CSS_PATH = "app.scss"
+
+    SCREENS = {"conf": ConfigScreen}
     BINDINGS = [
         ("ctrl+s", "save", "Save actual view."),
         ("ctrl+q", "quit", "Quit"),
@@ -29,12 +24,14 @@ class ClipBrowser(App):
         ("ctrl+r", "reset", "Reset content view to clipboard content."),
         ("ctrl+e", "push_screen('conf')", "Edit config")
     ]
-
     def compose(self) -> ComposeResult:
         """Compose our UI."""
-        yield DataLoader(id="left-pannel")
-        yield ContentView(id="content-view")    
-        yield ActionPannel(id="action-pannel")
+        yield Grid(
+            DataLoader(id="left-pannel"),
+            ContentView(id="content-view"),
+            ActionPannel(id="action-pannel"),
+            id="maingrid"
+        )
         yield Footer()
 
     def action_quit(self):
@@ -53,8 +50,6 @@ class ClipBrowser(App):
     def action_filter(self):
         filter = self.app.query_one("#action-filter").focus()
         filter.value = ""
-
-        
 
 if __name__ == "__main__":
     ClipBrowser().run()

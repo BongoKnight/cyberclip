@@ -28,14 +28,15 @@ class ContentView(Static):
         dock: right;
         align-vertical: top;
         background: $accent 10%;
-        min-width: 18;
+        width: 18;
+        height: 3;
     }
     #next-button{
         layer: above;
         dock: right;
         align-vertical: top;
         margin-top: 3;
-        background: $accent 10%;
+        height: 1;
     }
     #previous-button{
         layer: above;
@@ -43,13 +44,8 @@ class ContentView(Static):
         align-vertical: top;
         margin-top: 3;
         margin-right: 10;
-        background: $accent 10%;
+        height: 1;
     }
-
-    #copy-button:hover, #previous-button:hover, #next-button:hover {
-        background: $accent;
-    }
-
     #param-input{
         row-span:1;
         dock: bottom;

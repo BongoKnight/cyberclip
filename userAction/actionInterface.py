@@ -49,5 +49,5 @@ class actionInterface():
         """Visual representation of the action"""
         return self.execute()
     
-    def get_complex_param():
-        pass
+
+

@@ -17,8 +17,8 @@ Yeti:
 - api-key: <api-key>
     """
     
-    def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url"}):
-        super().__init__(parsers = parsers, supportedType = supportedType)
+    def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url"}, complex_param = {"Source":"", "Threat":"", "Campaign":"", "Tags":""}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param = complex_param)
         self.description = "Add observables in YETI."
         self.config = {}
         with open(Path(__file__).parent / '../data/conf.yml', encoding="utf8") as f:
@@ -38,8 +38,14 @@ Yeti:
         self.get_observables()
         for obs_type in self.supportedType:
             observables = self.observables.get(obs_type,[])
-            tags = ["test"]
-            source = ["Raport_v1"]
+            tags = self.complex_param.get("Tags", "").split(",")
+            source = self.complex_param.get("Source", "")
+            campaign = self.complex_param.get("Campaign", "")
+            threat = self.complex_param.get("Threat", "")
+            if threat:
+                tags.append(f"threat{threat}")
+            if campaign:
+                tags.append(f"campaign{campaign}")
             if len(observables)>0:
                 headers = {'Accept': 'application/json'}
                 headers.update({"X-Api-Key": self.conf.get("api-key"), "Content-Type":"application/json"})

@@ -3,7 +3,6 @@ from textual.reactive import var
 from textual.containers import  VerticalScroll
 from textual.widgets import Static,  Button, Input
 from textual.app import ComposeResult
-
 from userAction import actionInterface
 
 class ActionButton(Static):
@@ -27,10 +26,14 @@ class ActionButton(Static):
     #action-button{
         width: 100%;
         height: 3;
+    }
+    
+    .no-height{
+        height: 0;
     }"""
 
 
-    action = var(None)
+    action : actionInterface = var(None)
     action_name = var("")
     action_supported_type = var({})
     def compose(self) -> ComposeResult:
@@ -41,14 +44,30 @@ class ActionButton(Static):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Event handler called when a  button is pressed."""
+        from tui.ModalParamScreen import ParamScreen
+        from tui.ContentView import ContentView
         if event.button.id == "action-button":
-            from tui.ContentView import ContentView
-            mainApp = self.parent.ancestors[-1].query_one(ContentView)
-            if mainApp:
-                if self.parent.ancestors[-1].query_one("#param-input").value:
-                    self.action.param = self.parent.ancestors[-1].query_one("#param-input").value
-                self.parent.ancestors[-1].query_one("#param-input").value = ""
-                mainApp.text = str(self.action)
+            if not self.action.complex_param :
+                self.update_text()
+            else :
+                param_screen = ParamScreen()
+                param_screen.action_button = self
+                self.app.push_screen(param_screen, self.handle_param)
+
+    def update_text(self):
+        from tui.ContentView import ContentView
+        mainApp = self.app.query_one(ContentView)
+        if mainApp:
+            if self.parent.ancestors[-1].query_one("#param-input").value:
+                self.action.param = self.parent.ancestors[-1].query_one("#param-input").value
+            self.parent.ancestors[-1].query_one("#param-input").value = ""
+            mainApp.text = str(self.action)
+
+    def handle_param(self, complex_param : dict):
+        if complex_param :
+            self.action.complex_param = complex_param
+            self.update_text()
+
 
 class ActionPannel(Static):
     BINDINGS = [("escape", "clean_filter", "Clear the filter value."),]
@@ -69,7 +88,7 @@ class ActionPannel(Static):
     def on_input_changed(self, event: Input.Changed) -> None:
         from tui.ContentView import ContentView
         actions = self.query(ActionButton)
-        mainApp = self.parent.ancestors[-1].query_one(ContentView).filter_action()
+        self.app.query_one(ContentView).filter_action()
         for action in actions:
             for word in event.value.split():
                 if not re.search(f"(?i){word}", action.action.description, re.IGNORECASE):
