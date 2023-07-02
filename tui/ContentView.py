@@ -1,11 +1,14 @@
 import pyperclip
+from textual import on
 from textual.reactive import var, reactive
 from textual.containers import  Vertical, ScrollableContainer
-from textual.widgets import Static,  Button, Input, Switch, Label
+from textual.widgets import Static,  Button, Input, Switch, Label, Select
 from textual.app import ComposeResult
+from rich.markdown import Markdown
 
 from clipParser import clipParser
 
+MARKUP_TYPES = ["actionscript3","apache","applescript","asp","bash","brainfuck","c","c++","cfm","clojure","cmake","coffee","coffee-script","coffeescript","cpp","cs","csharp","css","csv","diff","elixir","erb","go","haml","html","http","java","javascript","jruby","json","jsx","less","lolcode","make","markdown","matlab","nginx","objectivec","pascal","perl","php","profile","python","rb","ruby","rust","salt","saltstate","scss","sh","shell","smalltalk","sql","svg","swift","vhdl","vim","viml","volt","vue","xml","yaml","zsh"]
 
 class ContentView(Static):
     DEFAULT_CSS="""#content-view{
@@ -28,7 +31,7 @@ class ContentView(Static):
         dock: right;
         align-vertical: top;
         background: $accent 10%;
-        width: 18;
+        width: 20;
         height: 3;
     }
     #next-button{
@@ -43,15 +46,24 @@ class ContentView(Static):
         dock: right;
         align-vertical: top;
         margin-top: 3;
-        margin-right: 10;
+        margin-right: 12;
         height: 1;
+    }
+    .markup{
+        layer: above;
+        dock: right;
+        align-vertical: top;
+        margin: 0;
+        margin-top: 4;
+        width: 20;
+        height: 3;
+        padding:0;
     }
     #param-input{
         row-span:1;
         dock: bottom;
     }
     """
-
 
     text= reactive("Waiting for Update...")
     parser = var(clipParser())
@@ -65,6 +77,7 @@ class ContentView(Static):
             Button("Copy", id="copy-button"),
             Button(u"\u21A9 Undo", id="previous-button", classes="small-button"),
             Button(u"Redo \u21AA", id="next-button", classes="small-button"),
+            Select([(markup, markup) for markup in MARKUP_TYPES], classes="markup", prompt="Show as..."),
             Input(placeholder="Add additional parameter for custom action.",id="param-input")
         )
 
@@ -102,7 +115,6 @@ class ContentView(Static):
         from tui.DataTypePannel import DataTypeButton, DataLoader
         from tui.ActionPannel import ActionPannel, ActionButton
         """Called when the text attribute changes."""   
-
         if new_text not in self.text_history:
             self.text_history.append(new_text)
             self.text_history = self.text_history[-20:]
@@ -148,3 +160,13 @@ class ContentView(Static):
             if self.text in self.text_history:
                 index = self.text_history.index(self.text)
                 self.text = self.text_history[min(len(self.text_history)-1, index + 1)]
+    
+    @on(Select.Changed)
+    def select_changed(self, event: Select.Changed) -> None:
+        if event.value:
+            new_text = f"```{event.value}\r\n{self.text}\r\n```"
+            clip_view = self.query_one("#clip-content")
+            clip_view.update(Markdown(new_text))
+        else :
+            self.query_one("#clip-content").update(str(self.text))
+        
