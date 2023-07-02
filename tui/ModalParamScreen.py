@@ -23,6 +23,9 @@ class ParamScreen(Screen):
         border: $accent;
         }
 
+    .complex-input > Label{
+        width: 25;
+    }
     """
 
     action_button : ActionButton = var(None)

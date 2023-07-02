@@ -32,14 +32,14 @@ class domainParser(ParserInterface):
         
     def contains(self):
         """Return true if text contains at least one domain."""
-        if re.search(r"\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b", self.text) :
+        if re.search(r"\b((?=[a-z0-9-]{1,63}\[?\.\]?)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\[?\.\]?)+[a-z]{2,63}\b", self.text) :
             return True
         else :
             return False
     
     def extract(self):
         """Return all domain contained in text."""
-        domainsIter = re.finditer(r"\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b", self.text)
+        domainsIter = re.finditer(r"\b((?=[a-z0-9-]{1,63}\[?\.\]?)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\[?\.\]?)+[a-z]{2,63}\b", self.text)
         domains = [domain.group().replace(".]",".").replace("[.",".") for domain in domainsIter]
         domains = [domain for domain in domains if re.search( self.TLD, domain)]
         self.objects = domains
