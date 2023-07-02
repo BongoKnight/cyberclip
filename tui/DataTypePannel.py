@@ -6,6 +6,37 @@ from textual.app import ComposeResult
 
 class DataTypeButton(Static):
     """A dataType widget to extract and handle actions on one specific types of data."""
+    DEFAULT_CSS = """#left-pannel{
+        row-span:5;
+        column-span: 1;
+        height:100%;
+        row-span:5;
+
+    }
+
+    #filter-button{
+        width: 100%;
+    }
+
+    #data-type-container{
+        row-span: 5;
+        column-span: 1;    
+    }
+
+    #datatype-button{
+        width: 80%;
+        height: 3;
+    }
+
+    .datatype{
+        width: 100%;
+        height: 3;
+    }
+
+    #update-button{
+        width: 100%;
+        height:3;
+    }"""
     parser_type = var("text")
 
     def compose(self) -> ComposeResult:

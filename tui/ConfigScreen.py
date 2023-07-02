@@ -8,6 +8,21 @@ from pathlib import Path
 from rich.markdown import Markdown
 
 class ConfigScreen(Screen):
+    DEFAULT_CSS = """ConfigScreen{
+        layout: vertical
+    }
+
+    ConfigInput {
+        height: 3;
+    }
+
+    #conf-name{
+        width: 20;
+    }
+    #conf-input{
+        min-width: 50%;
+        width: auto;
+    }"""
     BINDINGS = [("escape", "app.pop_screen", "Escape config screen."),
                 ("ctrl+s", "save_conf", "Save config")]
 

@@ -51,7 +51,9 @@ class ClipBrowser(App):
         self.query_one(ContentView).text = pyperclip.paste()
 
     def action_filter(self):
-        self.query_one("#action-filter").focus()
+        filter = self.app.query_one("#action-filter").focus()
+        filter.value = ""
+
         
 
 if __name__ == "__main__":

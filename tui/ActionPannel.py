@@ -8,6 +8,28 @@ from userAction import actionInterface
 
 class ActionButton(Static):
     """A action widget for action specific to certain types of data."""
+    DEFAULT_CSS="""#action-container{
+        column-span: 1;
+        row-span: 5;
+        height: 100%;
+    }
+    #action-pannel{
+        column-span: 1;
+        row-span: 5;
+        height: 100%;
+    }
+
+
+    #action-filter{
+        height: 3;
+    }
+
+    #action-button{
+        width: 100%;
+        height: 3;
+    }"""
+
+
     action = var(None)
     action_name = var("")
     action_supported_type = var({})

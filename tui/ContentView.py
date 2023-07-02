@@ -8,6 +8,55 @@ from clipParser import clipParser
 
 
 class ContentView(Static):
+    DEFAULT_CSS="""#content-view{
+        border: $accent;
+        column-span: 3;
+        row-span: 5;
+        height: 100%;
+
+    }
+
+    .small-button{
+        border: none;
+        height: auto;
+        width: auto;
+        min-width: 0;
+    }
+
+    #copy-button{
+        layer: above;
+        dock: right;
+        align-vertical: top;
+        background: $accent 10%;
+        min-width: 18;
+    }
+    #next-button{
+        layer: above;
+        dock: right;
+        align-vertical: top;
+        margin-top: 3;
+        background: $accent 10%;
+    }
+    #previous-button{
+        layer: above;
+        dock: right;
+        align-vertical: top;
+        margin-top: 3;
+        margin-right: 10;
+        background: $accent 10%;
+    }
+
+    #copy-button:hover, #previous-button:hover, #next-button:hover {
+        background: $accent;
+    }
+
+    #param-input{
+        row-span:1;
+        dock: bottom;
+    }
+    """
+
+
     text= reactive("Waiting for Update...")
     parser = var(clipParser())
     initial_text = var(pyperclip.paste())
