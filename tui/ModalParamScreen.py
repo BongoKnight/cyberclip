@@ -71,14 +71,18 @@ class ParamScreen(Screen):
         return params
 
     def get_complex_param_widgets(self):
-        if self.action_button.action.complex_param:
+        if self.action_button.action.complex_param_scheme:
             widgets = []
-            for key, value in self.action_button.action.complex_param.items():
+            stored_values = self.action_button.action.complex_param
+            for key, value in self.action_button.action.complex_param_scheme.items():
                 if isinstance(value, str):
-                    widgets.append(SimpleInput(label=key, value=value, classes="complex-input"))
+                    widgets.append(SimpleInput(label=key, value=stored_values.get(key,""), classes="complex-input"))
                 if isinstance(value,list):
                     if len(value) == 0:
-                        widgets.append(TagsInput(label=key, value=value, classes="complex-input"))
+                        widgets.append(TagsInput(label=key, value=stored_values.get(key,[]), classes="complex-input"))
                     else:
                         widgets.append(SelectionInput(label=key, choices=value, classes="complex-input"))
+                if isinstance(value, dict):
+                    if ["type","value"] in value.keys():
+                        pass
             return widgets

@@ -36,6 +36,7 @@ class TagsInput(Static):
         input =  self.query_one(Input)
         if input.value and input.value not in self._value:
             new_tag = Tag(value=input.value)
+            new_tag.parent_input = self
             self.query_one(HorizontalScroll).mount(new_tag)
             self._value.add(input.value)
             input.value = ""
@@ -69,6 +70,7 @@ class Tag(Static):
     }
     """
     value = var("")
+    parent_input = var(None)
     def __init__(self, value="", **kwargs):
         super().__init__(**kwargs)
         self.value = value 
@@ -79,13 +81,13 @@ class Tag(Static):
 
     @on(Button.Pressed)
     def edit_tag(self, event : Button.Pressed):
-        self.ancestors[1].query_one(Input).focus()
-        if event.button.id == "tag-value":
-            self.ancestors[1].query_one(Input).value = self.value
-            self.ancestors[2].query_one(TagsInput).value.remove(self.value)
-            self.remove()
-        else:
-            self.ancestors[2].query_one(TagsInput).value.remove(self.value)
+        if self.parent_input:
+            self.parent_input.query_one(Input).focus()
+            if event.button.id == "tag-value":
+                self.parent_input.query_one(Input).value = self.value
+                self.parent_input._value.remove(self.value)
+            else:
+                self.parent_input._value.remove(self.value)
             self.remove()
         event.stop()
 

@@ -17,6 +17,7 @@ class ContentToolbar(Static):
         align-vertical: top;
         width: 20;
         height: 10;
+        background: rgba(255,255,255,0);
     }
 
     .small-button{

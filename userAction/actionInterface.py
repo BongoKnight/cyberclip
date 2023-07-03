@@ -22,6 +22,7 @@ class actionInterface():
         self.description = "Quick description of the action."
         self.param = param_data
         self.complex_param = complex_param
+        self.complex_param_scheme = complex_param
         self.observables = {}
         self.results = {}
         

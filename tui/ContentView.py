@@ -10,12 +10,12 @@ from clipParser import clipParser
 MARKUP_TYPES = ["actionscript3","apache","applescript","asp","bash","brainfuck","c","c++","cfm","clojure","cmake","coffee","coffee-script","coffeescript","cpp","cs","csharp","css","csv","diff","elixir","erb","go","haml","html","http","java","javascript","jruby","json","jsx","less","lolcode","make","markdown","matlab","nginx","objectivec","pascal","perl","php","profile","python","rb","ruby","rust","salt","saltstate","scss","sh","shell","smalltalk","sql","svg","swift","vhdl","vim","viml","volt","vue","xml","yaml","zsh"]
 
 class ContentView(Static):
-    DEFAULT_CSS="""#content-view{
+    DEFAULT_CSS="""
+    ContentView{
         border: $accent;
         column-span: 3;
         row-span: 5;
         height: 100%;
-
     }
     #param-input{
         row-span:1;

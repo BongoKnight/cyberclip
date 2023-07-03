@@ -43,21 +43,24 @@ Yeti:
             campaigns = self.complex_param.get("Campaign", "")
             threats = self.complex_param.get("Threat", "")
             if threats:
-                for threat in threat:
+                for threat in threats:
                     tags.append(f"threat{threat}")
             if campaigns:
                 for campaign in campaigns:
                     tags.append(f"campaign{campaign}")
             if len(observables)>0:
-                headers = {'Accept': 'application/json'}
-                headers.update({"X-Api-Key": self.conf.get("api-key"), "Content-Type":"application/json"})
-                params = {"observables": [{"tags": tags, "value": o, "source": source} for o in observables]}
-                resp = requests.post(self.conf.get("url") + "/api/observable/bulk", headers=headers,
-                        verify=False, json=params)
-                if resp.json():
-                    for item in resp.json():
-                        if datetime.fromisoformat(item.get("created")) < datetime.now() - timedelta(hours=1,minutes=2):
-                            self.lines.append(f'{item.get("value")} is already known. \r\n{set([i.get("name","") for i in item.get("tags")])}')
+                try:
+                    headers = {'Accept': 'application/json'}
+                    headers.update({"X-Api-Key": self.conf.get("api-key"), "Content-Type":"application/json"})
+                    params = {"observables": [{"tags": tags, "value": o, "source": source} for o in observables]}
+                    resp = requests.post(self.conf.get("url") + "/api/observable/bulk", headers=headers,
+                            verify=False, json=params)
+                    if resp.json():
+                        for item in resp.json():
+                            if datetime.fromisoformat(item.get("created")) < datetime.now() - timedelta(hours=1,minutes=2):
+                                self.lines.append(f'{item.get("value")} is already known. \r\n{set([i.get("name","") for i in item.get("tags")])}')
+                except ConnectionError:
+                    self.lines.append("Error while connecting Yeti.")
         return
     
     def __str__(self):
