@@ -17,7 +17,7 @@ Yeti:
 - api-key: <api-key>
     """
     
-    def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url"}, complex_param = {"Source":"", "Threat":"", "Campaign":"", "Tags":""}):
+    def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url"}, complex_param = {"Source":"", "Threat":[], "Campaign":[], "Tags":[]}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param = complex_param)
         self.description = "Add observables in YETI."
         self.config = {}
@@ -38,14 +38,16 @@ Yeti:
         self.get_observables()
         for obs_type in self.supportedType:
             observables = self.observables.get(obs_type,[])
-            tags = self.complex_param.get("Tags", "").split(",")
+            tags = self.complex_param.get("Tags", "")
             source = self.complex_param.get("Source", "")
-            campaign = self.complex_param.get("Campaign", "")
-            threat = self.complex_param.get("Threat", "")
-            if threat:
-                tags.append(f"threat{threat}")
-            if campaign:
-                tags.append(f"campaign{campaign}")
+            campaigns = self.complex_param.get("Campaign", "")
+            threats = self.complex_param.get("Threat", "")
+            if threats:
+                for threat in threat:
+                    tags.append(f"threat{threat}")
+            if campaigns:
+                for campaign in campaigns:
+                    tags.append(f"campaign{campaign}")
             if len(observables)>0:
                 headers = {'Accept': 'application/json'}
                 headers.update({"X-Api-Key": self.conf.get("api-key"), "Content-Type":"application/json"})

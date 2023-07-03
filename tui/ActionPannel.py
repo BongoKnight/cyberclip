@@ -51,6 +51,7 @@ class ActionButton(Static):
                 self.update_text()
             else :
                 param_screen = ParamScreen()
+                param_screen.border_title = f"Parameters for '{self.action.description}' action."
                 param_screen.action_button = self
                 self.app.push_screen(param_screen, self.handle_param)
 
