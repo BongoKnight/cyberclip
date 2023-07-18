@@ -93,9 +93,10 @@ Showed data can be exported to clipboard or to a file.
 		- [ ] Write filter and stats action for DataFrame (possibility to open dataframe in visidata?)
 	- [x] For AS Number
 		- [ ] AS to Regex
-		- [ ] AS range
+		- [x] AS range
 - [x] Make a domain and a host Parser, improve the domain parsing
 - [ ] Assync action results
+- [ ] Assync loading of action (some loading times are long, especially for AS action)
 - [ ] Requirement.txt
 - [ ] Save action with file input (need to implement modal, have to check textual discord).
 - [ ] Write python script/template to generate custom Parser/Action

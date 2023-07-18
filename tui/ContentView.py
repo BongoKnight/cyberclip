@@ -1,4 +1,5 @@
 import pyperclip
+from textual import events, work
 from textual.reactive import var, reactive
 from textual.containers import  Vertical, ScrollableContainer
 from textual.widgets import Static,  Button, Input, Switch, Label, Select
@@ -23,11 +24,11 @@ class ContentView(Static):
     }
     """
 
+    initial_text = "Waiting for Update..."
     text= reactive("Waiting for Update...")
     parser = var(clipParser())
-    initial_text = var(pyperclip.paste())
     text_history = var([])
-    
+
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader.""" 
         yield Vertical(
@@ -69,7 +70,7 @@ class ContentView(Static):
     def watch_text(self, new_text: str) -> None:
         from tui.DataTypePannel import DataTypeButton, DataLoader
         from tui.ActionPannel import ActionPannel, ActionButton
-        """Called when the text attribute changes."""   
+        """Called when the text attribute changes."""
         if new_text not in self.text_history:
             self.text_history.append(new_text)
             self.text_history = self.text_history[-20:]
@@ -99,9 +100,11 @@ class ContentView(Static):
         for action in self.ancestors[-1].query(ActionButton):
             action.action.supportedType = set(action.action_supported_type)
             action.action.parsers = self.parser.parsers
+           
 
         # Filter action on existing active datatype
         self.filter_action()
+        
 
 
         

@@ -54,7 +54,7 @@ class clipParser():
             if file.endswith(".py") and file != "__init__.py":
                 parserModuleName = file.split(".")[0]
                 parserModules.append(parserModuleName)
-                self.log.debug("Importing {} parser".format(parserModuleName))
+                self.log.info("Importing {} parser".format(parserModuleName))
         # import all parser parserModule
         parserModuleImport = __import__(f'{module_name}',fromlist=parserModules)
 
@@ -75,7 +75,7 @@ class clipParser():
             if file.endswith(".py") and file != "__init__.py":
                 actionModule = file.split(".")[0]
                 actionModules.append(actionModule)
-                self.log.debug("Importing {} parser".format(actionModule))
+                self.log.info("Importing {} parser".format(actionModule))
         # import all parser parserModule
         actionModuleImport = __import__('userAction',fromlist=actionModules)
         actionModuleImport+= __import__('userAction.private',fromlist=actionModules)

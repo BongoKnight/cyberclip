@@ -40,7 +40,7 @@ class ActionButton(Static):
         yield Button(self.action_name, id="action-button", classes="")
     
     def on_mount(self) -> None:
-            self.query_one(Button).tooltip = self.action.__doc__
+        self.query_one(Button).tooltip = self.action.__doc__
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Event handler called when a  button is pressed."""
