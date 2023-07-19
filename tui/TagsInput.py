@@ -29,7 +29,7 @@ class TagsInput(Static):
     def compose(self) -> ComposeResult:
         yield Label(renderable=self.label)
         yield Input(placeholder=f"Enter {self.label}...")
-        yield HorizontalScroll(classes="tag-storage")
+        yield HorizontalScroll(*[Tag(value=value, parent_input = self) for value in self._value] ,classes="tag-storage")
     
     @on(Input.Submitted)
     def add_tag(self, event : events.Key) -> None:
@@ -71,9 +71,10 @@ class Tag(Static):
     """
     value = var("")
     parent_input = var(None)
-    def __init__(self, value="", **kwargs):
+    def __init__(self, value="", parent_input=None, **kwargs):
         super().__init__(**kwargs)
-        self.value = value 
+        self.value = value
+        self.parent_input = parent_input
 
     def compose(self) -> ComposeResult:
         yield Button(self.value, id="tag-value")
