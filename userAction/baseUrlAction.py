@@ -28,6 +28,8 @@ class baseUrlAction(actionInterface):
             self.base_url.update({domain:f"https://{domain}" for domain in self.observables.get("domain")})
         if self.observables.get("ip"):
             self.base_url.update({ip:f"https://{ip}" for ip in self.observables.get("ip")})
+        if self.observables.get("ipv6"):
+            self.base_url.update({ip:f"https://{ip}" for ip in self.observables.get("ipv6")})
         return self.base_url
 
     
