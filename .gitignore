@@ -2,7 +2,7 @@ clipboard.txt
 genericEnricher.py
 /enrich
 tools.py
-as.gz
+*.gz
 mittre.json
 __pycache__/
 /data/conf.yml
@@ -12,3 +12,4 @@ userAction/private/*
 !userAction/private/__init__.py
 userTypeParser/private/*
 !userTypeParser/private/__init__.py
+/.venv
