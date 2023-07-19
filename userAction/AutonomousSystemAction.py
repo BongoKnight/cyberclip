@@ -123,7 +123,7 @@ class IpToAsAction(actionInterface):
                 ips = self.observables.get("ip", [])
                 for ip in ips:
                     int_ip = int(ipaddress.ip_address(ip))
-                    response = AS_DB.loc[(AS_DB["min_ip"]<int_ip) & (AS_DB["max_ip"]>=int_ip)].to_dict(orient="row")
+                    response = AS_DB.loc[(AS_DB["min_ip"]<int_ip) & (AS_DB["max_ip"]>=int_ip)].to_dict(orient="records")
                     if len(response)>0:
                         infos = response[0]
                         infos.update({"min_ip": str(ipaddress.ip_address(infos.get("min_ip",0))),
@@ -135,7 +135,7 @@ class IpToAsAction(actionInterface):
                 ips = self.observables.get("ipv6", [])
                 for ip in ips:
                     ip_object = ipaddress.ip_address(ip)
-                    response = AS_IPv6_DB.loc[(AS_IPv6_DB["min_ip"]<ip_object) & (AS_IPv6_DB["max_ip"]>=ip_object)].to_dict(orient="row")
+                    response = AS_IPv6_DB.loc[(AS_IPv6_DB["min_ip"]<ip_object) & (AS_IPv6_DB["max_ip"]>=ip_object)].to_dict(orient="records")
                     if len(response)>0:
                         infos = response[0]
                         infos.update({"min_ip": str(infos.get("min_ip",0)),
