@@ -9,7 +9,10 @@ Code exemple ::
 """
 import logging
 import yaml
-from userTypeParser.ParserInterface import ParserInterface
+try:
+    from userTypeParser.ParserInterface import ParserInterface
+except:
+    from ParserInterface import ParserInterface
 
 
 class YamlParser(ParserInterface):
@@ -46,7 +49,7 @@ class YamlParser(ParserInterface):
                 self.objects = []
         except :
             self.objects = []
-        return [str(self.objects)]
+        return [self.objects]
         
         
 if __name__=="__main__":

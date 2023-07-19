@@ -9,7 +9,10 @@ Code exemple ::
 """
 import logging
 import json
-from userTypeParser.ParserInterface import ParserInterface
+try:
+    from userTypeParser.ParserInterface import ParserInterface
+except:
+    from ParserInterface import ParserInterface
 
 
 class JSONParser(ParserInterface):
@@ -44,7 +47,7 @@ class JSONParser(ParserInterface):
             self.objects = json.loads(self.text)
         except :
             self.objects = []
-        return [str(self.objects)]
+        return [self.objects]
         
         
 if __name__=="__main__":
