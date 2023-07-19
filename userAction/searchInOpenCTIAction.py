@@ -22,7 +22,7 @@ class searchInOpenCTIAction(actionInterface):
     - api_url: https://opencti.internal/graphql
     - api_key: <UUID API Key>
     """    
-    def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url","md5"}):
+    def __init__(self, parsers ={}, supportedType = {"ip","ipv6","domain","mail","url","md5"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Search all obsevables in OpenCTI."
         self.lines = []

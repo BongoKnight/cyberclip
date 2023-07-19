@@ -17,7 +17,7 @@ Yeti:
 - api-key: <api-key>
     """
     
-    def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url"}, complex_param = {"Source":"", "Threat":[], "Campaign":[], "Tags":[]}):
+    def __init__(self, parsers ={}, supportedType = {"ip","ipv6","domain","mail","url"}, complex_param = {"Source":"", "Threat":[], "Campaign":[], "Tags":[]}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param = complex_param)
         self.description = "Add observables in YETI."
         self.config = {}

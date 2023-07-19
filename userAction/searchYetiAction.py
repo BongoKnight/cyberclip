@@ -16,7 +16,7 @@ Yeti:
 - api-key: <api-key>
     """
     
-    def __init__(self, parsers ={}, supportedType = {"ip","domain","mail","url"}):
+    def __init__(self, parsers ={}, supportedType = {"ip","ipv6","domain","mail","url"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Search observables in YETI."
         self.config = {}

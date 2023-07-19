@@ -13,7 +13,7 @@ class baseUrlAction(actionInterface):
         - https://www.example.com/path/of/page returns https://www.example.com/
         - www.example.com returns https://www.example.com/
     """
-    def __init__(self, parsers = {}, supportedType = {"url","domain","ip"}):
+    def __init__(self, parsers = {}, supportedType = {"url","domain","ip","ipv6"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "To base URL"
         self.base_url = {}
