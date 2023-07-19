@@ -22,6 +22,9 @@ class ContentView(Static):
         row-span:1;
         dock: bottom;
     }
+    #clip-content{
+    width: 100%;
+    }
     """
 
     initial_text = "Waiting for Update..."

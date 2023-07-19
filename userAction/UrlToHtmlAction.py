@@ -17,16 +17,17 @@ class UrlToHtmlAction(actionInterface):
     def execute(self) -> object:
         """Execute the action."""
         urls = set(self.parsers.get("url").extract())
+        results = {}
         for url in urls:
             try:
                 headers = {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0',
                 }
                 response = requests.get(url, headers=headers)
-                self.observables.update({url:response.text})
+                results.update({url:response.text})
             except:
-                self.observables.update({url:""})
-        return self.observables
+                results.update({url:""})
+        return results
     
     def __str__(self):
         """Visual representation of the action"""
