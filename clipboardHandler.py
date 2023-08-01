@@ -92,9 +92,9 @@ def get_clipboard_files(folders=False):
         elif win32clipboard.CF_OEMTEXT in f:
             files = [win32clipboard.GetClipboardData(win32clipboard.CF_OEMTEXT)]
         if folders:
-            files = [f for f in files if os.path.isdir(f)] if files else None
+            files = [f"📂{f}" for f in files if os.path.isdir(f)] if files else None
         else:
-            files = [f for f in files if os.path.isfile(f)] if files else None
+            files = [f"📄{f}" for f in files if os.path.isfile(f)] if files else None
         win32clipboard.CloseClipboard()
         print(files)
         return files
@@ -108,9 +108,9 @@ def get_clipboard_files(folders=False):
         elif "text/plain" in f:
             files = enum_files_from_clipboard("text/plain")
         if folders:
-            files = [f for f in files if os.path.isdir(str(f))] if files else None
+            files = [f"📂{f}" for f in files if os.path.isdir(str(f))] if files else None
         else:
-            files = [f for f in files if os.path.isfile(str(f))] if files else None
+            files = [f"📄{f}" for f in files if os.path.isfile(str(f))] if files else None
         print(files)
         return files
 
@@ -123,23 +123,44 @@ def get_clipboard_data() -> dict:
             formats = get_clipboard_formats()
             clip_formats = {getattr(win32clipboard, attr):attr for attr in dir(win32clipboard) if not callable(getattr(win32clipboard, attr)) and attr.startswith("CF_")}
             for format in formats:
-                datatype = clip_formats.get(format)
-                if datatype:
-                    print(f"Data found : {clip_formats.get(format)}")
-                    clip_data.update({i:win32clipboard.GetClipboardData(format)})
-                else:
-                    print(f"Data found (Clip Format Id): {format}")
-                    try:
+                if format != 15:
+                    datatype = clip_formats.get(format)
+                    if datatype:
+                        print(f"Data found : {clip_formats.get(format)}")
                         clip_data.update({format:win32clipboard.GetClipboardData(format)})
-                    except:
-                        clip_data.update({format:""})
+                    else:
+                        print(f"Data found (Clip Format Id): {format}")
+                        try:
+                            clip_data.update({format:win32clipboard.GetClipboardData(format)})
+                        except:
+                            clip_data.update({format:""})
+                else:
+                    if get_clipboard_files(folders=False) or get_clipboard_files(folders=True):
+                        filepath_data = get_clipboard_files(folders=False) + get_clipboard_files(folders=True)
+                        clip_data.update({15: filepath_data})
         except Exception as e:
             print(e)
         finally:
-            win32clipboard.CloseClipboard()
+            try:
+                win32clipboard.CloseClipboard()
+            except:
+                pass
     else:
         clip_data.update({1:pyperclip.paste()})
         if get_clipboard_files(folders=False) or get_clipboard_files(folders=True):
             filepath_data = get_clipboard_files(folders=False) + get_clipboard_files(folders=True)
             clip_data.update({15: filepath_data})
     return clip_data
+
+def get_clipboard_text():
+    data = get_clipboard_data()
+    text_data = data.get(1,"") # 1 is textual data in Windows clipboard
+    utf8_data = data.get(13,"") # 13 is UTF8 data in Windows clipboard
+    filepath_data = "\r\n".join(data.get(15, [])) # 15 is file data in textual Clipboard
+    if utf8_data:
+        str_data = utf8_data
+    elif text_data:
+        str_data = text_data
+    else :
+        str_data =filepath_data
+    return str_data
