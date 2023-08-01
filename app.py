@@ -26,6 +26,7 @@ class ClipBrowser(App):
     ]
     def compose(self) -> ComposeResult:
         """Compose our UI."""
+        self.console.set_window_title("📝CyberClip👩‍💻")
         yield Grid(
             DataLoader(id="left-pannel"),
             ContentView(id="content-view"),
@@ -43,9 +44,6 @@ class ClipBrowser(App):
 
     def action_copy(self):
         pyperclip.copy(self.query_one(ContentView).text)
-
-    def action_reset(self):
-        self.query_one(ContentView).text = pyperclip.paste()
 
     def action_filter(self):
         filter = self.app.query_one("#action-filter").focus()

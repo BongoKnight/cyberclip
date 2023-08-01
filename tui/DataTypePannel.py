@@ -3,6 +3,7 @@ from textual.reactive import var
 from textual.containers import  VerticalScroll, Horizontal
 from textual.widgets import Static,  Button, Switch
 from textual.app import ComposeResult
+from clipboardHandler import get_clipboard_data
 
 class DataTypeButton(Static):
     """A dataType widget to extract and handle actions on one specific types of data."""
@@ -70,7 +71,16 @@ class DataLoader(Static):
         """Event handler called when a button is pressed."""
         from tui.ContentView import ContentView
         if event.button.id == "update-button":
-            self.data = pyperclip.paste()
+            data = get_clipboard_data()
+            text_data = data.get(1,"") # 1 is textual data in Windows clipboard
+            utf8_data = data.get(13,"") # 13 is UTF8 data in Windows clipboard
+            filepath_data = "\r\n".join(data.get(15, [])) # 15 is file data in textual Clipboard
+            if utf8_data:
+                self.data = '\r\n'.join(list(set([filepath_data, utf8_data])))
+            elif text_data:
+                self.data ='\r\n'.join(list(set([filepath_data, text_data])))
+            else :
+                self.data ='\r\n'.join(list(set([filepath_data])))
             mainApp = self.ancestors[-1].query_one(ContentView)
             if mainApp: 
                 mainApp.text = self.data

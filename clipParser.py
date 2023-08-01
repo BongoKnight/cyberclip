@@ -54,7 +54,7 @@ class clipParser():
             if file.endswith(".py") and file != "__init__.py":
                 parserModuleName = file.split(".")[0]
                 parserModules.append(parserModuleName)
-                self.log.info("Importing {} parser".format(parserModuleName))
+                self.log.info(f"Importing {parserModuleName} from {module_name}")
         # import all parser parserModule
         parserModuleImport = __import__(f'{module_name}',fromlist=parserModules)
 
