@@ -59,13 +59,15 @@ class ContentView(Static):
                         for action_button in actions:
                             if datatype_button.parser_type in action_button.action_supported_type:
                                 action_button.action.supportedType.discard(datatype_button.parser_type)
-                
+            
+            self.app.actions = []
             for action_button in actions:
                 if  (len(action_button.action.supportedType.intersection(actual_detected_type)) >=1
                     and len(action_button.action.supportedType.intersection(action_button.action_supported_type)) >= 1
                     ) :
                     action_button.visible = True
                     action_button.remove_class("no-height")
+                    self.app.actions.append(action_button)
                 else:
                     action_button.visible = False
                     action_button.add_class("no-height")
@@ -73,11 +75,12 @@ class ContentView(Static):
     def watch_text(self, new_text: str) -> None:
         from tui.DataTypePannel import DataTypeButton, DataLoader
         from tui.ActionPannel import ActionPannel, ActionButton
+        self.query_one("#clip-content").update(str(new_text))
         """Called when the text attribute changes."""
         if new_text not in self.text_history:
             self.text_history.append(new_text)
             self.text_history = self.text_history[-20:]
-        self.query_one("#clip-content").update(str(new_text))
+        
         
         self.parser.parseData(new_text)
         parser_types = self.parser.detectedType

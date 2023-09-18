@@ -37,6 +37,7 @@ Showed data can be exported to clipboard or to a file.
 
 - [x] Make a gitignore
 - [x] Add an history (Undo et Redo buttons)
+- [x] Add a command palette
 - [x] Filtering of types :
 	- [x] Button to filter actions per type
 	- [x] Button to (un)select all types at once
@@ -46,11 +47,11 @@ Showed data can be exported to clipboard or to a file.
 - [x] Add an help field to make a long description of action possible. (ie sort) 
 	- [x] Use of  instance.execute/__str__.__doc__
 - [x] Wrap custom actions and UserTypeParser in a `private` dir
-- [ ] As the view container is a Static, it could accept a renderable widget as action result... It might be a way to make scripts with more interractions :
-	- [ ] Action to render text as Markdown
+- [x] As the view container is a Static, it could accept a renderable widget as action result... It might be a way to make scripts with more interractions :
+	- [x] Action to render text as Markdown
 	- [ ] Action to render table in DataTable widget (with custom action to copy colum or row)
 	- [ ] Regex Highlight
-	- [ ] Code Highlight
+	- [x] Code Highlight
 - [ ] Write `public` actions :
 	- [x] TSV to Markdown Table
 	- [x] Domain and Url to base URL

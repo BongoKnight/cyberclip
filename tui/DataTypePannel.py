@@ -51,17 +51,17 @@ class DataTypeButton(Static):
         """Event handler called when a  button is pressed."""
         if event.button.id == "datatype-button":
             from tui.ContentView import ContentView
-            mainApp = self.parent.ancestors[-1].query_one(ContentView)
-            if mainApp:
-                mainApp.text = "\n".join(mainApp.parser.results["matches"].get(self.parser_type, ""))
-                mainApp.filter_action()
+            contentView = self.parent.ancestors[-1].query_one(ContentView)
+            if contentView:
+                contentView.text = "\n".join(contentView.parser.results["matches"].get(self.parser_type, ""))
+                contentView.filter_action()
 
 
     def on_switch_changed(self, event: Switch.Changed) -> None:
         """Event handler called when Switch is pressed."""
         from tui.ContentView import ContentView
-        mainApp = self.parent.ancestors[-1].query_one(ContentView)
-        mainApp.filter_action()
+        contentView = self.parent.ancestors[-1].query_one(ContentView)
+        contentView.filter_action()
 
 class DataLoader(Static):
     """A dataLoader widget."""

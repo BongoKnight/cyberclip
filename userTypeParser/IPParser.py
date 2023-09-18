@@ -46,6 +46,39 @@ class ipv4Parser(ParserInterface):
         self.log.debug(", ".join(self.objects))
         return ips
 
+
+class CIDRParser(ParserInterface):
+    """Parser for CIDR."""
+    
+    
+    def __init__(self, text: str, parsertype="cidr", loglevel = logging.INFO):
+        self.text = text
+        self.parsertype = "cidr"
+        self.objects = []
+        self.log = logging.Logger("cidr")
+        ch = logging.StreamHandler()
+        ch.setLevel(loglevel)
+        # create formatter
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %I:%M:%S')
+        # add formatter to ch
+        ch.setFormatter(formatter)
+        self.log.addHandler(ch)
+        
+    def contains(self):
+        """Return true if text contains at least one CIDR"""
+        if re.search(r"\b([0-9]{1,3}(\.|\[\.\])){3}[0-9]{1,3}\/\d{1,2}\b",self.text) :
+            return True
+        else :
+            return False
+    
+    def extract(self):
+        """Return all CIDR contained in text."""
+        ipsIter = re.finditer(r"\b([0-9]{1,3}(\.|\[\.\])){3}[0-9]{1,3}\/\d{1,2}\b", self.text)
+        ips = [ip.group().replace("[.]",".") for ip in ipsIter]
+        self.objects = ips
+        self.log.debug(", ".join(self.objects))
+        return ips
+
 class ipv6Parser(ParserInterface):
     """Parser for ipv6."""
     def __init__(self, text: str, parsertype="ipv6", loglevel = logging.INFO):

@@ -1,5 +1,6 @@
 import win32clipboard
 import pyperclip
+import re
 import sys, os, subprocess
 from six import binary_type
 from urllib.parse import unquote
@@ -9,6 +10,23 @@ CLIPBOARD_TYPE = {
     13: ["UTF8_STRING"],
     15: ["files"]
 }
+
+
+def get_file_icon(filename: str)-> str:
+    if re.search("(\.apng|\.avif|\.gif|\.jfif|\.jpeg|\.jpg|\.pjp|\.pjpeg|\.png|\.svg|\.webp)$", filename):
+        return "📷"
+    elif re.search("(\.3gp|\.8svx|\.aa|\.aac|\.aax|\.act|\.aiff|\.alac|\.amr|\.ape|\.au|\.awb|\.dss|\.dvf|\.flac|\.gsm|\.iklax|\.ivs|\.m4a|\.m4b|\.m4p|\.mmf|\.mogg|\.movpkg|\.mp3|\.mpc|\.msv|\.nmf|\.oga|\.ogg|\.opus|\.ra|\.raw|\.rf64|\.rm|\.sln|\.tta|\.voc|\.vox|\.wav|\.webm|\.wma|\.wv)$", filename):
+        return "🔊"
+    elif re.search("(\.xlsx|\.tsv|\.csv|\.xls)$", filename):
+        return "📊"
+    elif re.search("(\.py|\.pyc|\.jsx?|\.c|\.cpp|\.java|\.cs|\.css|\.html?|\.go|\.ruby|\.rb|\.php|\.db|\.exe|\.ba(t|sh))$", filename):
+        return "👩‍💻"
+    elif re.search("(\.docx?|\.pptx?|\.txt|\.epub|\.md|\.pdf)$", filename):
+        return "📝"
+    elif re.search("(\.[7bg]?zip|\.[jrt]ar|\.gz)$", filename):
+        return "🗂️"
+    else :
+        return "📄"
 
 
 def get_clipboard_formats():
@@ -94,7 +112,7 @@ def get_clipboard_files(folders=False):
         if folders:
             files = [f"📂{f}" for f in files if os.path.isdir(f)] if files else None
         else:
-            files = [f"📄{f}" for f in files if os.path.isfile(f)] if files else None
+            files = [f"{get_file_icon(f)}{f}" for f in files if os.path.isfile(f)] if files else None
         win32clipboard.CloseClipboard()
         print(files)
         return files
@@ -110,7 +128,7 @@ def get_clipboard_files(folders=False):
         if folders:
             files = [f"📂{f}" for f in files if os.path.isdir(str(f))] if files else None
         else:
-            files = [f"📄{f}" for f in files if os.path.isfile(str(f))] if files else None
+            files = [f"{get_file_icon(f)}{f}" for f in files if os.path.isfile(str(f))] if files else None
         print(files)
         return files
 

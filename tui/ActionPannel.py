@@ -3,7 +3,9 @@ from textual.reactive import var
 from textual.containers import  VerticalScroll
 from textual.widgets import Static,  Button, Input
 from textual.app import ComposeResult
+from textual.command import Hit, Hits, Provider
 from userAction import actionInterface
+from functools import partial
 
 class ActionButton(Static):
     """A action widget for action specific to certain types of data."""
@@ -57,18 +59,47 @@ class ActionButton(Static):
 
     def update_text(self):
         from tui.ContentView import ContentView
-        mainApp = self.app.query_one(ContentView)
-        if mainApp:
+        contentView = self.app.query_one(ContentView)
+        if contentView:
             if self.parent.ancestors[-1].query_one("#param-input").value:
                 self.action.param = self.parent.ancestors[-1].query_one("#param-input").value
             self.parent.ancestors[-1].query_one("#param-input").value = ""
-            mainApp.text = str(self.action)
+            contentView.text = str(self.action)
 
     def handle_param(self, complex_param : dict):
         if complex_param :
             self.action.complex_param = complex_param
             self.update_text()
 
+class ActionCommands(Provider):
+    """A command provider to return all actions for the current text."""
+
+    def recover_actions(self) -> list[actionInterface.actionInterface]:
+        """Get a list of curently active actions."""
+        return self.app.actions
+
+    async def startup(self) -> None:  
+        """Called once when the command palette is opened, prior to searching."""
+        worker = self.app.run_worker(self.recover_actions, thread=True)
+        self.actions = await worker.wait()
+
+    async def search(self, query: str) -> Hits:  
+        """Search for action."""
+        matcher = self.matcher(query)  
+
+        for action in self.actions :
+            action_desc = action.action.description
+            action_doc = action.action.__doc__
+            scoreDesc = matcher.match(action_desc) 
+            scoreDoc = matcher.match(action_doc) 
+
+            if scoreDesc > 0 or scoreDoc > 0:
+                yield Hit(
+                    max(scoreDesc, scoreDoc),
+                    matcher.highlight(action_desc),  
+                    partial(action.update_text),
+                    help=action_doc,
+                )
 
 class ActionPannel(Static):
     BINDINGS = [("escape", "clean_filter", "Clear the filter value."),]
@@ -97,13 +128,5 @@ class ActionPannel(Static):
                         action.visible = False
                         action.add_class("no-height")
 
-    def action_match(action, value):
-        if re.search(f"(?i){value}", action.action.description, re.IGNORECASE):
-            return True
-        elif value in action.action.supportedType:
-            return True
-        else:
-            return
-        
     def clean_filter(self):
         self.query_one(Input).value = ""
