@@ -97,7 +97,7 @@ class ActionCommands(Provider):
                 yield Hit(
                     max(scoreDesc, scoreDoc),
                     matcher.highlight(action_desc),  
-                    partial(action.update_text),
+                    partial(action.query_one("#action-button").press),
                     help=action_doc,
                 )
 

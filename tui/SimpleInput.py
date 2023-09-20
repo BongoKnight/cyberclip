@@ -9,11 +9,14 @@ class SimpleInput(Static):
     label = var("")
     def __init__(self, label : str ="", value : str ="", **kwargs):
         super().__init__(**kwargs)
-        self.value = value
+        self._value = value
         self.label = label
 
     def compose(self) -> ComposeResult:
         yield Horizontal(
             Label(self.label, markup=False),
-            Input(value=self.value, placeholder="Enter text here...")
+            Input(value=self._value, placeholder="Enter text here...")
             )
+    @property
+    def value(self):
+        return self.query_one(Input).value

@@ -6,6 +6,10 @@ tools.py
 mittre.json
 __pycache__/
 /data/conf.yml
+/data/*.csv
+/data/*.tsv
+/data/*.json
+/data/*.xlsx
 *.pyc
 log.log
 userAction/private/*
