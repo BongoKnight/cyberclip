@@ -9,30 +9,8 @@ from functools import partial
 
 class ActionButton(Static):
     """A action widget for action specific to certain types of data."""
-    DEFAULT_CSS="""#action-container{
-        column-span: 1;
-        row-span: 5;
-        height: 100%;
-    }
-    #action-pannel{
-        column-span: 1;
-        row-span: 5;
-        height: 100%;
-    }
-
-
-    #action-filter{
-        height: 3;
-    }
-
-    #action-button{
-        width: 100%;
-        height: 3;
-    }
-    
-    .no-height{
-        height: 0;
-    }"""
+    DEFAULT_CSS="""
+"""
 
 
     action : actionInterface = var(None)

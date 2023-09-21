@@ -1,4 +1,4 @@
-from textual.widgets import Static,  Button, Select
+from textual.widgets import Static,  Button, Select, TextArea
 from textual.containers import Vertical
 from textual.app import ComposeResult
 from textual import on
@@ -11,51 +11,7 @@ MARKUP_TYPES = ["actionscript3","apache","applescript","asp","bash","brainfuck",
 class ContentToolbar(Static):
 
     DEFAULT_CSS = """
-    ContentToolbar{
-        layer: above;
-        dock: right;
-        align-vertical: top;
-        width: 20;
-        height: 10;
-        background: rgba(255,255,255,0);
-    }
 
-    .small-button{
-        border: none;
-        height: auto;
-        width: auto;
-        min-width: 0;
-    }
-
-    #copy-button{
-        dock: right;
-        align-vertical: top;
-        background: $accent 10%;
-        width: 20;
-        height: 3;
-    }
-    #next-button{
-        dock: right;
-        align-vertical: top;
-        margin-top: 3;
-        height: 1;
-    }
-    #previous-button{
-        dock: right;
-        align-vertical: top;
-        margin-top: 3;
-        margin-right: 12;
-        height: 1;
-    }
-    .markup{
-        dock: right;
-        align-vertical: top;
-        margin: 0;
-        margin-top: 4;
-        width: 20;
-        height: 3;
-        padding:0;
-    }
     """
     def compose(self) -> ComposeResult:
             yield Button("Copy", id="copy-button")
@@ -84,7 +40,8 @@ class ContentToolbar(Static):
         from tui.ContentView import ContentView
         content_view = self.app.query_one(ContentView)
         if event.value:
-            new_text = f"```{event.value}\r\n{content_view.text}\r\n```"
-            content_view.query_one("#clip-content").update(Markdown(new_text))
+            content_view.query_one("#clip-content").langage = event.value
         else :
-            content_view.query_one("#clip-content").update(str(content_view.text))
+            textArea = content_view.query_one(TextArea)
+            textArea.clear()
+            textArea.insert(str(content_view.text))

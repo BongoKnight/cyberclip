@@ -2,7 +2,7 @@ import pyperclip
 from textual import events, work
 from textual.reactive import var, reactive
 from textual.containers import  Vertical, ScrollableContainer
-from textual.widgets import Static,  Button, Input, Switch, Label, Select
+from textual.widgets import Static,  Button, Input, Switch, Label, Select, TextArea
 from textual.app import ComposeResult
 
 from tui.ContentToolbar import ContentToolbar
@@ -16,7 +16,7 @@ class ContentView(Static):
         border: $accent;
         column-span: 3;
         row-span: 5;
-        height: 100%;
+        height: 1fr;
     }
     #param-input{
         row-span:1;
@@ -35,7 +35,7 @@ class ContentView(Static):
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader.""" 
         yield Vertical(
-            ScrollableContainer(Label(self.initial_text ,name="Content", id="clip-content", markup=False)),
+            ScrollableContainer(TextArea(self.initial_text ,name="Content", id="clip-content")),
             ContentToolbar(),
             Input(placeholder="Add additional parameter for custom action.",id="param-input")
         )
@@ -73,10 +73,12 @@ class ContentView(Static):
                     action_button.add_class("no-height")
 
     def watch_text(self, new_text: str) -> None:
+        """Called when the text attribute changes."""
         from tui.DataTypePannel import DataTypeButton, DataLoader
         from tui.ActionPannel import ActionPannel, ActionButton
-        self.query_one("#clip-content").update(str(new_text))
-        """Called when the text attribute changes."""
+        textArea = self.query_one(TextArea)
+        textArea.clear()
+        textArea.insert(str(new_text))
         if new_text not in self.text_history:
             self.text_history.append(new_text)
             self.text_history = self.text_history[-20:]

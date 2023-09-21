@@ -24,7 +24,6 @@ with open(Path(__file__).parent / '../data/conf.yml', encoding="utf8") as f:
                     conf.update({key:value})
         SHODAN_CONFIG = dict(conf)
 SHODAN_KEY = SHODAN_CONFIG.get("api-key","")
-print(SHODAN_KEY)
 
 class searchInShodanAction(actionInterface):
     """Search all type of observables with the Shodan API. The API Key is passed in the config file. Only IP are handled atm.
