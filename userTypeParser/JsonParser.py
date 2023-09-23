@@ -47,7 +47,7 @@ class JSONParser(ParserInterface):
             self.objects = json.loads(self.text)
         except :
             self.objects = []
-        return [self.objects]
+        return [json.dumps(self.objects, indent=4)]
         
         
 if __name__=="__main__":

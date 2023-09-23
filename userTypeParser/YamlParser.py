@@ -49,7 +49,7 @@ class YamlParser(ParserInterface):
                 self.objects = []
         except :
             self.objects = []
-        return [self.objects]
+        return [str(self.objects)]
         
         
 if __name__=="__main__":
