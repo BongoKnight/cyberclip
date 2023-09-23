@@ -1,5 +1,8 @@
 import os
 import sys
+import yaml
+from yaml.loader import SafeLoader
+from pathlib import Path
 script_dir = os.path.dirname( __file__ )
 parser_dir = os.path.join( script_dir, '..')
 sys.path.append( parser_dir )
@@ -25,6 +28,7 @@ class actionInterface():
         self.complex_param_scheme = complex_param
         self.observables = {}
         self.results = {}
+        self.conf = {}
         
     def execute(self) -> dict:
         """Execute the action
@@ -32,6 +36,17 @@ class actionInterface():
         Return a dict of matches and values.
         """
         return {}
+    
+    def load_conf(self, conf_name, path='../../data/conf.yml'):
+        with open(Path(__file__).parent / path, encoding="utf8") as f:
+            self.config = yaml.load(f, Loader=SafeLoader)
+            if self.config.get(conf_name):
+                conf = {}
+                for i in self.config.get(conf_name):
+                    if isinstance(i,dict):
+                        for key, value in i.items():
+                            conf.update({key:value})
+                self.conf = dict(conf)
     
     def get_observables(self) -> dict:
         """

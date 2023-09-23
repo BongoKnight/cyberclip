@@ -10,6 +10,7 @@ __pycache__/
 /data/*.tsv
 /data/*.json
 /data/*.xlsx
+/data/*.zip
 *.pyc
 log.log
 userAction/private/*
