@@ -5,7 +5,7 @@ from textual._path import CSSPathType
 from textual.app import App, CSSPathType, ComposeResult
 from textual.containers import Grid
 from textual.driver import Driver
-from textual.widgets import Footer
+from textual.widgets import Footer, TabbedContent, TabPane, Label
 
 from tui.ConfigScreen import ConfigScreen
 from tui.DataTypePannel import DataLoader
@@ -36,12 +36,18 @@ class ClipBrowser(App):
     def compose(self) -> ComposeResult:
         """Compose our UI."""
         self.console.set_window_title("📝CyberClip👩‍💻")
-        yield Grid(
-            DataLoader(id="left-pannel"),
-            ContentView(id="content-view"),
-            ActionPannel(id="action-pannel"),
-            id="maingrid"
-        )
+        with TabbedContent():
+            with TabPane("📝CyberClip👩‍💻"):
+                yield Grid(
+                    DataLoader(id="left-pannel"),
+                    ContentView(id="content-view"),
+                    ActionPannel(id="action-pannel"),
+                    id="maingrid"
+                )
+            with TabPane('TableView'):
+                yield Label("TableView")
+            with TabPane('Recipes'):
+                yield Label("Recipes")
         yield Footer()
 
     def action_quit(self):

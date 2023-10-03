@@ -1,7 +1,7 @@
 import pyperclip
 from textual.reactive import var
-from textual.containers import  VerticalScroll, Horizontal
-from textual.widgets import Static,  Button, Switch
+from textual.containers import  VerticalScroll, Horizontal, Vertical
+from textual.widgets import Static,  Button, Switch, TextArea
 from textual.app import ComposeResult
 from clipboardHandler import get_clipboard_text
 
@@ -46,6 +46,11 @@ class DataLoader(Static):
             mainApp = self.ancestors[-1].query_one(ContentView)
             if mainApp: 
                 mainApp.text = self.data
+        if event.button.id == "text-update-button":
+            mainApp = self.ancestors[-1].query_one(ContentView)
+            self.data = mainApp.query_one(TextArea).text
+            if mainApp: 
+                mainApp.text = self.data
         if event.button.id == "filter-button":
             self.select_all_datatype = not  self.select_all_datatype 
             for switch in self.query(Switch):
@@ -60,6 +65,9 @@ class DataLoader(Static):
 
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader."""
-        yield Button("Reset", id="update-button", variant="success")
+        yield Vertical(
+            Button("Parse clip", id="update-button", variant="success"),
+            Button("Parse text", id="text-update-button", variant="primary"), classes='update'
+        )
         yield VerticalScroll(id="data-type-container")
         yield Button("(Un)select all", id="filter-button", variant="primary")

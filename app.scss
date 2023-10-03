@@ -117,7 +117,9 @@ ContentToolbar{
     height: 3;
 }
 
-#update-button{
-    width: 100%;
+#update-button, #text-update-button{
+    width: 1fr;
     height:3;
 }
+
+.update{height: 6;}
