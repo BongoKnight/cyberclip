@@ -13,7 +13,6 @@ MARKUP_TYPES = ["actionscript3","apache","applescript","asp","bash","brainfuck",
 class ContentView(Static):
     DEFAULT_CSS="""
     ContentView{
-        border: $accent;
         column-span: 3;
         row-span: 5;
         height: 1fr;
@@ -23,7 +22,8 @@ class ContentView(Static):
         dock: bottom;
     }
     #clip-content{
-    width: 100%;
+        width: 100%;
+        border: $accent;
     }
     """
 
@@ -35,8 +35,8 @@ class ContentView(Static):
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader.""" 
         yield Vertical(
-            ScrollableContainer(TextArea(self.initial_text ,name="Content", id="clip-content")),
             ContentToolbar(),
+            ScrollableContainer(TextArea(self.initial_text ,name="Content", id="clip-content")),
             Input(placeholder="Add additional parameter for custom action.",id="param-input")
         )
 

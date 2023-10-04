@@ -42,7 +42,10 @@ class ActionButton(Static):
             if self.parent.ancestors[-1].query_one("#param-input").value:
                 self.action.param = self.parent.ancestors[-1].query_one("#param-input").value
             self.parent.ancestors[-1].query_one("#param-input").value = ""
-            contentView.text = str(self.action)
+            try:
+                contentView.text = str(self.action)
+            except Exception as e:
+                self.app.notify(f"Error : {e}", severity="error",timeout=5)
 
     def handle_param(self, complex_param : dict):
         if complex_param :

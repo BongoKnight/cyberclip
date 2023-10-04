@@ -1,9 +1,9 @@
-from textual.widgets import Static, Button, Input, Label, Select
+from textual.widgets import Static, Label, Select
 from textual.widgets import _select
-from textual.containers import Horizontal, HorizontalScroll
+from textual.containers import Horizontal
 from textual.app import ComposeResult
-from textual.reactive import reactive, var
-from textual import on, events
+from textual.reactive import var
+from textual import on
 
 TRUE_EMOTE = "✅"
 FALSE_EMOTE = "❌"

@@ -1,5 +1,5 @@
 from textual.widgets import Static,  Button, Select, TextArea
-from textual.containers import Vertical
+from textual.containers import Vertical, Horizontal
 from textual.app import ComposeResult
 from textual import on
 from rich.markdown import Markdown
@@ -14,18 +14,28 @@ class ContentToolbar(Static):
 
     """
     def compose(self) -> ComposeResult:
-            yield Button("Copy", id="copy-button")
-            yield Button(u"\u21A9 Undo", id="previous-button", classes="small-button")
-            yield Button(u"Redo \u21AA", id="next-button", classes="small-button")
-            yield Select([(markup, markup) for markup in MARKUP_TYPES], classes="markup", prompt="Show as...")
-        
-    
+            yield Horizontal(
+                Button("📋", id="copy-button", classes="small-button"),
+                Button("❌", id="clear-button", classes="small-button"),
+                Button(u"\u21A9", id="previous-button", classes="small-button"),
+                Button(u"\u21AA", id="next-button", classes="small-button"),
+                #Select([(markup, markup) for markup in MARKUP_TYPES], classes="markup", prompt="Show as...")
+            )
+
+    def on_mount(self) -> None:
+        self.query_one("#copy-button").tooltip = "Copy text to clipboard"
+        self.query_one("#clear-button").tooltip = "Delete the whole text"
+        self.query_one("#previous-button").tooltip = "Undo"
+        self.query_one("#next-button").tooltip = "Redo"
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         from tui.ContentView import ContentView
         content_view = self.app.query_one(ContentView)
         button_id = event.button.id
         if button_id == "copy-button":
             pyperclip.copy(content_view.text)
+        if button_id == "clear-button":
+            content_view.text = ""
         elif button_id == "previous-button":
             if content_view.text in content_view.text_history:
                 index = content_view.text_history.index(content_view.text)

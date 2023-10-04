@@ -15,7 +15,7 @@ class DataTypeButton(Static):
         """Create child widgets of a dataType.""" 
         yield Horizontal(
              Button(self.parser_type, id="datatype-button", classes=""),
-             Switch(value=True, id="datatype-active")
+             Switch(value=True, id="datatype-active"), classes="datatype"
              )
     
     def on_button_pressed(self, event: Button.Pressed) -> None:

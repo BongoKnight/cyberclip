@@ -1,6 +1,6 @@
 from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.widgets import Label, Button, Input
+from textual.widgets import Label, Button, Input, Checkbox
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.reactive import var
 
@@ -8,6 +8,7 @@ from tui.ActionPannel import ActionButton
 from tui.TagsInput import TagsInput
 from tui.SimpleInput import SimpleInput
 from tui.SelectionInput import SelectionInput
+from tui.MultiSelect import MultiSelect
 
 class ParamScreen(Screen):
     """Modal screen for entering parameters"""
@@ -75,6 +76,23 @@ class ParamScreen(Screen):
             widgets = []
             stored_values = self.action_button.action.complex_param
             for key, value in self.action_button.action.complex_param_scheme.items():
+                if isinstance(value, dict):
+                    assert "type" in value.keys()
+                    assert "value" in value.keys()
+                    real_value = value.get("value")
+                    input_type = value.get("type")
+                    self.action_button.action.complex_param[key] = real_value
+                    stored_values = self.action_button.action.complex_param
+                    if input_type.lower() == "text":
+                        widgets.append(SimpleInput(label=key, value=stored_values.get(key,""), classes="complex-input"))
+                    elif input_type.lower() == "tags":
+                        widgets.append(TagsInput(label=key, value=stored_values.get(key,[]), classes="complex-input"))
+                    elif input_type.lower() == "fixedlist":
+                        widgets.append(SelectionInput(label=key, choices=real_value, classes="complex-input"))
+                    elif input_type.lower() == "compactlist":
+                        widgets.append(MultiSelect(label=key, choices=real_value, classes="complex-input"))
+                    elif input_type.lower() == "bool":
+                        widgets.append(Checkbox(label=key, value=real_value, classes="complex-input"))
                 if isinstance(value, str):
                     widgets.append(SimpleInput(label=key, value=stored_values.get(key,""), classes="complex-input"))
                 if isinstance(value,list):
@@ -82,7 +100,6 @@ class ParamScreen(Screen):
                         widgets.append(TagsInput(label=key, value=stored_values.get(key,[]), classes="complex-input"))
                     else:
                         widgets.append(SelectionInput(label=key, choices=value, classes="complex-input"))
-                if isinstance(value, dict):
-                    if ["type","value"] in value.keys():
-                        pass
+                if isinstance(value, bool):
+                    widgets.append(Checkbox(label=key, value=value))
             return widgets
