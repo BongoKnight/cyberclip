@@ -14,19 +14,19 @@ CLIPBOARD_TYPE = {
 
 def get_file_icon(filename: str)-> str:
     if re.search("(\.apng|\.avif|\.gif|\.jfif|\.jpeg|\.jpg|\.pjp|\.pjpeg|\.png|\.svg|\.webp)$", filename):
-        return "📷"
+        return "📷 "
     elif re.search("(\.3gp|\.8svx|\.aa|\.aac|\.aax|\.act|\.aiff|\.alac|\.amr|\.ape|\.au|\.awb|\.dss|\.dvf|\.flac|\.gsm|\.iklax|\.ivs|\.m4a|\.m4b|\.m4p|\.mmf|\.mogg|\.movpkg|\.mp3|\.mpc|\.msv|\.nmf|\.oga|\.ogg|\.opus|\.ra|\.raw|\.rf64|\.rm|\.sln|\.tta|\.voc|\.vox|\.wav|\.webm|\.wma|\.wv)$", filename):
-        return "🔊"
+        return "🔊 "
     elif re.search("(\.xlsx|\.tsv|\.csv|\.xls)$", filename):
-        return "📊"
+        return "📊 "
     elif re.search("(\.py|\.pyc|\.jsx?|\.c|\.cpp|\.java|\.cs|\.css|\.html?|\.go|\.ruby|\.rb|\.php|\.db|\.exe|\.ba(t|sh))$", filename):
-        return "👩‍💻"
+        return "👩‍💻 "
     elif re.search("(\.docx?|\.pptx?|\.txt|\.epub|\.md|\.pdf)$", filename):
-        return "📝"
+        return "📝 "
     elif re.search("(\.[7bg]?zip|\.[jrt]ar|\.gz)$", filename):
-        return "🗂️"
+        return "🗂️ "
     else :
-        return "📄"
+        return "📄 "
 
 
 def get_clipboard_formats():
@@ -109,6 +109,9 @@ def get_clipboard_files(folders=False):
             files = [win32clipboard.GetClipboardData(win32clipboard.CF_TEXT)]
         elif win32clipboard.CF_OEMTEXT in f:
             files = [win32clipboard.GetClipboardData(win32clipboard.CF_OEMTEXT)]
+        elif 14 in f:
+            #14 is a custom datatype for excel, pyperclip handle the text representation
+            files = [pyperclip.paste()] 
         if folders:
             files = [f"📂{f}" for f in files if os.path.isdir(f)] if files else None
         else:

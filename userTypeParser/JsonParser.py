@@ -9,6 +9,8 @@ Code exemple ::
 """
 import logging
 import json
+from json.decoder import JSONDecodeError
+import re
 try:
     from userTypeParser.ParserInterface import ParserInterface
 except:
@@ -21,14 +23,6 @@ class JSONParser(ParserInterface):
     def __init__(self, text: str, parsertype="json", loglevel = logging.INFO):
         self.text = text
         self.parsertype = "json"
-        self.log = logging.Logger("json")
-        ch = logging.StreamHandler()
-        ch.setLevel(loglevel)
-        # create formatter
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %I:%M:%S')
-        # add formatter to ch
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
         
     def contains(self):
         """Return true if text contains JSON valid data"""
@@ -37,6 +31,12 @@ class JSONParser(ParserInterface):
             if valid_json :
                 return True
         except :
+            for match in re.findall(r'(\{.*\})', self.text):
+                try:
+                    json.loads(match[0])
+                    return True
+                except JSONDecodeError as e:
+                    pass
             return False
         else :
             return False
@@ -47,6 +47,12 @@ class JSONParser(ParserInterface):
             self.objects = json.loads(self.text)
         except :
             self.objects = []
+            for match in re.findall(r'(\{.*\})', self.text):
+                try:
+                    if json.loads(match[0]):
+                        self.objects.append(json.loads(match[0]))
+                except JSONDecodeError as e:
+                    pass
         return [json.dumps(self.objects, indent=4)]
         
         

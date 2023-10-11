@@ -7,6 +7,7 @@ import os
 import urllib
 import socket
 import dns
+import json
 from dns import resolver
 
 class DNSAction(actionInterface):
@@ -14,8 +15,9 @@ class DNSAction(actionInterface):
     A action module, to return reverse DNS for an IP, and DNS for a domain.
     For a domain the a list of DNS reccord can be specified (default A) : ie. AAA,SPF,TXT.
     """
-    def __init__(self, parsers = {}, supportedType = {"ipv6","ip","domain"}, param_data: str ="A"):
-        super().__init__(parsers = parsers, supportedType = supportedType, param_data= param_data)
+    CONF = {"Reccords":{"type":"tags","value":["A","TXT"]}}
+    def __init__(self, parsers = {}, supportedType = {"ipv6","ip","domain"}, complex_param = CONF):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
         self.description = "DNS/Reverse DNS"
         self.dns_results = {}
         
@@ -38,7 +40,7 @@ class DNSAction(actionInterface):
         if self.observables.get("domain"):
             for domain in self.observables.get("domain"):
                 dns_reccords = {}
-                for type in self.param.split(","):
+                for type in self.complex_param.get("Reccords", []):
                     try:
                         dns_reccords.update({type:",".join([ip.to_text() for ip in resolver.resolve(domain, type)])})
                     except:
@@ -49,7 +51,10 @@ class DNSAction(actionInterface):
     def __str__(self):
         """Return result of DNS request for domain and of Reverse DNS for IP. For domain the type of NS reccord can be inputed as a parameter."""
         self.execute()
-        return  "\n".join([f"{i}\t{str(self.dns_results.get(i))}" for i in self.dns_results])
+        results = []
+        for key, value in self.dns_results.items():
+            results.append(str(key) + "\t" + json.dumps(value))
+        return  "\n".join(results)
 
 if __name__=='__main__':
     from userTypeParser.domainParser import domainParser

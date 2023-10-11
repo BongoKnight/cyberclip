@@ -20,14 +20,6 @@ class URLParser(ParserInterface):
         self.text = text
         self.parsertype = "url"
         self.objects = []
-        self.log = logging.Logger("URL")
-        ch = logging.StreamHandler()
-        ch.setLevel(loglevel)
-        # create formatter
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %I:%M:%S')
-        # add formatter to ch
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
         
     def contains(self):
         """Return true if text contains at least one URL."""
@@ -41,7 +33,6 @@ class URLParser(ParserInterface):
         URLsIter = re.finditer(r"\b(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:([\-a-zA-Z0-9+&@#\/%=~_|$?!:,.]*)|[a-z\-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:([a-z\-A-Z0-9+&@#\/%=~_|$?!:,.]*)|[a-zA-Z0-9\-+&@#\/%=~_|$])", self.text)
         URLs = [URL.group() for URL in URLsIter]
         self.objects = URLs
-        self.log.debug(", ".join(self.objects))
         return URLs
         
         
