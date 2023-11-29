@@ -81,11 +81,11 @@ class AsToCidrAction(actionInterface):
             if len(AS_DB.columns):
                 AS_numbers = self.observables.get("asnum", [])
                 for as_num in AS_numbers:
-                    int_as = int(re.search("\d+",as_num).group())
+                    int_as = int(re.search(r"\d+",as_num).group())
                     AS_RANGE = AS_DB.loc[AS_DB["as_num"]==int_as]
                     AS_RANGE = AS_RANGE[["as_num","CIDRS"]]
                     AS_RANGE = AS_RANGE.groupby('as_num').agg(sum).reset_index()
-                    response = AS_RANGE.loc[AS_RANGE["as_num"]==int_as].to_dict(orient="row")
+                    response = AS_RANGE.loc[AS_RANGE["as_num"]==int_as].to_dict(orient="records")
                     if len(response)>0:
                         infos = response[0]
                         self.results.update({as_num:infos})

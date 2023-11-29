@@ -56,7 +56,7 @@ class MitreAction(actionInterface):
 
 if __name__=='__main__':
     from userTypeParser.MitreParser import MitreParser
-    data = "ip\tinfo\n154.0.123.1\T1548"
+    data = "ip\tinfo\n154.0.123.1\tT1548"
     text_parser = MitreParser(data)
     a = str(MitreAction({"mitre":text_parser},["mitre"]))
     print(a, text_parser.objects)

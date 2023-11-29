@@ -3,7 +3,6 @@ try:
 except:
     from actionInterface import actionInterface
 from bs4 import BeautifulSoup
-import pyhtml2md
 
 class HtmlExtractAction(actionInterface):
     """
@@ -71,41 +70,6 @@ class HtmlExtractTextAction(actionInterface):
                 lines.append(str(item.string))
         return  "\r\n".join(lines)
 
-class HtmlToMarkdownAction(actionInterface):
-    """
-A action module to convert HTML to Markdown.
-For example :
-    <h1>Dune</h1><p>Fear is the mind-killer.</p><p>Fear is the little-death that brings total obliteration.</p>
-    
-    Returns :
-    # Dune
-    Fear is the mind-killer.
-    Fear is the little-death that brings total obliteration.
-    """
-
-    def __init__(self, parsers = {}, supportedType = {"html"}, param_data="h1, h2, h3, h4, h5, p"):
-        super().__init__(parsers = parsers, supportedType = supportedType, param_data = param_data)
-        self.description = "Convert HTML to Markdown."
-
-    def execute(self) -> object:
-        """Execute the action."""
-        self.observables = {}
-        html_texts = self.parsers.get("html").extract()
-        if html_texts:
-            for html_text in html_texts:
-                soup = BeautifulSoup(html_text, "html.parser")
-                filtered_dom = soup.select(self.param)
-                self.observables.update({html_text:filtered_dom})
-        return self.observables
-    
-    def __str__(self):
-        """Visual representation of the action"""
-        lines = []
-        filtered_dom = self.execute()
-        for html_text, html_extract in filtered_dom.items():
-            for item in html_extract:
-                lines.append(str(item))
-        return   pyhtml2md.convert("\r\n".join(lines))
 
 
 if __name__=='__main__':
