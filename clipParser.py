@@ -142,7 +142,6 @@ class clipParser():
 if __name__=='__main__':
     a = clipParser()
     a.log.level = logging.debug
-    data = "127.0.0.1, 124.0.12.23 SARA-65890 simon@vade.com aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    data = "127.0.0.1, 124.0.12.23  user@domain.com aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     print(a.parseData(data))
-
 

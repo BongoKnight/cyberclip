@@ -9,6 +9,11 @@ $accent:  rgb(0, 140, 255);
     grid-gutter: 1;
 }
 
+#main-table{
+    height: auto;
+    width: 100%;
+}
+
 Tooltip {
     background: antiquewhite;
     border: $accent;

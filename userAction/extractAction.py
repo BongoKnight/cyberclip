@@ -33,7 +33,7 @@ if __name__=='__main__':
     from userTypeParser.IPParser import ipParser
     from userTypeParser.MD5Parser import md5Parser
 
-    data = "127.0.0.1, 124.0.12.23 SARA-65890 simon@vade.com aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    data = "127.0.0.1, 124.0.12.23 user@domain.com aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ip_parser = ipParser(data)
     md5_parser = md5Parser(data)
     a = str(extractAction([ip_parser, md5_parser],["ip"]))

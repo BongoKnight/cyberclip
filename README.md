@@ -105,6 +105,7 @@ Showed data can be exported to clipboard or to a file.
 # Thanks to and similar project:
 
 - [Textual](https://textual.textualize.io/)
+- [Textual-pandas](https://github.com/dannywade/textual-pandas)
 - [CyberChef](https://gchq.github.io/CyberChef/)
 - [Visidata](https://www.visidata.org/)
 - [Cheepy](https://github.com/securisec/chepy)

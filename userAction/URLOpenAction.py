@@ -29,6 +29,6 @@ class URLOpenAction(actionInterface):
 if __name__=='__main__':
     from userTypeParser.URLParser import URLParser
 
-    data = "127.0.0.1, https://google.com/ SARA-574332 simon@vade.com aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    data = "127.0.0.1, https://google.com/ user@domain.com aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     url_parser = URLParser(data)
     a = str(URLOpenAction({"url":url_parser},["url"]))

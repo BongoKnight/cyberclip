@@ -1,6 +1,10 @@
 import sys
 from typing import Type
 import pyperclip
+from io import StringIO
+import pandas as pd
+
+from textual import on
 from textual._path import CSSPathType
 from textual.app import App, CSSPathType, ComposeResult
 from textual.containers import Grid
@@ -12,7 +16,8 @@ from tui.DataTypePannel import DataLoader
 from tui.ContentView import ContentView
 from tui.ActionPannel import ActionPannel, ActionCommands
 
-
+from tui.TableView import FiltrableDataFrame
+from userTypeParser import TSVParser
 
 class ClipBrowser(App):
     """Textual clipboard browser app."""
@@ -44,8 +49,8 @@ class ClipBrowser(App):
                     ActionPannel(id="action-pannel"),
                     id="maingrid"
                 )
-            with TabPane('TableView'):
-                yield Label("TableView")
+            with TabPane('TableView', id="table-view"):
+                yield FiltrableDataFrame(pd.DataFrame(), id="main-table")
             with TabPane('Recipes'):
                 yield Label("Recipes")
         yield Footer()
@@ -60,9 +65,28 @@ class ClipBrowser(App):
     def action_copy(self):
         pyperclip.copy(self.query_one(ContentView).text)
 
-    def select_action_filter(self):
+    def action_select_action_filter(self):
         filter = self.app.query_one("#action-filter").focus()
         filter.value = ""
+
+    @on(TabbedContent.TabActivated)
+    def check_TSV(self, event: TabbedContent.TabActivated):
+        if event.tab.label_text == "TableView":
+            df = pd.DataFrame()
+            parser = TSVParser.tsvParser(pyperclip.paste())
+            if parser.extract():
+                df = pd.read_clipboard(sep="\t")
+            try:
+                self.app.call_after_refresh(self.update_dataframe, df)
+            except:
+                pass
+    
+    def update_dataframe(self, df):
+        tab = self.query("#table-view")[1]
+        tab.remove_children()
+        tab.mount(FiltrableDataFrame(pd.DataFrame(df), id="main-table"))
+
+
 
 if __name__ == "__main__":
     ClipBrowser().run()
