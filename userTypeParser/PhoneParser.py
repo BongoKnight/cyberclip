@@ -7,7 +7,6 @@ Code exemple ::
     print(b.extract(), b.contains())
 
 """
-import logging
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
@@ -16,18 +15,10 @@ class phoneParser(ParserInterface):
     """Parser for phone."""
     
     
-    def __init__(self, text: str, parsertype="phone", loglevel = logging.INFO):
+    def __init__(self, text: str, parsertype="phone"):
         self.text = text
         self.parsertype = "phone"
         self.objects = []
-        self.log = logging.Logger("phone")
-        ch = logging.StreamHandler()
-        ch.setLevel(loglevel)
-        # create formatter
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %I:%M:%S')
-        # add formatter to ch
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
         
     def contains(self):
         """Return true if text contains at least one phone."""
@@ -41,7 +32,6 @@ class phoneParser(ParserInterface):
         phonesIter = re.finditer(r"\b[0-9]{10}\b", self.text)
         phones = [phone.group() for phone in phonesIter]
         self.objects = phones
-        self.log.debug(", ".join(self.objects))
         return phones
         
         

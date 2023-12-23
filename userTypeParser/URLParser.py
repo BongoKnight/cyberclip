@@ -7,7 +7,6 @@ Code exemple ::
     print(b.extract(), b.contains())
 
 """
-import logging
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
@@ -16,7 +15,7 @@ class URLParser(ParserInterface):
     """Parser for URL."""
     
     
-    def __init__(self, text: str, parsertype="url", loglevel = logging.INFO):
+    def __init__(self, text: str, parsertype="url"):
         self.text = text
         self.parsertype = "url"
         self.objects = []

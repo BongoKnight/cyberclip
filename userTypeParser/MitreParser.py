@@ -7,7 +7,6 @@ Code exemple ::
     print(b.extract(), b.contains())
 
 """
-import logging
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
@@ -16,18 +15,10 @@ class MitreParser(ParserInterface):
     """Parser for Mitre Att&ck TTP."""
     
     
-    def __init__(self, text: str, parsertype="mitre", loglevel = logging.INFO):
+    def __init__(self, text: str, parsertype="mitre"):
         self.text = text
         self.parsertype = "mitre"
         self.objects = []
-        self.log = logging.Logger("Mitre")
-        ch = logging.StreamHandler()
-        ch.setLevel(loglevel)
-        # create formatter
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %I:%M:%S')
-        # add formatter to ch
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
         
     def contains(self):
         """Return true if text contains at least one Mitre TTP."""
@@ -41,7 +32,6 @@ class MitreParser(ParserInterface):
         MitreIter = re.finditer(r"\bT\d{4}(\.\d{3})?\b", self.text)
         MitreTTPs = [TTP.group() for TTP in MitreIter]
         self.objects = MitreTTPs
-        self.log.debug(", ".join(self.objects))
         return MitreTTPs
         
         

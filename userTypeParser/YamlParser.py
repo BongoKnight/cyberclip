@@ -7,7 +7,6 @@ Code exemple ::
     print(b.extract(), b.contains())
 
 """
-import logging
 import yaml
 try:
     from userTypeParser.ParserInterface import ParserInterface
@@ -18,17 +17,9 @@ except:
 class YamlParser(ParserInterface):
     """Parser for Yaml, use yaml.safe_load"""
     
-    def __init__(self, text: str, parsertype="yaml", loglevel = logging.INFO):
+    def __init__(self, text: str, parsertype="yaml"):
         self.text = text
         self.parsertype = "yaml"
-        self.log = logging.Logger("yaml")
-        ch = logging.StreamHandler()
-        ch.setLevel(loglevel)
-        # create formatter
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %I:%M:%S')
-        # add formatter to ch
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
         
     def contains(self):
         """Return true if text contains Yaml valid data"""

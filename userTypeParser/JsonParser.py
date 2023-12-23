@@ -7,7 +7,6 @@ Code exemple ::
     print(b.extract(), b.contains())
 
 """
-import logging
 import json
 from json.decoder import JSONDecodeError
 import re
@@ -20,7 +19,7 @@ except:
 class JSONParser(ParserInterface):
     """Parser for Json, use json.loads"""
     
-    def __init__(self, text: str, parsertype="json", loglevel = logging.INFO):
+    def __init__(self, text: str, parsertype="json"):
         self.text = text
         self.parsertype = "json"
         

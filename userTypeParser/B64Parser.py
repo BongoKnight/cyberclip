@@ -7,7 +7,6 @@ Code exemple ::
     print(b.extract(), b.contains())
 
 """
-import logging
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
@@ -17,19 +16,11 @@ class B64Parser(ParserInterface):
     Parser for base 64 text.
     """
     
-    def __init__(self, text: str, parsertype="b64", loglevel = logging.INFO):
+    def __init__(self, text: str, parsertype="b64"):
         self.text = text
         self.parsertype = "b64"
         self.objects = []
-        self.log = logging.Logger("b64")
-        ch = logging.StreamHandler()
-        ch.setLevel(loglevel)
-        # create formatter
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %I:%M:%S')
-        # add formatter to ch
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
-        
+
     def contains(self):
         """
         Return True if text contains at least one base 64 line.
@@ -50,7 +41,6 @@ class B64Parser(ParserInterface):
         b64Iter = re.finditer(r"^[A-Za-z0-9+/]+=*$", self.text, re.MULTILINE)
         b64s = [b64.group() for b64 in b64Iter if len(b64.group()) % 4 == 0]
         self.objects = b64s
-        self.log.debug(", ".join(self.objects))
         return b64s
         
         

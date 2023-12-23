@@ -7,7 +7,6 @@ Code exemple ::
     print(b.extract(), b.contains())
 
 """
-import logging
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
@@ -18,18 +17,10 @@ class asnumParser(ParserInterface):
     """
     
     
-    def __init__(self, text: str, parsertype="asnum", loglevel = logging.INFO):
+    def __init__(self, text: str, parsertype="asnum"):
         self.text = text
         self.parsertype = "asnum"
         self.objects = []
-        self.log = logging.Logger("asnum")
-        ch = logging.StreamHandler()
-        ch.setLevel(loglevel)
-        # create formatter
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %I:%M:%S')
-        # add formatter to ch
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
         
     def contains(self):
         """
@@ -50,7 +41,6 @@ class asnumParser(ParserInterface):
         asnumsIter = re.finditer(r"\bAS\d+\b", self.text, re.IGNORECASE)
         asnums = [asnum.group().replace("[.]",".") for asnum in asnumsIter]
         self.objects = asnums
-        self.log.debug(", ".join(self.objects))
         return asnums
         
         

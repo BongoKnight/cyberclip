@@ -8,7 +8,6 @@ Code exemple ::
 
 Source : https://stackoverflow.com/questions/24856035/how-to-detect-with-python-if-the-string-contains-html-code
 """
-import logging
 import re
 from bs4 import BeautifulSoup 
 from userTypeParser.ParserInterface import ParserInterface
@@ -18,18 +17,10 @@ class HtmlParser(ParserInterface):
     """Parser for Mitre Att&ck TTP."""
     
     
-    def __init__(self, text: str, parsertype="html", loglevel = logging.INFO):
+    def __init__(self, text: str, parsertype="html"):
         self.text = text
         self.parsertype = "html"
         self.objects = []
-        self.log = logging.Logger("HTML")
-        ch = logging.StreamHandler()
-        ch.setLevel(loglevel)
-        # create formatter
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %I:%M:%S')
-        # add formatter to ch
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
         
     def contains(self):
         """Return true if text contains at least one Mitre TTP."""
