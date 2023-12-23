@@ -41,6 +41,9 @@ type DataFrameFilters = list[DataFrameFilter]
 #####################
 
 class FilterInput(Static):
+    """
+    Small input field with a checkbox for indicating a reverse filter.
+    """
 
     DEFAULT_CSS = """
     FilterInput > Input {
@@ -73,6 +76,9 @@ class FilterInput(Static):
     def __init__(self, input_id=0):
         super().__init__()
         self.input_id = input_id
+
+    def on_mout(self):
+        self.query_one(Checkbox).tooltip = "Exclude matches"
 
     def compose(self) -> ComposeResult:
         yield Input(id=f"filter-input-{self.input_id}",  classes="filter-input", placeholder="Filter...")
@@ -141,28 +147,27 @@ class DataFrameTable(DataTable):
 class FiltrableDataFrame(Static):
     DEFAULT_CSS = """
     FiltrableDataFrame {
-        height: 99%;
-        scrollbar-gutter: stable;
         layout: grid;
-        grid-size: 1 3;  /* 3 lines */
+        grid-size: 1 2;  /* 2 lines */
         grid-columns: 1fr;
-        grid-rows: 5 3 1fr;
+        grid-rows: 5 1fr;
     }
     #table-option{
         row-span: 1;
     }
     #table-container{
-        row-span: 2;
         overflow-x: scroll;
         overflow-y: hidden;
         width: auto;
-        height: auto;
+        height: 99%;
+        row-span: 1;
     }
 
     #filter-container{
         width: auto;
         margin-top: 1;
         margin-bottom: 1;
+        height: auto;
     }
 
     #selectmode{
@@ -172,7 +177,6 @@ class FiltrableDataFrame(Static):
     DataFrameTable{
         height: auto;
         width: auto;
-        row-span: 1;
         overflow: hidden scroll;
     }
 
@@ -192,11 +196,11 @@ class FiltrableDataFrame(Static):
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="table-option"):
-            with RadioSet(id="selectmode") as f:
+            with RadioSet(id="selectmode") as radioset:
                     yield RadioButton("cell", value=True)
                     yield RadioButton("row")
                     yield RadioButton("column")
-                    f.border_title = "Select :"
+                    radioset.border_title = "Select :"
             yield Button("Copy selected",id="copy", variant="primary")
             yield Button("Copy table",id="copy-table", variant="primary")
             yield Button("Clean filters",id="clean-filter", variant="error")
