@@ -24,7 +24,7 @@ class DataTypeButton(Static):
             from tui.ContentView import ContentView
             contentView = self.parent.ancestors[-1].query_one(ContentView)
             if contentView:
-                contentView.text = "\n".join(contentView.parser.results["matches"].get(self.parser_type, ""))
+                contentView.text = "\n".join(self.app.parser.results["matches"].get(self.parser_type, ""))
                 contentView.filter_action()
 
 

@@ -4,7 +4,9 @@ import pyperclip
 from io import StringIO
 import pandas as pd
 
+
 from textual import on
+from textual.reactive import var
 from textual._path import CSSPathType
 from textual.app import App, CSSPathType, ComposeResult
 from textual.containers import Grid
@@ -18,6 +20,8 @@ from tui.ActionPannel import ActionPannel, ActionCommands
 
 from tui.TableView import FiltrableDataFrame
 from userTypeParser import TSVParser
+from clipParser import clipParser
+
 
 class ClipBrowser(App):
     """Textual clipboard browser app."""
@@ -34,9 +38,12 @@ class ClipBrowser(App):
         ("ctrl+e", "push_screen('conf')", "Edit config")
     ]
 
+    parser = var(clipParser())
+
     def __init__(self, driver_class: type[Driver] | None = None, css_path: CSSPathType | None = None, watch_css: bool = False):
         super().__init__(driver_class, css_path, watch_css)
         self.actions = []
+
 
     def compose(self) -> ComposeResult:
         """Compose our UI."""
@@ -74,12 +81,13 @@ class ClipBrowser(App):
         if event.tab.label_text == "TableView":
             df = pd.DataFrame()
             parser = TSVParser.tsvParser(pyperclip.paste())
-            if parser.extract():
-                df = pd.read_clipboard(sep="\t")
-            try:
-                self.app.call_after_refresh(self.update_dataframe, df)
-            except:
-                pass
+            if parser.extract():            
+                try:
+                    df = pd.read_clipboard(sep="\t",header=None)
+                    df.columns = [str(i) for i in df.columns]
+                    self.app.call_after_refresh(self.update_dataframe, df)
+                except Exception as e:
+                    self.app.notify(f"Error : {str(e)}",title="Error while loading data...",timeout=5, severity="error")
     
     def update_dataframe(self, df):
         tab = self.query("#table-view")[1]

@@ -4,9 +4,7 @@ from textual.reactive import var, reactive
 from textual.containers import  Vertical, ScrollableContainer
 from textual.widgets import Static,  Button, Input, Switch, Label, Select, TextArea
 from textual.app import ComposeResult
-
 from tui.ContentToolbar import ContentToolbar
-from clipParser import clipParser
 
 MARKUP_TYPES = ["actionscript3","apache","applescript","asp","bash","brainfuck","c","c++","cfm","clojure","cmake","coffee","coffee-script","coffeescript","cpp","cs","csharp","css","csv","diff","elixir","erb","go","haml","html","http","java","javascript","jruby","json","jsx","less","lolcode","make","markdown","matlab","nginx","objectivec","pascal","perl","php","profile","python","rb","ruby","rust","salt","saltstate","scss","sh","shell","smalltalk","sql","svg","swift","vhdl","vim","viml","volt","vue","xml","yaml","zsh"]
 
@@ -29,7 +27,6 @@ class ContentView(Static):
 
     initial_text = "Waiting for Update..."
     text= reactive("Waiting for Update...")
-    parser = var(clipParser())
     text_history = var([])
 
     def compose(self) -> ComposeResult:
@@ -46,7 +43,7 @@ class ContentView(Static):
         actionView = self.parent.ancestors[-1].query_one(ActionPannel)
         if actionView:
             actions = actionView.query(ActionButton)
-            actual_detected_type = set(self.parser.detectedType)
+            actual_detected_type = set(self.app.parser.detectedType)
             for datatype_button in self.parent.ancestors[-1].query(DataTypeButton):
                 # Update actions supported_type and hide action buttons where no type are supported
                 if datatype_button.query(Switch):
@@ -84,8 +81,8 @@ class ContentView(Static):
             self.text_history = self.text_history[-20:]
         
         
-        self.parser.parseData(new_text)
-        parser_types = self.parser.detectedType
+        self.app.parser.parseData(new_text)
+        parser_types = self.app.parser.detectedType
         # Update detected type buttons
         buttons = self.ancestors[-1].query(DataTypeButton)
         if buttons:             
@@ -95,19 +92,19 @@ class ContentView(Static):
             self.ancestors[-1].query_one(DataLoader).add_dataType(type_of_data)
 
         existing_action = set()
-        for action_name, action in self.parser.actions.items():
+        for action_name, action in self.app.parser.actions.items():
             for action_button in self.ancestors[-1].query(ActionButton):
                 if action_button.action_name == action_name:
                     existing_action.add(action_name)            
 
         # Add inexisting action buttons
-        for action_name, action in self.parser.actions.items():
+        for action_name, action in self.app.parser.actions.items():
             if  action_name not in existing_action:
                 self.ancestors[-1].query_one(ActionPannel).add_action(action)
 
         for action in self.ancestors[-1].query(ActionButton):
             action.action.supportedType = set(action.action_supported_type)
-            action.action.parsers = self.parser.parsers
+            action.action.parsers = self.app.parser.parsers
            
 
         # Filter action on existing active datatype
