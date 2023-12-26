@@ -29,7 +29,7 @@ class DataTypeButton(Static):
             from tui.ContentView import ContentView
             contentView = self.parent.ancestors[-1].query_one(ContentView)
             if contentView:
-                contentView.text = "\n".join(self.app.parser.results["matches"].get(self.parser_type, ""))
+                self.app.text = "\n".join(self.app.parser.results["matches"].get(self.parser_type, ""))
                 contentView.filter_action()
     
     @property
@@ -56,13 +56,13 @@ class DataLoader(Static):
         if event.button.id == "update-button":
             self.data = get_clipboard_text()
             mainApp = self.ancestors[-1].query_one(ContentView)
-            if mainApp: 
-                mainApp.text = self.data
+            if mainApp:
+                self.app.text = self.data
         if event.button.id == "text-update-button":
             mainApp = self.ancestors[-1].query_one(ContentView)
             self.data = mainApp.query_one(TextArea).text
             if mainApp: 
-                mainApp.text = self.data
+                self.app.text = self.data
         if event.button.id == "filter-button":
             self.select_all_datatype = not  self.select_all_datatype 
             for switch in self.query(Switch):

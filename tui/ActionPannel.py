@@ -43,7 +43,7 @@ class ActionButton(Static):
                 self.action.param = self.parent.ancestors[-1].query_one("#param-input").value
             self.parent.ancestors[-1].query_one("#param-input").value = ""
             try:
-                contentView.text = str(self.action)
+                self.app.text = str(self.action)
             except Exception as e:
                 self.app.notify(f"Error : {e}", severity="error",timeout=5)
 

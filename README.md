@@ -35,6 +35,8 @@ Showed data can be exported to clipboard or to a file.
 
 # To do
 
+- [ ] Make the script installable with pip+git
+- [ ] MKDocs on GitHub
 - [x] Make a gitignore
 - [x] Add an history (Undo et Redo buttons)
 - [x] Add a command palette
@@ -82,16 +84,18 @@ Showed data can be exported to clipboard or to a file.
 	- [x] For HTML
 	- [x] For JSON
 	- [x] For Yaml
+	- [ ] For JWT
+	- [ ] For lat long coordinates
 	- [ ] For tabular data (CSV, TSV, Markdown)
-		- [ ] Import in pandas dataframe
+		- [x] Import in pandas dataframe
 			-[x] Ok for TSV
 		- [ ] (WIP) Allow enrichment of dataframe (Another UI for entering the conf?) (and so of it's visual representation)
 			- [ ] From SQLite
 			- [ ] From CSV
 			- [ ] From MISP
 			- [ ] From SQLite
-		- [ ] Update sort action for DataFrame
-		- [ ] Write filter and stats action for DataFrame (possibility to open dataframe in visidata?)
+		- [x] Update sort action for DataFrame
+		- [x] Write filter and stats action for DataFrame (possibility to open dataframe in visidata?)
 	- [x] For AS Number
 		- [ ] AS to Regex
 		- [x] AS range

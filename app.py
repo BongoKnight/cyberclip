@@ -6,7 +6,7 @@ import pandas as pd
 
 
 from textual import on
-from textual.reactive import var
+from textual.reactive import var, reactive
 from textual._path import CSSPathType
 from textual.app import App, CSSPathType, ComposeResult
 from textual.containers import Grid
@@ -39,6 +39,7 @@ class ClipBrowser(App):
     ]
 
     parser = var(clipParser())
+    text= reactive("Waiting for Update...")
 
     def __init__(self, driver_class: type[Driver] | None = None, css_path: CSSPathType | None = None, watch_css: bool = False):
         super().__init__(driver_class, css_path, watch_css)
@@ -67,10 +68,10 @@ class ClipBrowser(App):
 
     def action_save(self):      
         with open("clipboard.txt", "w") as f:
-            f.write(self.query_one(ContentView).text)
+            f.write(self.text)
 
     def action_copy(self):
-        pyperclip.copy(self.query_one(ContentView).text)
+        pyperclip.copy(self.text)
 
     def action_select_action_filter(self):
         filter = self.app.query_one("#action-filter").focus()
@@ -94,7 +95,8 @@ class ClipBrowser(App):
         tab.remove_children()
         tab.mount(FiltrableDataFrame(pd.DataFrame(df), id="main-table"))
 
-
+    def watch_text(self, new_text: str) -> None:
+        self.query_one(ContentView).update_text(new_text)
 
 if __name__ == "__main__":
     ClipBrowser().run()

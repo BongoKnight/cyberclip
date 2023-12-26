@@ -30,20 +30,19 @@ class ContentToolbar(Static):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         from tui.ContentView import ContentView
-        content_view = self.app.query_one(ContentView)
         button_id = event.button.id
         if button_id == "copy-button":
-            pyperclip.copy(content_view.text)
+            pyperclip.copy(self.app.text)
         if button_id == "clear-button":
-            content_view.text = ""
+            self.app.text = ""
         elif button_id == "previous-button":
-            if content_view.text in content_view.text_history:
-                index = content_view.text_history.index(content_view.text)
-                content_view.text = content_view.text_history[max(0, index - 1)]
+            if self.app.text in self.app.text_history:
+                index = self.app.text_history.index(self.app.text)
+                self.app.text = self.app.text_history[max(0, index - 1)]
         elif button_id == "next-button":
-            if content_view.text in content_view.text_history:
-                index = content_view.text_history.index(content_view.text)
-                content_view.text = content_view.text_history[min(len(content_view.text_history)-1, index + 1)]
+            if self.app.text in self.app.text_history:
+                index = self.app.text_history.index(self.app.text)
+                self.app.text = self.app.text_history[min(len(self.app.text_history)-1, index + 1)]
     
     @on(Select.Changed)
     def select_changed(self, event: Select.Changed) -> None:
@@ -54,4 +53,4 @@ class ContentToolbar(Static):
         else :
             textArea = content_view.query_one(TextArea)
             textArea.clear()
-            textArea.insert(str(content_view.text))
+            textArea.insert(str(self.app.text))

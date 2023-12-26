@@ -26,7 +26,6 @@ class ContentView(Static):
     """
 
     initial_text = "Waiting for Update..."
-    text= reactive("Waiting for Update...")
     text_history = var([])
 
     def compose(self) -> ComposeResult:
@@ -68,7 +67,7 @@ class ContentView(Static):
                     action_button.visible = False
                     action_button.add_class("no-height")
 
-    def watch_text(self, new_text: str) -> None:
+    def update_text(self, new_text: str) -> None:
         """Called when the text attribute changes."""
         from tui.DataTypePannel import DataTypeButton, DataLoader
         from tui.ActionPannel import ActionPannel, ActionButton
@@ -78,7 +77,6 @@ class ContentView(Static):
         if new_text not in self.text_history:
             self.text_history.append(new_text)
             self.text_history = self.text_history[-20:]
-        
         
         self.app.parser.parseData(new_text)
         parser_types = self.app.parser.detectedType
