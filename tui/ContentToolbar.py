@@ -36,13 +36,13 @@ class ContentToolbar(Static):
         if button_id == "clear-button":
             self.app.text = ""
         elif button_id == "previous-button":
-            if self.app.text in self.app.text_history:
-                index = self.app.text_history.index(self.app.text)
-                self.app.text = self.app.text_history[max(0, index - 1)]
+            if self.app.text in self.app.contentview.text_history:
+                index = self.app.contentview.text_history.index(self.app.text)
+                self.app.text = self.app.contentview.text_history[max(0, index - 1)]
         elif button_id == "next-button":
-            if self.app.text in self.app.text_history:
-                index = self.app.text_history.index(self.app.text)
-                self.app.text = self.app.text_history[min(len(self.app.text_history)-1, index + 1)]
+            if self.app.text in self.app.contentview.text_history:
+                index = self.app.contentview.text_history.index(self.app.text)
+                self.app.text = self.app.contentview.text_history[min(len(self.app.contentview.text_history)-1, index + 1)]
     
     @on(Select.Changed)
     def select_changed(self, event: Select.Changed) -> None:

@@ -77,6 +77,10 @@ class ClipBrowser(App):
         filter = self.app.query_one("#action-filter").focus()
         filter.value = ""
 
+    @property
+    def contentview(self):
+        return self.query_one(ContentView)
+
     @on(TabbedContent.TabActivated)
     def check_TSV(self, event: TabbedContent.TabActivated):
         if event.tab.label_text == "TableView":
