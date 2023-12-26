@@ -46,16 +46,15 @@ class ContentView(Static):
             actual_detected_type = set(self.app.parser.detectedType)
             for datatype_button in self.parent.ancestors[-1].query(DataTypeButton):
                 # Update actions supported_type and hide action buttons where no type are supported
-                if datatype_button.query(Switch):
-                    if datatype_button.query(Switch)[0].value:
-                        for action_button in actions:
-                            # Add the supported type if the default action support it.
-                            if datatype_button.parser_type in action_button.action_supported_type:
-                                action_button.action.supportedType.add(datatype_button.parser_type)
-                    else:
-                        for action_button in actions:
-                            if datatype_button.parser_type in action_button.action_supported_type:
-                                action_button.action.supportedType.discard(datatype_button.parser_type)
+                if datatype_button.switch and datatype_button.switch.value:
+                    for action_button in actions:
+                        # Add the supported type if the default action support it.
+                        if datatype_button.parser_type in action_button.action_supported_type:
+                            action_button.action.supportedType.add(datatype_button.parser_type)
+                else:
+                    for action_button in actions:
+                        if datatype_button.parser_type in action_button.action_supported_type:
+                            action_button.action.supportedType.discard(datatype_button.parser_type)
             
             self.app.actions = []
             for action_button in actions:
@@ -84,31 +83,33 @@ class ContentView(Static):
         self.app.parser.parseData(new_text)
         parser_types = self.app.parser.detectedType
         # Update detected type buttons
-        buttons = self.ancestors[-1].query(DataTypeButton)
+        buttons = self.parent.query(DataTypeButton)
         if buttons:             
             for button in buttons:
                 button.remove()
         for type_of_data in parser_types:
-            self.ancestors[-1].query_one(DataLoader).add_dataType(type_of_data)
-
+            if type_of_data == "text":
+                self.parent.query_one(DataLoader).add_dataType(type_of_data, active=False)
+            else:
+                self.parent.query_one(DataLoader).add_dataType(type_of_data, active=True)
         existing_action = set()
         for action_name, action in self.app.parser.actions.items():
-            for action_button in self.ancestors[-1].query(ActionButton):
+            for action_button in self.parent.query(ActionButton):
                 if action_button.action_name == action_name:
                     existing_action.add(action_name)            
 
         # Add inexisting action buttons
         for action_name, action in self.app.parser.actions.items():
             if  action_name not in existing_action:
-                self.ancestors[-1].query_one(ActionPannel).add_action(action)
+                self.parent.query_one(ActionPannel).add_action(action)
 
-        for action in self.ancestors[-1].query(ActionButton):
+        for action in self.parent.query(ActionButton):
             action.action.supportedType = set(action.action_supported_type)
             action.action.parsers = self.app.parser.parsers
            
 
         # Filter action on existing active datatype
-        self.filter_action()
+        self.app.call_after_refresh(self.filter_action)
         
 
 

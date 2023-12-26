@@ -1,4 +1,5 @@
 import pyperclip
+from rich.console import RenderableType
 from textual.reactive import var
 from textual.containers import  VerticalScroll, Horizontal, Vertical
 from textual.widgets import Static,  Button, Switch, TextArea
@@ -11,11 +12,15 @@ class DataTypeButton(Static):
 """
     parser_type = var("text")
 
+    def __init__(self, active: bool = True, renderable: RenderableType = "", *, expand: bool = False, shrink: bool = False, markup: bool = True, name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
+        super().__init__(renderable, expand=expand, shrink=shrink, markup=markup, name=name, id=id, classes=classes, disabled=disabled)
+        self._active = active
+
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataType.""" 
         yield Horizontal(
              Button(self.parser_type, id="datatype-button", classes=""),
-             Switch(value=True, id="datatype-active"), classes="datatype"
+             Switch(value=self._active, id="datatype-active"), classes="datatype"
              )
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -26,6 +31,13 @@ class DataTypeButton(Static):
             if contentView:
                 contentView.text = "\n".join(self.app.parser.results["matches"].get(self.parser_type, ""))
                 contentView.filter_action()
+    
+    @property
+    def switch(self) -> Switch:
+        try:
+            return self.query_one(Switch)
+        except:
+            return
 
 
     def on_switch_changed(self, event: Switch.Changed) -> None:
@@ -56,12 +68,13 @@ class DataLoader(Static):
             for switch in self.query(Switch):
                 switch.value = self.select_all_datatype
 
-    def add_dataType(self, type_of_data: str) -> DataTypeButton:
+    def add_dataType(self, type_of_data: str, active : bool = True) -> DataTypeButton:
         """An action to add a timer."""
-        new_datatype = DataTypeButton(classes="datatype")
+        new_datatype = DataTypeButton(classes="datatype", active=active)
         self.query_one("#data-type-container").mount(new_datatype)
         new_datatype.scroll_visible()
         new_datatype.parser_type = type_of_data 
+        return new_datatype
 
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader."""
