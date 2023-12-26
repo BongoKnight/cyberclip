@@ -29,7 +29,8 @@ with open(Path(__file__).parent / '../data/conf.yml', encoding="utf8") as f:
 OPENCTI_URL = OPENCTI_CONFIG.get("api_url","")
 OPENCTI_KEY = OPENCTI_CONFIG.get("api_key","")
 try:
-    OPENCTI_CLIENT = pycti.OpenCTIApiClient(OPENCTI_URL, OPENCTI_KEY)
+    if OPENCTI_KEY and OPENCTI_URL:
+        OPENCTI_CLIENT = pycti.OpenCTIApiClient(OPENCTI_URL, OPENCTI_KEY)
 except:
     print("OpenCTI is not reachable.")
     OPENCTI_CLIENT = None
