@@ -1,0 +1,14 @@
+Misp:
+- auth: YOUR_API_KEY
+- url: YOUR_MISP_URL/attributes/restSearch
+Splunk:
+- url: https://splunk.internal/
+- base_search: fr-FR/app/search/search?dispatch.sample_ratio=1&q=
+OpenCTI:
+- api_url: <OpenCTIUrl>/graphql
+- api_key: <AdminAPIKey UUID>
+Yeti:
+- url: http://127.0.0.1:5000
+- api-key: <api-key>
+Shodan:
+- api-key: "<Shodan API Key>"
