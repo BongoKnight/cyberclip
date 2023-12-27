@@ -1,3 +1,9 @@
+# Installation
+
+```bash
+python -m pip install 'cyberclip @ git+https://github.com/BongoKnight/cyberclip'
+```
+
 # Use case
 
 ## Demo
