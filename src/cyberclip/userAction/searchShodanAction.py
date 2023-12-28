@@ -11,19 +11,6 @@ import json
 import time
 
 """A action module, to open search observables contained in a text in Shodan."""
-SHODAN_KEY = ""
-SHODAN_CONFIG = {}
-
-with open(Path(__file__).parent / '../data/conf.yml', encoding="utf8") as f:
-    config = yaml.load(f, Loader=SafeLoader)
-    if config.get("Shodan"):
-        conf = {}
-        for i in config.get("Shodan"):
-            if isinstance(i,dict):
-                for key, value in i.items():
-                    conf.update({key:value})
-        SHODAN_CONFIG = dict(conf)
-SHODAN_KEY = SHODAN_CONFIG.get("api-key","")
 
 class searchInShodanAction(actionInterface):
     """Search all type of observables with the Shodan API. The API Key is passed in the config file. Only IP are handled atm.
@@ -37,8 +24,9 @@ class searchInShodanAction(actionInterface):
     def __init__(self, parsers ={}, supportedType = {"ip"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Search all obsevables in Shodan."
-        if SHODAN_KEY:
-            self.api = shodan.Shodan(SHODAN_KEY)
+        self.load_conf("Shodan")
+        if self.conf.get("api-key",""):
+            self.api = shodan.Shodan(self.conf.get("api-key",""))
         else:
             self.api = None
 

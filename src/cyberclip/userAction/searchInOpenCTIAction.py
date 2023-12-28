@@ -12,29 +12,6 @@ import urllib.parse
 import pycti
 
 """A action module, to open search observables contained in a text in an OpenCTI instance."""
-OPENCTI_CONFIG = {}
-OPENCTI_CLIENT = None
-OPENCTI_URL = ""
-OPENCTI_KEY = ""
-
-with open(Path(__file__).parent / '../data/conf.yml', encoding="utf8") as f:
-    config = yaml.load(f, Loader=SafeLoader)
-    if config.get("OpenCTI"):
-        conf = {}
-        for i in config.get("OpenCTI"):
-            if isinstance(i,dict):
-                for key, value in i.items():
-                    conf.update({key:value})
-        OPENCTI_CONFIG = dict(conf)
-OPENCTI_URL = OPENCTI_CONFIG.get("api_url","")
-OPENCTI_KEY = OPENCTI_CONFIG.get("api_key","")
-try:
-    if OPENCTI_KEY and OPENCTI_URL:
-        OPENCTI_CLIENT = pycti.OpenCTIApiClient(OPENCTI_URL, OPENCTI_KEY)
-except:
-    print("OpenCTI is not reachable.")
-    OPENCTI_CLIENT = None
-
 
 class searchInOpenCTIAction(actionInterface):
     """Search all type of observables with the openCTI API. The configuration is passed in the config file.
@@ -49,9 +26,9 @@ class searchInOpenCTIAction(actionInterface):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Search all obsevables in OpenCTI."
         self.lines = []
-        self.config = {}
-        if OPENCTI_CLIENT:
-            self.api = OPENCTI_CLIENT
+        self.load_conf("OpenCTI")
+        if (key:=self.conf.get("api_key","")) and (url:=self.conf.get("api_url","")):
+            self.api = pycti.OpenCTIApiClient(url, key)
         else:
             self.api = None
 

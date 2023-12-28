@@ -5,6 +5,7 @@ from textual.containers import Horizontal, Vertical, ScrollableContainer
 from cyberclip.tui.MultiSelect import MultiSelect
 import pandas as pd
 from pathlib import Path
+from typing import TypeAlias
 from textual.reactive import reactive
 import re
 import pyperclip
@@ -35,7 +36,7 @@ class DataFrameFilter:
     value: str
     exclude: bool = False
 
-type DataFrameFilters = list[DataFrameFilter]
+DataFrameFilters : TypeAlias = list[DataFrameFilter]
 
 
 #####################

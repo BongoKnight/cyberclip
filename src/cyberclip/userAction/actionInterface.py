@@ -38,16 +38,17 @@ class actionInterface():
         """
         return {}
     
-    def load_conf(self, conf_name, path='../../data/conf.yml'):
+    def load_conf(self, conf_name, path='../data/conf.yml'):
+        conf = {}
         with open(Path(__file__).parent / path, encoding="utf8") as f:
             self.config = yaml.load(f, Loader=SafeLoader)
-            if self.config.get(conf_name):
-                conf = {}
-                for i in self.config.get(conf_name):
+            if self.config and self.config.get(conf_name):
+                for i in self.config.get(conf_name, {}):
                     if isinstance(i,dict):
                         for key, value in i.items():
                             conf.update({key:value})
                 self.conf = dict(conf)
+        return self.conf
     
     def get_observables(self) -> dict:
         """
