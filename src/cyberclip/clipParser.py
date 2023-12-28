@@ -56,7 +56,10 @@ class clipParser():
                 parserModules.append(parserModuleName)
                 self.log.info(f"Importing {parserModuleName} from {module_name}")
         # import all parser parserModule
-        parserModuleImport = __import__(f'{module_name}',fromlist=parserModules)
+        try:
+            parserModuleImport = __import__(f'{module_name}',fromlist=parserModules)
+        except:
+            self.log.error(f"Error while loading {parserModules}.")
 
         return parserModuleImport
 
@@ -77,8 +80,11 @@ class clipParser():
                 actionModules.append(actionModule)
                 self.log.info("Importing {} action".format(actionModule))
         # import all parser parserModule
-        actionModuleImport = __import__('userAction',fromlist=actionModules)
-        actionModuleImport+= __import__('userAction.private',fromlist=actionModules)
+        try:
+            actionModuleImport = __import__('userAction',fromlist=actionModules)
+            actionModuleImport+= __import__('userAction.private',fromlist=actionModules)
+        except:
+            self.log.error(f"Error while loading {actionModules}.")
         return actionModuleImport
         
     
