@@ -55,7 +55,7 @@ class UrlToFaviconHashAction(actionInterface):
             try:
                 hash = self.get_favicon_hash(domain)
                 results.update({domain:hash})
-            except:
+            except Exception as e:
                 results.update({domain:f"Error : {str(e)}"})
         return results
 
