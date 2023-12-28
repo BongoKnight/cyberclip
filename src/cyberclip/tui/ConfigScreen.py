@@ -42,7 +42,7 @@ class ConfigScreen(Screen):
                             widget.parent_conf = config_name
                             yield widget
         except Exception as e:
-            self.app.notify("The file conf.yaml might not exist. Error : {e}","Error with conf.", timeout=5, severity="error")
+            self.app.notify("The file conf.yaml might not exist. Error : {e}", title="Error with conf.", timeout=5, severity="error")
         yield Footer()
 
     def action_save_conf(self):
