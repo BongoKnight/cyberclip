@@ -28,7 +28,10 @@ class searchInOpenCTIAction(actionInterface):
         self.lines = []
         self.load_conf("OpenCTI")
         if (key:=self.conf.get("api_key","")) and (url:=self.conf.get("api_url","")):
-            self.api = pycti.OpenCTIApiClient(url, key)
+            try:
+                self.api = pycti.OpenCTIApiClient(url, key)
+            except:
+                self.api = None
         else:
             self.api = None
 
@@ -37,12 +40,13 @@ class searchInOpenCTIAction(actionInterface):
         self.lines = []
         self.observables = self.get_observables()
         observables = []
-        for obs_type in self.supportedType:
-            if self.observables.get(obs_type,[]):
-                observables+= self.observables.get(obs_type,[])
-        results = self.api.stix_cyber_observable.list(filters=[{"values":observables, "key":"value"}])
-        indexed_result = {result.get("value"):result for result in results}
-        return indexed_result
+        if self.api:
+            for obs_type in self.supportedType:
+                if self.observables.get(obs_type,[]):
+                    observables+= self.observables.get(obs_type,[])
+            results = self.api.stix_cyber_observable.list(filters=[{"values":observables, "key":"value"}])
+            indexed_result = {result.get("value"):result for result in results}
+            return indexed_result
     
     def __str__(self):
         """Visual representation of the action"""
