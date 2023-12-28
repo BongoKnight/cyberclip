@@ -26,7 +26,6 @@ dependencies = [
   "XlsxWriter==3.1.9",
   "antlr4-python3-runtime==4.9.3",
   "beautifulsoup4==4.12.2",
-  "bs4==0.0.1",
   "cachetools==5.3.2",
   "certifi==2023.11.17",
   "charset-normalizer==3.3.2",
@@ -34,7 +33,7 @@ dependencies = [
   "click==8.1.7",
   "colorama==0.4.6",
   "datefinder==0.7.3",
-  "dnspython==2.4.2",
+  "dnspython",
   "filelock==3.13.1",
   "filigran-sseclient==1.0.1",
   "idna==3.6",
@@ -72,7 +71,7 @@ dependencies = [
   "typing_extensions==4.9.0",
   "tzdata==2023.3",
   "uc-micro-py==1.0.2",
-  "urllib3==2.1.0"
+  "urllib3"
 ]
 
 [tool.setuptools.package-data]
