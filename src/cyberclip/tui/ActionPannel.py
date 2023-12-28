@@ -2,15 +2,17 @@ import re
 from textual import on
 from textual.reactive import var
 from textual.containers import  VerticalScroll
-from textual.widgets import Static,  Button, Input
+from textual.widgets import Static, Button, Input
 from textual.app import ComposeResult
 from textual.command import Hit, Hits, Provider
 from functools import partial
 
 try:
-    from cyberclip.userAction import actionInterface
+    from cyberclip.userAction.actionInterface import actionInterface
+    from cyberclip.userTypeParser.ParserInterface import ParserInterface
 except:
-    from userAction import actionInterface
+    from userAction.actionInterface import actionInterface
+    from userTypeParser.ParserInterface import ParserInterface
 
 
 class ActionButton(Static):
@@ -61,21 +63,26 @@ class ActionButton(Static):
 class ActionCommands(Provider):
     """A command provider to return all actions for the current text."""
 
-    def recover_actions(self) -> list[actionInterface.actionInterface]:
+    def recover_actions(self) -> list[actionInterface | ParserInterface]:
         """Get a list of all actions."""
-        return self.app.parser.actions.values()
+        actions = list(self.app.parser.actions.values())
+        parser = list(self.app.parser.parsers.values())
+        return actions + parser
     
-    def execute_action(self, action: actionInterface) -> None:
+    def execute_action(self, actionnable: ParserInterface | actionInterface ) -> None:
         """Event handler called when a  button is pressed."""
         from tui.ModalParamScreen import ParamScreen
         from tui.ContentView import ContentView
-        if not action.complex_param :
-            self.app.text = str(action)
-        else :
-            param_screen = ParamScreen()
-            param_screen.border_title = f"Parameters for '{action.description}' action."
-            param_screen.action = action
-            self.app.push_screen(param_screen, partial(self.app.handle_param, action))
+        if actionnable.isinstance(actionInterface):
+            if not actionnable.complex_param :
+                self.app.text = str(actionnable)
+            else :
+                param_screen = ParamScreen()
+                param_screen.border_title = f"Parameters for '{actionnable.description}' action."
+                param_screen.action = actionnable
+                self.app.push_screen(param_screen, partial(self.app.handle_param, actionnable))
+        elif actionnable.isinstance(ParserInterface):
+            self.app.text = "\r\n".join(actionnable.extract())
 
     async def startup(self) -> None:  
         """Called once when the command palette is opened, prior to searching."""
@@ -84,21 +91,35 @@ class ActionCommands(Provider):
 
     async def search(self, query: str) -> Hits:  
         """Search for action."""
-        matcher = self.matcher(query)  
+        matcher = self.matcher(query)
+        actions = [(action, type(action)) for action in self.actions]
+        for actionnable, type_of_actionnable in actions:
+            if type_of_actionnable.isinstance(actionInterface):
+                action_desc = actionnable.description
+                action_doc = actionnable.__doc__
+                scoreDesc = matcher.match(action_desc) 
+                scoreDoc = matcher.match(action_doc) 
 
-        for action in self.actions :
-            action_desc = action.description
-            action_doc = action.__doc__
-            scoreDesc = matcher.match(action_desc) 
-            scoreDoc = matcher.match(action_doc) 
+                if scoreDesc > 0 or scoreDoc > 0:
+                    yield Hit(
+                        max(scoreDesc, scoreDoc),
+                        matcher.highlight(action_desc),
+                        partial(self.execute_action, actionnable),
+                        help=action_doc,
+                    )
+            elif type_of_actionnable.isinstance(ParserInterface):
+                parser_desc = f"Extract {actionnable.parsertype}"
+                parser_doc = actionnable.__doc__
+                scoreDesc = matcher.match(parser_desc) 
+                scoreDoc = matcher.match(parser_doc) 
 
-            if scoreDesc > 0 or scoreDoc > 0:
-                yield Hit(
-                    max(scoreDesc, scoreDoc),
-                    matcher.highlight(action_desc),
-                    partial(self.execute_action, action),
-                    help=action_doc,
-                )
+                if scoreDesc > 0 or scoreDoc > 0:
+                    yield Hit(
+                        max(scoreDesc, scoreDoc),
+                        matcher.highlight(parser_desc),
+                        partial(self.execute_action, actionnable),
+                        help=parser_doc,
+                    )
 
 class ActionPannel(Static):
     BINDINGS = [("escape", "clean_filter", "Clear the filter value."),]
