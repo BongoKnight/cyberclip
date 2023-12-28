@@ -28,19 +28,21 @@ class ConfigScreen(Screen):
 
     def compose(self) -> ComposeResult:
         config_fields = {}
-        
-        with open(Path(__file__).parent / '../data/conf.yml', encoding="utf8") as f:
-            config_fields = yaml.load(f, Loader=SafeLoader)
-        for config_name, config_elems in config_fields.items():
-            yield Static(Markdown(f"# {config_name}"))
-            for config in config_elems:
-                if isinstance(config, dict):
-                    for key, value in config.items():
-                        widget = ConfigInput()
-                        widget.input_name = key
-                        widget.input_value = value
-                        widget.parent_conf = config_name
-                        yield widget
+        try:
+            with open(Path(__file__).parent / '../data/conf.yml', encoding="utf8") as f:
+                config_fields = yaml.load(f, Loader=SafeLoader)
+            for config_name, config_elems in config_fields.items():
+                yield Static(Markdown(f"# {config_name}"))
+                for config in config_elems:
+                    if isinstance(config, dict):
+                        for key, value in config.items():
+                            widget = ConfigInput()
+                            widget.input_name = key
+                            widget.input_value = value
+                            widget.parent_conf = config_name
+                            yield widget
+        except Exception as e:
+            self.app.notify("The file conf.yaml might not exist. Error : {e}","Error with conf.", timeout=5, severity="error")
         yield Footer()
 
     def action_save_conf(self):
