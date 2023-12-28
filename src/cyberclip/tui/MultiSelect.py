@@ -69,11 +69,12 @@ class MultiSelect(Static):
                 new_options[index] = (f"{FALSE_EMOTE} " + option[1], option[1])
         self.options = new_options
         self.select.set_options(new_options)
-        self.select.value = None
+        self.select.clear()
 
 
     @on(Select.Changed)
     def switch_state(self, event: Select.Changed) -> None:
+        self.app.notify(str(event.value))
         if event.value == None:
             self.select_or_deselect_all()
         else:
@@ -86,7 +87,6 @@ class MultiSelect(Static):
                         new_options[index] = (f"{FALSE_EMOTE} " + option[1], option[1])
                     self.options = new_options
                     event.control.set_options(new_options)
-                    event.control.value = None
                     break
         self.post_message(self.Changed(self))
 
