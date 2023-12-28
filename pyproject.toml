@@ -79,7 +79,7 @@ dependencies = [
 "cyberclip.data" = ["*.bak"]
 
 [project.scripts]
-cyberclip = "app:main"
+cyberclip = "cyberclip.app:main"
 
 [project.urls]
 Homepage = "https://github.com/BongoKnight/cyberclip"

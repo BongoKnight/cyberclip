@@ -3,6 +3,9 @@
 ```bash
 python -m pip install 'cyberclip @ git+https://github.com/BongoKnight/cyberclip'
 ```
+- Create the config in `cyberclip/data/config.yml` from the `cyberclip/data/config.yml.bak`
+- Add customs parser/actions in the `private` directory under `cyberclip/userAction` and `cyberclip/userTypeParser`, some example will be added in the "Getting started" tutoriel and in the `graveyard` directory.
+
 
 # Use case
 
