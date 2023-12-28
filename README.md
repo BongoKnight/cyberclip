@@ -1,11 +1,28 @@
 # Installation
 
 ```bash
-python -m pip install 'cyberclip @ git+https://github.com/BongoKnight/cyberclip'
+# Windows users might need to specify the full python.exe path
+python -m pip install "cyberclip @ git+https://github.com/BongoKnight/cyberclip"
 ```
+
 - Create the config in `cyberclip/data/config.yml` from the `cyberclip/data/config.yml.bak`
 - Add customs parser/actions in the `private` directory under `cyberclip/userAction` and `cyberclip/userTypeParser`, some example will be added in the "Getting started" tutoriel and in the `graveyard` directory.
 
+Then you should be able to run the script with :
+
+```bash
+# On linux
+cyberclip
+# On Windows
+cyberclip.exe
+# Or alternatively with :
+cd "C:\Users\<user>\AppData\Local\Programs\Python\Python312\Lib\site-packages\cyberclip" && python3 app.py
+```
+
+# Requests and improvments
+
+- Feel free to open an issue if you think of other type of data to parse, or if you think of an action you would like to be applied to a specific type of data,
+- Feel free to open an issue if you have some crash, I think I need to improve the error handling to avoid the crashing of the GUI 
 
 # Use case
 
@@ -44,8 +61,12 @@ Showed data can be exported to clipboard or to a file.
 
 # To do
 
-- [ ] Make the script installable with pip+git
+- [x] Make the script installable with pip+git
 - [ ] MKDocs on GitHub
+- [ ] Recipes panes :
+	- [ ] Loading of all actions
+	- [ ] Refactoring of actions options (complex_data)
+	- [ ] 
 - [x] Make a gitignore
 - [x] Add an history (Undo et Redo buttons)
 - [x] Add a command palette
@@ -60,7 +81,7 @@ Showed data can be exported to clipboard or to a file.
 - [x] Wrap custom actions and UserTypeParser in a `private` dir
 - [x] As the view container is a Static, it could accept a renderable widget as action result... It might be a way to make scripts with more interractions :
 	- [x] Action to render text as Markdown
-	- [ ] Action to render table in DataTable widget (with custom action to copy colum or row)
+	- [x] Action to render table in DataTable widget (with custom action to copy colum or row)
 	- [ ] Regex Highlight
 	- [x] Code Highlight
 - [ ] Write `public` actions :
@@ -88,13 +109,13 @@ Showed data can be exported to clipboard or to a file.
 	- [ ] Url redirect chain
 	- [x] Url to Html
 	- [x] HTML filtering with CSS selectors
-	- [ ] JSON filtering with pyjq (installing not straightforward in Windows need to check for other options...)
+	- [x] JSON filtering with pyjq (with jsonpath_ng, syntax is quite hard...)
 - [ ] Custom parsers :
 	- [x] For HTML
 	- [x] For JSON
 	- [x] For Yaml
 	- [ ] For JWT
-	- [ ] For lat long coordinates
+	- [ ] For lat long coordinates (maybe as a tutorial)
 	- [ ] For tabular data (CSV, TSV, Markdown)
 		- [x] Import in pandas dataframe
 			-[x] Ok for TSV
@@ -111,7 +132,7 @@ Showed data can be exported to clipboard or to a file.
 - [x] Make a domain and a host Parser, improve the domain parsing
 - [ ] Assync action results
 - [ ] Assync loading of action (some loading times are long, especially for AS action)
-- [ ] Requirement.txt
+- [x] Requirement.txt
 - [ ] Save action with file input (need to implement modal, have to check textual discord).
 - [ ] Write python script/template to generate custom Parser/Action
 
