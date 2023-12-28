@@ -24,6 +24,7 @@ class prependAction(actionInterface):
         self.observables = self.get_observables()
         if self.observables.get("text"):
             return self.param.replace("\\t","\t")+"\r\n"+self.observables.get("text")[0]
+        return ""
 
     
     def __str__(self):

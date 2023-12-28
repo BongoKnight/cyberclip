@@ -10,12 +10,14 @@ try:
     from cyberclip.tui.SimpleInput import SimpleInput
     from cyberclip.tui.SelectionInput import SelectionInput
     from cyberclip.tui.MultiSelect import MultiSelect
+    from cyberclip.userAction import actionInterface
 except:
     from tui.ActionPannel import ActionButton
     from tui.TagsInput import TagsInput
     from tui.SimpleInput import SimpleInput
     from tui.SelectionInput import SelectionInput
     from tui.MultiSelect import MultiSelect
+    from userAction import actionInterface
 
 class ParamScreen(Screen):
     """Modal screen for entering parameters"""
@@ -47,7 +49,7 @@ class ParamScreen(Screen):
     }
     """
 
-    action_button : ActionButton = var(None)
+    action : actionInterface = var(None)
     BINDINGS = [("escape", "app.pop_screen", "Escape config screen.")]
 
     def compose(self) -> ComposeResult:
@@ -61,7 +63,7 @@ class ParamScreen(Screen):
         )
 
     def on_mount(self) -> None:
-        self.query_one("#dialog").border_title = self.action_button.action.description
+        self.query_one("#dialog").border_title = self.action.description
 
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -79,17 +81,17 @@ class ParamScreen(Screen):
         return params
 
     def get_complex_param_widgets(self):
-        if self.action_button.action.complex_param_scheme:
+        if self.action.complex_param_scheme:
             widgets = []
-            stored_values = self.action_button.action.complex_param
-            for key, value in self.action_button.action.complex_param_scheme.items():
+            stored_values = self.action.complex_param
+            for key, value in self.action.complex_param_scheme.items():
                 if isinstance(value, dict):
                     assert "type" in value.keys()
                     assert "value" in value.keys()
                     real_value = value.get("value")
                     input_type = value.get("type")
-                    self.action_button.action.complex_param[key] = real_value
-                    stored_values = self.action_button.action.complex_param
+                    self.action.complex_param[key] = real_value
+                    stored_values = self.action.complex_param
                     if input_type.lower() == "text":
                         widgets.append(SimpleInput(label=key, value=stored_values.get(key,""), classes="complex-input"))
                     elif input_type.lower() == "tags":

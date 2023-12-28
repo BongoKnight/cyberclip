@@ -1,4 +1,5 @@
 import re
+from textual import on
 from textual.reactive import var
 from textual.containers import  VerticalScroll
 from textual.widgets import Static,  Button, Input
@@ -27,18 +28,18 @@ class ActionButton(Static):
     def on_mount(self) -> None:
         self.query_one(Button).tooltip = self.action.__doc__
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
+    @on(Button.Pressed, "#action-button")
+    def execute_option_action(self, event: Button.Pressed) -> None:
         """Event handler called when a  button is pressed."""
         from tui.ModalParamScreen import ParamScreen
         from tui.ContentView import ContentView
-        if event.button.id == "action-button":
-            if not self.action.complex_param :
-                self.update_text()
-            else :
-                param_screen = ParamScreen()
-                param_screen.border_title = f"Parameters for '{self.action.description}' action."
-                param_screen.action_button = self
-                self.app.push_screen(param_screen, self.handle_param)
+        if not self.action.complex_param :
+            self.update_text()
+        else :
+            param_screen = ParamScreen()
+            param_screen.border_title = f"Parameters for '{self.action.description}' action."
+            param_screen.action = self.action
+            self.app.push_screen(param_screen, self.handle_param)
 
     def update_text(self):
         from tui.ContentView import ContentView
@@ -61,8 +62,20 @@ class ActionCommands(Provider):
     """A command provider to return all actions for the current text."""
 
     def recover_actions(self) -> list[actionInterface.actionInterface]:
-        """Get a list of curently active actions."""
-        return self.app.actions
+        """Get a list of all actions."""
+        return self.app.parser.actions.values()
+    
+    def execute_action(self, action: actionInterface) -> None:
+        """Event handler called when a  button is pressed."""
+        from tui.ModalParamScreen import ParamScreen
+        from tui.ContentView import ContentView
+        if not action.complex_param :
+            self.app.text = str(action)
+        else :
+            param_screen = ParamScreen()
+            param_screen.border_title = f"Parameters for '{action.description}' action."
+            param_screen.action = action
+            self.app.push_screen(param_screen, partial(self.app.handle_param, action))
 
     async def startup(self) -> None:  
         """Called once when the command palette is opened, prior to searching."""
@@ -74,16 +87,16 @@ class ActionCommands(Provider):
         matcher = self.matcher(query)  
 
         for action in self.actions :
-            action_desc = action.action.description
-            action_doc = action.action.__doc__
+            action_desc = action.description
+            action_doc = action.__doc__
             scoreDesc = matcher.match(action_desc) 
             scoreDoc = matcher.match(action_doc) 
 
             if scoreDesc > 0 or scoreDoc > 0:
                 yield Hit(
                     max(scoreDesc, scoreDoc),
-                    matcher.highlight(action_desc),  
-                    partial(action.query_one("#action-button").press),
+                    matcher.highlight(action_desc),
+                    partial(self.execute_action, action),
                     help=action_doc,
                 )
 
@@ -106,7 +119,7 @@ class ActionPannel(Static):
     def on_input_changed(self, event: Input.Changed) -> None:
         from tui.ContentView import ContentView
         actions = self.query(ActionButton)
-        self.app.query_one(ContentView).filter_action()
+        self.app.actions = self.app.query_one(ContentView).filter_action()
         for action in actions:
             for word in event.value.split():
                 if not re.search(f"(?i){word}", action.action.description, re.IGNORECASE):

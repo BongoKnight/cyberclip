@@ -21,6 +21,7 @@ try:
     from cyberclip.tui.TableView import FiltrableDataFrame
     from cyberclip.userTypeParser import TSVParser
     from cyberclip.clipParser import clipParser
+    from cyberclip.userAction import actionInterface
 except:
     from tui.ConfigScreen import ConfigScreen
     from tui.DataTypePannel import DataLoader
@@ -29,6 +30,7 @@ except:
     from tui.TableView import FiltrableDataFrame
     from userTypeParser import TSVParser
     from clipParser import clipParser
+    from userAction import actionInterface
 
 
 
@@ -54,7 +56,6 @@ class ClipBrowser(App):
     def __init__(self, driver_class: type[Driver] | None = None, css_path: CSSPathType | None = None, watch_css: bool = False):
         super().__init__(driver_class, css_path, watch_css)
         self.actions = []
-
 
     def compose(self) -> ComposeResult:
         """Compose our UI."""
@@ -111,6 +112,12 @@ class ClipBrowser(App):
 
     def watch_text(self, new_text: str) -> None:
         self.query_one(ContentView).update_text(new_text)
+
+    def handle_param(self, action : actionInterface , complex_param : dict):
+        if complex_param :
+            action.complex_param = complex_param
+            self.text = str(action)
+    
 
 def main():
     ClipBrowser().run()
