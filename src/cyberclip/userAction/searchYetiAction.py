@@ -19,16 +19,7 @@ Yeti:
     def __init__(self, parsers ={}, supportedType = {"ip","ipv6","domain","mail","url"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Search observables in YETI."
-        self.config = {}
-        with open(Path(__file__).parent / '../data/conf.yml', encoding="utf8") as f:
-            self.config = yaml.load(f, Loader=SafeLoader)
-            if self.config.get("Yeti"):
-                conf = {}
-                for i in self.config.get("Yeti"):
-                    if isinstance(i,dict):
-                        for key, value in i.items():
-                            conf.update({key:value})
-                self.conf = dict(conf)
+        self.config = self.load_conf("Yeti")
 
 
     def execute(self) -> object:
