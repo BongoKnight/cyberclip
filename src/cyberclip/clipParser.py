@@ -48,19 +48,19 @@ class clipParser():
          __import__('module_name',fromlist=parserModules)
     
         """
-        parserModules = []
+        parserModuleImport = []
         files = os.listdir(module_instance.__path__[0])
         for file in files :
+            parserModules = []
             if file.endswith(".py") and file != "__init__.py":
                 parserModuleName = file.split(".")[0]
                 parserModules.append(parserModuleName)
                 self.log.info(f"Importing {parserModuleName} from {module_name}")
-        # import all parser parserModule
-        try:
-            parserModuleImport = __import__(f'{module_name}',fromlist=parserModules)
-        except:
-            self.log.error(f"Error while loading {parserModules}.")
-
+                # import all parser parserModule from file
+                try:
+                    parserModuleImport = __import__(f'{module_name}',fromlist=parserModules)
+                except:
+                    self.log.error(f"Error while loading {parserModules} from {file}.")
         return parserModuleImport
 
     def loadAction(self):
@@ -71,20 +71,22 @@ class clipParser():
         -------
         __import__('userAction',fromlist=actionModules)    
         """
-        actionModules = []
+
         files = os.listdir(userAction.__path__[0])
         files+= os.listdir(userAction.private.__path__[0])
+        actionModuleImport = []
         for file in files :
+            actionModules = []
             if file.endswith(".py") and file != "__init__.py":
                 actionModule = file.split(".")[0]
                 actionModules.append(actionModule)
-                self.log.info("Importing {} action".format(actionModule))
-        # import all parser parserModule
-        try:
-            actionModuleImport = __import__('userAction',fromlist=actionModules)
-            actionModuleImport+= __import__('userAction.private',fromlist=actionModules)
-        except:
-            self.log.error(f"Error while loading {actionModules}.")
+                self.log.info(f"Importing {actionModule} action")
+                # import all parser parserModule from file
+                try:
+                    actionModuleImport+= __import__('userAction',fromlist=actionModules)
+                    actionModuleImport+= __import__('userAction.private',fromlist=actionModules)
+                except:
+                    self.log.error(f"Error while loading {actionModules} from {file}.")
         return actionModuleImport
         
     
