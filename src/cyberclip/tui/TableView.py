@@ -1,17 +1,23 @@
-from textual.events import Mount
 from dataclasses import dataclass
-from textual.widgets import DataTable, Input, Label, Log, RadioButton, RadioSet, Button, Static, Checkbox, Select
-from textual.containers import Horizontal, Vertical, ScrollableContainer
-from cyberclip.tui.MultiSelect import MultiSelect
-import pandas as pd
 from pathlib import Path
 from typing import TypeAlias
-from textual.reactive import reactive
 import re
+
+import pandas as pd
 import pyperclip
+
+from textual.events import Mount
+from textual.widgets import DataTable, Input, Label, Log, RadioButton, RadioSet, Button, Static, Checkbox, Select
+from textual.containers import Horizontal, Vertical, ScrollableContainer
+from textual.reactive import reactive
 from textual.app import ComposeResult
 from textual import on
 from textual.app import App
+
+try:
+    from cyberclip.tui.MultiSelect import MultiSelect
+except:
+    from tui.MultiSelect import MultiSelect
 
 #####################
 #  Helping methods  #

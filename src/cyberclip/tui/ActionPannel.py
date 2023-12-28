@@ -4,8 +4,13 @@ from textual.containers import  VerticalScroll
 from textual.widgets import Static,  Button, Input
 from textual.app import ComposeResult
 from textual.command import Hit, Hits, Provider
-from cyberclip.userAction import actionInterface
 from functools import partial
+
+try:
+    from cyberclip.userAction import actionInterface
+except:
+    from userAction import actionInterface
+
 
 class ActionButton(Static):
     """A action widget for action specific to certain types of data."""

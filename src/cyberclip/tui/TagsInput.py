@@ -9,6 +9,7 @@ class TagsInput(Static):
     label = var("")
     DEFAULT_CSS = """
     TagsInput{
+        width: auto;
         layout: horizontal;
     }
     TagsInput > Input, Label {
@@ -18,6 +19,7 @@ class TagsInput(Static):
     HorizontalScroll{
         height:4;
         align-horizontal: left;
+        width: 1fr;
         }
 
     """
@@ -28,10 +30,10 @@ class TagsInput(Static):
     
     def compose(self) -> ComposeResult:
         yield Label(renderable=self.label)
-        yield Input(placeholder=f"Enter {self.label}...")
+        yield Input(placeholder=f"Enter {self.label}...",classes="inputag")
         yield HorizontalScroll(*[Tag(value=value, parent_input = self) for value in self._value] ,classes="tag-storage")
     
-    @on(Input.Submitted)
+    @on(Input.Submitted, ".inputag")
     def add_tag(self, event : events.Key) -> None:
         input =  self.query_one(Input)
         if input.value and input.value not in self._value:
@@ -41,6 +43,7 @@ class TagsInput(Static):
             self._value.add(input.value)
             input.value = ""
             self.query_one(Input).focus()
+        
     
     @property
     def value(self):

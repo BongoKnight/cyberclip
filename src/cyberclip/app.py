@@ -13,14 +13,24 @@ from textual.containers import Grid
 from textual.driver import Driver
 from textual.widgets import Footer, TabbedContent, TabPane, Label
 
-from cyberclip.tui.ConfigScreen import ConfigScreen
-from cyberclip.tui.DataTypePannel import DataLoader
-from cyberclip.tui.ContentView import ContentView
-from cyberclip.tui.ActionPannel import ActionPannel, ActionCommands
+try:
+    from cyberclip.tui.ConfigScreen import ConfigScreen
+    from cyberclip.tui.DataTypePannel import DataLoader
+    from cyberclip.tui.ContentView import ContentView
+    from cyberclip.tui.ActionPannel import ActionPannel, ActionCommands
+    from cyberclip.tui.TableView import FiltrableDataFrame
+    from cyberclip.userTypeParser import TSVParser
+    from cyberclip.clipParser import clipParser
+except:
+    from tui.ConfigScreen import ConfigScreen
+    from tui.DataTypePannel import DataLoader
+    from tui.ContentView import ContentView
+    from tui.ActionPannel import ActionPannel, ActionCommands
+    from tui.TableView import FiltrableDataFrame
+    from userTypeParser import TSVParser
+    from clipParser import clipParser
 
-from cyberclip.tui.TableView import FiltrableDataFrame
-from cyberclip.userTypeParser import TSVParser
-from clipParser import clipParser
+
 
 
 class ClipBrowser(App):

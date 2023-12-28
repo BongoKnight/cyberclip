@@ -13,17 +13,17 @@ CLIPBOARD_TYPE = {
 
 
 def get_file_icon(filename: str)-> str:
-    if re.search("(\.apng|\.avif|\.gif|\.jfif|\.jpeg|\.jpg|\.pjp|\.pjpeg|\.png|\.svg|\.webp)$", filename):
+    if re.search(r"(\.apng|\.avif|\.gif|\.jfif|\.jpeg|\.jpg|\.pjp|\.pjpeg|\.png|\.svg|\.webp)$", filename):
         return "📷 "
-    elif re.search("(\.3gp|\.8svx|\.aa|\.aac|\.aax|\.act|\.aiff|\.alac|\.amr|\.ape|\.au|\.awb|\.dss|\.dvf|\.flac|\.gsm|\.iklax|\.ivs|\.m4a|\.m4b|\.m4p|\.mmf|\.mogg|\.movpkg|\.mp3|\.mpc|\.msv|\.nmf|\.oga|\.ogg|\.opus|\.ra|\.raw|\.rf64|\.rm|\.sln|\.tta|\.voc|\.vox|\.wav|\.webm|\.wma|\.wv)$", filename):
+    elif re.search(r"(\.3gp|\.8svx|\.aa|\.aac|\.aax|\.act|\.aiff|\.alac|\.amr|\.ape|\.au|\.awb|\.dss|\.dvf|\.flac|\.gsm|\.iklax|\.ivs|\.m4a|\.m4b|\.m4p|\.mmf|\.mogg|\.movpkg|\.mp3|\.mpc|\.msv|\.nmf|\.oga|\.ogg|\.opus|\.ra|\.raw|\.rf64|\.rm|\.sln|\.tta|\.voc|\.vox|\.wav|\.webm|\.wma|\.wv)$", filename):
         return "🔊 "
-    elif re.search("(\.xlsx|\.tsv|\.csv|\.xls)$", filename):
+    elif re.search(r"(\.xlsx|\.tsv|\.csv|\.xls)$", filename):
         return "📊 "
-    elif re.search("(\.py|\.pyc|\.jsx?|\.c|\.cpp|\.java|\.cs|\.css|\.html?|\.go|\.ruby|\.rb|\.php|\.db|\.exe|\.ba(t|sh))$", filename):
+    elif re.search(r"(\.py|\.pyc|\.jsx?|\.c|\.cpp|\.java|\.cs|\.css|\.html?|\.go|\.ruby|\.rb|\.php|\.db|\.exe|\.ba(t|sh))$", filename):
         return "👩‍💻 "
-    elif re.search("(\.docx?|\.pptx?|\.txt|\.epub|\.md|\.pdf)$", filename):
+    elif re.search(r"(\.docx?|\.pptx?|\.txt|\.epub|\.md|\.pdf)$", filename):
         return "📝 "
-    elif re.search("(\.[7bg]?zip|\.[jrt]ar|\.gz)$", filename):
+    elif re.search(r"(\.[7bg]?zip|\.[jrt]ar|\.gz)$", filename):
         return "🗂️ "
     else :
         return "📄 "
