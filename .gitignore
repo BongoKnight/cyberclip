@@ -19,5 +19,6 @@ log.log
 /src/cyberclip/userTypeParser/private/*
 !/src/cyberclip/userTypeParser/private/__init__.py
 /.venv
-/src/cyberclip.egg-info/*
+cyberclip.egg-info/*
 /dist/*
+/build/*

@@ -1,0 +1,3 @@
+include src/cyberclip/data/*.bak
+exclude src/cyberclip/userAction/private/*.py
+exclude src/cyberclip/userTypeParser/private/*.py
