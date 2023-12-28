@@ -2,7 +2,7 @@ from textual.events import Mount
 from dataclasses import dataclass
 from textual.widgets import DataTable, Input, Label, Log, RadioButton, RadioSet, Button, Static, Checkbox, Select
 from textual.containers import Horizontal, Vertical, ScrollableContainer
-from tui.MultiSelect import MultiSelect
+from cyberclip.tui.MultiSelect import MultiSelect
 import pandas as pd
 from pathlib import Path
 from textual.reactive import reactive

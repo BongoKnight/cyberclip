@@ -4,11 +4,11 @@ from textual.widgets import Label, Button, Input, Checkbox
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.reactive import var
 
-from tui.ActionPannel import ActionButton
-from tui.TagsInput import TagsInput
-from tui.SimpleInput import SimpleInput
-from tui.SelectionInput import SelectionInput
-from tui.MultiSelect import MultiSelect
+from cyberclip.tui.ActionPannel import ActionButton
+from cyberclip.tui.TagsInput import TagsInput
+from cyberclip.tui.SimpleInput import SimpleInput
+from cyberclip.tui.SelectionInput import SelectionInput
+from cyberclip.tui.MultiSelect import MultiSelect
 
 class ParamScreen(Screen):
     """Modal screen for entering parameters"""

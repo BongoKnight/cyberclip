@@ -4,7 +4,7 @@ from textual.reactive import var, reactive
 from textual.containers import  Vertical, ScrollableContainer
 from textual.widgets import Static,  Button, Input, Switch, Label, Select, TextArea
 from textual.app import ComposeResult
-from tui.ContentToolbar import ContentToolbar
+from cyberclip.tui.ContentToolbar import ContentToolbar
 
 MARKUP_TYPES = ["actionscript3","apache","applescript","asp","bash","brainfuck","c","c++","cfm","clojure","cmake","coffee","coffee-script","coffeescript","cpp","cs","csharp","css","csv","diff","elixir","erb","go","haml","html","http","java","javascript","jruby","json","jsx","less","lolcode","make","markdown","matlab","nginx","objectivec","pascal","perl","php","profile","python","rb","ruby","rust","salt","saltstate","scss","sh","shell","smalltalk","sql","svg","swift","vhdl","vim","viml","volt","vue","xml","yaml","zsh"]
 

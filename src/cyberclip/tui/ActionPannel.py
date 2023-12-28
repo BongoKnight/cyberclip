@@ -4,7 +4,7 @@ from textual.containers import  VerticalScroll
 from textual.widgets import Static,  Button, Input
 from textual.app import ComposeResult
 from textual.command import Hit, Hits, Provider
-from userAction import actionInterface
+from cyberclip.userAction import actionInterface
 from functools import partial
 
 class ActionButton(Static):

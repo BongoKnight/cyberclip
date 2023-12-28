@@ -13,13 +13,13 @@ from textual.containers import Grid
 from textual.driver import Driver
 from textual.widgets import Footer, TabbedContent, TabPane, Label
 
-from tui.ConfigScreen import ConfigScreen
-from tui.DataTypePannel import DataLoader
-from tui.ContentView import ContentView
-from tui.ActionPannel import ActionPannel, ActionCommands
+from .tui.ConfigScreen import ConfigScreen
+from .tui.DataTypePannel import DataLoader
+from .tui.ContentView import ContentView
+from .tui.ActionPannel import ActionPannel, ActionCommands
 
-from tui.TableView import FiltrableDataFrame
-from userTypeParser import TSVParser
+from .tui.TableView import FiltrableDataFrame
+from .userTypeParser import TSVParser
 from clipParser import clipParser
 
 
