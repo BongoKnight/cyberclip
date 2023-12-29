@@ -65,6 +65,15 @@ class actionInterface():
             if parser.parsertype in self.supportedType:
                 self.observables[parser.parsertype]=parser.extract()
         return self.observables
+    
+    def get_value(self, config_name):
+        config = self.complex_param.get(config_name)
+        if isinstance(config, dict):
+            return config.get("value","")
+        elif isinstance(config, str):
+            return config
+        else:
+            return ""
 
     def __str__(self):
         """Visual representation of the action"""

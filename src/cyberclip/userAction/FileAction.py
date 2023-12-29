@@ -59,7 +59,7 @@ class CalculateHashAction(actionInterface):
                 with open(filename, 'rb') as file:
                     filecontent = file.read()
                     hashes = {}
-                    for hash in self.complex_param.get("Hashes", {}):
+                    for hash in self.get_value("Hashes"):
                         try:
                             if hash.lower() == "sha1":
                                 hash_str = hashlib.sha1(filecontent).hexdigest()

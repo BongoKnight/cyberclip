@@ -4,6 +4,8 @@ except:
     from actionInterface import actionInterface
 import requests
 from urllib.parse import urlparse
+import ssl
+import socket
 
 class UrlToHtmlAction(actionInterface):
     """
@@ -29,6 +31,40 @@ class UrlToHtmlAction(actionInterface):
             except:
                 results.update({url:""})
         return results
+
+
+class GetCertificatesAction(actionInterface):
+    """
+    A action module to recover certificate from Domain or IP.
+    """
+    CONF = {"Port":{"type":"text", "value":"443"}}
+    def __init__(self, parsers = {}, supportedType = {"domain","ip"}, complex_param = CONF):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
+        self.description = "Get certificate."
+
+    def verify_ssl_certificate(self, hostname, port=443):
+        context = ssl.create_default_context()
+        with socket.create_connection((hostname, port)) as sock:
+            with context.wrap_socket(sock, server_hostname=hostname) as ssock:
+                ssock.do_handshake()
+                cert = ssock.getpeercert()
+                return cert
+
+    def execute(self) -> object:
+        """Execute the action."""
+        self.results = {}
+        observables = set(self.get_observables().get("ip") +  self.get_observables().get("domain"))
+        for observable in observables:
+            port = int(self.get_value("Port"))
+            try:
+                self.results[observable] = self.verify_ssl_certificate(observable, port=port)
+            except Exception as e:
+                self.results[observable] = f"Error while getting the certificate : {e}, {port}"
+        return self.results
+    
+    def __str__(self):
+        self.execute()
+        return "\r\n".join(f"{observable}\t{str(certif)}" for observable, certif in self.results.items())
 
 class UrlToFaviconHashAction(actionInterface):
     """

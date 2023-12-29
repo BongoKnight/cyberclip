@@ -29,10 +29,10 @@ Yeti:
         self.get_observables()
         for obs_type in self.supportedType:
             observables = self.observables.get(obs_type,[])
-            tags = self.complex_param.get("Tags", "")
-            source = self.complex_param.get("Source", "")
-            campaigns = self.complex_param.get("Campaign", "")
-            threats = self.complex_param.get("Threat", "")
+            tags = self.get_value("Tags")
+            source = self.get_value("Source")
+            campaigns = self.get_value("Campaign")
+            threats = self.get_value("Threat")
             if threats:
                 for threat in threats:
                     tags.append(f"threat{threat}")
