@@ -36,6 +36,12 @@ class JSONParser(ParserInterface):
                     return True
                 except JSONDecodeError as e:
                     pass
+            for line in self.text.splitlines():
+                try:
+                    json.loads(line)
+                    return True
+                except JSONDecodeError as e:
+                    pass
             return False
         else :
             return False
@@ -50,6 +56,12 @@ class JSONParser(ParserInterface):
                 try:
                     if json.loads(match[0]):
                         self.objects.append(json.loads(match[0]))
+                except JSONDecodeError as e:
+                    pass
+            for line in self.text.splitlines():
+                try:
+                    if json.loads(line):
+                        self.objects.append(json.loads(line))
                 except JSONDecodeError as e:
                     pass
         return [json.dumps(self.objects, indent=4)]

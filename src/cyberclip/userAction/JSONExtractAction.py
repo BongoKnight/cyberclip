@@ -2,13 +2,14 @@ try:
     from userAction.actionInterface import actionInterface
 except:
     from actionInterface import actionInterface
-from jsonpath_ng import jsonpath, parse
+from jsonpath import jsonpath
+import json
 import yaml
 
 class JSONExtractAction(actionInterface):
     """
 A action module to extract data from an JSON.
-Use jsonpath-ng module.
+Use jsonpath module.
 
     """
 
@@ -17,17 +18,17 @@ Use jsonpath-ng module.
         self.description = "Extract from JSON/YAML with Path selector"
         self.results = {}
 
-    def filter_json(self, json_objects: list[dict]):
-        extract = {}
+    def filter_json(self, json_objects: str):
         if json_objects:
-            for json in json_objects:
+            for json_str in json_objects:
+                extract = {}
                 for selector in self.complex_param.get("Selectors",[]):
                     try:
-                        extract.update({selector:[match.value for match in parse(selector).find(json) if match.value]})
-                    except:
-                        pass
-                self.results.update({str(json):extract})
-        return extract
+                        extract[selector] = jsonpath(json.loads(json_str), selector)
+                    except Exception as e:
+                        extract[selector] = [f"Error : {e}"]
+            self.results.update({str(json_str):extract})
+        return self.results
         
     def execute(self) -> object:
         """Execute the action."""
@@ -37,7 +38,7 @@ Use jsonpath-ng module.
             json_objects = self.observables.get("json")
             self.filter_json(json_objects)          
         if self.observables.get("yaml"):
-            json_objects = self.observables.get("yaml")
+            json_objects = [json.dumps(yaml.safe_load(yaml_str)) for yaml_str in self.observables.get("yaml")]
             self.filter_json(json_objects)        
         return self.results
     
@@ -45,18 +46,9 @@ Use jsonpath-ng module.
         """Visual representation of the action"""
         lines = []
         filtered_jsons = self.execute()
-        
         for json_objects, extract in filtered_jsons.items():
-            constant_length = True if len(set([len(values) for values in extract.values()])) == 1 else False
-            if not constant_length:
-                for selector, values in extract.items():
-                    newline = "\r\n"
-                    lines.append(f"{selector}\r\n{newline.join([str(i) for i in values ])}")
-            else:
-                lines.append("\t".join([selector for selector in extract.keys()]))
-                zipped_extract = zip(*[values for values in extract.values()])
-                lines+= ["\t".join([str(i) for i in tupple]) for tupple in zipped_extract]
-
+            for selector, value in extract.items():
+                lines.append(f"{selector}\t{str(value)}")
         return  "\r\n".join(lines)
 
 if __name__=='__main__':

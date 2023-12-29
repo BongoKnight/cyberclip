@@ -24,9 +24,10 @@ class YamlParser(ParserInterface):
     def contains(self):
         """Return true if text contains Yaml valid data"""
         try:
-            valid_yaml = yaml.safe_load(self.text)
-            if not isinstance(valid_yaml, str):
-                return True
+            if self.text:
+                valid_yaml = yaml.safe_load(self.text)
+                if not isinstance(valid_yaml, str):
+                    return True
         except :
             return False
         else :
@@ -35,12 +36,13 @@ class YamlParser(ParserInterface):
     def extract(self):
         """Return all JSON contained in text."""
         try:
-            self.objects = yaml.safe_load(self.text)
-            if isinstance(self.objects, str):
-                self.objects = []
+            if self.text:
+                self.objects = yaml.safe_load(self.text)
+                if isinstance(self.objects, str):
+                    self.objects = []
         except :
             self.objects = []
-        return [str(self.objects)]
+        return [yaml.dump(self.objects)]
         
         
 if __name__=="__main__":
