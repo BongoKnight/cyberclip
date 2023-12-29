@@ -14,6 +14,7 @@ except:
     from ParserInterface import ParserInterface
 
 import os
+from pathlib import Path
 
 class filenameParser(ParserInterface):
     """Parser for filename."""
@@ -26,15 +27,15 @@ class filenameParser(ParserInterface):
         
     def contains(self):
         """Return true if text contains at least one filename."""
-        if re.search(r"\b[A-Z]:(//|\\).*(/|\\)[A-Za-z0-9-_ ]+\.[A-Za-z0-9]+\b",self.text) :
+        if re.search(r"\b[A-Z]:(\/|\\).*(\/|\\)[A-Za-z0-9éàèù'_ \.\(\)\$\-\[\]]+\.[A-Za-z0-9]+\b",self.text) :
             return True
         else :
             return False
     
     def extract(self):
         """Return all filenames contained in text and existing in the filesystem."""
-        filenamesIter = re.finditer(r"\b[A-Z]:(/|\\)+.*(/|\\)[A-Za-z0-9-_ ]+\.[A-Za-z0-9]+\b", self.text)
-        filepaths_clean = [filename.group().replace('\\','/')[2:] for filename in filenamesIter]
+        filenamesIter = re.finditer(r"\b[A-Z]:(\/|\\).*(\/|\\)[A-Za-z0-9éàèù'_ \.\(\)\$\-\[\]]+\.[A-Za-z0-9]+\b", self.text)
+        filepaths_clean = [filename.group().replace('\\','/')[0:] for filename in filenamesIter]
         filenames = [filename for filename in filepaths_clean if os.path.isfile(filename)]
         self.objects = filenames
         return filenames

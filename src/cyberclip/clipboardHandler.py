@@ -191,5 +191,3 @@ def get_clipboard_text():
     else :
         str_data = filepath_data
     return str_data
-
-print(get_clipboard_text())
