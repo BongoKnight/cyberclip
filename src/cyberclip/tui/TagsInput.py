@@ -9,18 +9,20 @@ class TagsInput(Static):
     label = var("")
     DEFAULT_CSS = """
     TagsInput{
+        max-width: 100%;
         width: auto;
         layout: horizontal;
     }
     TagsInput > Input, Label {
         width: 25;
     }
-
-    HorizontalScroll{
+    TagsInput > Label {
+        margin-top: 1;
+    }
+    .tag-storage{
         height:4;
         align-horizontal: left;
-        width: 1fr;
-        }
+    }
 
     """
     def __init__(self, label : str ="", value : set = set(), **kwargs):
@@ -56,19 +58,27 @@ class Tag(Static):
     DEFAULT_CSS = """
     Tag > Button {
         border: none;
-        height: 1;
-        min-width: 0;
         background: $primary;
+        height: 1;
+        width: auto;
+        min-width: 3;
     }
+
     Tag > Button:hover {
-        background: $primary-darken-1;
+        background: $primary-lighten-1;
         color: white;
     }
+
+    Tag > #tag-value {
+        min-width: 10;
+    }
+    
     Tag {
         margin-top: 1;
         margin-left: 1;
         layout: horizontal;
         height: 4;
+        max-width: 30;
         width: auto;
     }
     """
@@ -96,3 +106,11 @@ class Tag(Static):
         event.stop()
 
 
+if __name__ == "__main__":
+    from textual.app import App
+
+    class ClassApp(App):
+        def compose(self):
+            yield TagsInput("Test",value=["titi","toto"])
+    app = ClassApp()
+    app.run()

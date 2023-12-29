@@ -73,7 +73,7 @@ class ActionCommands(Provider):
         """Event handler called when a  button is pressed."""
         from tui.ModalParamScreen import ParamScreen
         from tui.ContentView import ContentView
-        if actionnable.isinstance(actionInterface):
+        if isinstance(actionnable, actionInterface):
             if not actionnable.complex_param :
                 self.app.text = str(actionnable)
             else :
@@ -81,7 +81,7 @@ class ActionCommands(Provider):
                 param_screen.border_title = f"Parameters for '{actionnable.description}' action."
                 param_screen.action = actionnable
                 self.app.push_screen(param_screen, partial(self.app.handle_param, actionnable))
-        elif actionnable.isinstance(ParserInterface):
+        elif isinstance(actionnable, ParserInterface):
             self.app.text = "\r\n".join(actionnable.extract())
 
     async def startup(self) -> None:  
@@ -92,9 +92,8 @@ class ActionCommands(Provider):
     async def search(self, query: str) -> Hits:  
         """Search for action."""
         matcher = self.matcher(query)
-        actions = [(action, type(action)) for action in self.actions]
-        for actionnable, type_of_actionnable in actions:
-            if type_of_actionnable.isinstance(actionInterface):
+        for actionnable in self.actions:
+            if isinstance(actionnable, actionInterface):
                 action_desc = actionnable.description
                 action_doc = actionnable.__doc__
                 scoreDesc = matcher.match(action_desc) 
@@ -107,7 +106,7 @@ class ActionCommands(Provider):
                         partial(self.execute_action, actionnable),
                         help=action_doc,
                     )
-            elif type_of_actionnable.isinstance(ParserInterface):
+            elif isinstance(actionnable, ParserInterface):
                 parser_desc = f"Extract {actionnable.parsertype}"
                 parser_doc = actionnable.__doc__
                 scoreDesc = matcher.match(parser_desc) 
