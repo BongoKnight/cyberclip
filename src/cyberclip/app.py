@@ -22,6 +22,7 @@ try:
     from cyberclip.userTypeParser import TSVParser
     from cyberclip.clipParser import clipParser
     from cyberclip.userAction import actionInterface
+    from cyberclip.clipboardHandler import get_clipboard_text
 except:
     from tui.ConfigScreen import ConfigScreen
     from tui.DataTypePannel import DataLoader
@@ -31,6 +32,7 @@ except:
     from userTypeParser import TSVParser
     from clipParser import clipParser
     from userAction import actionInterface
+    from clipboardHandler import get_clipboard_text
 
 
 
@@ -85,7 +87,7 @@ class ClipBrowser(App):
         pyperclip.copy(self.text)
 
     def action_reset(self):
-        self.text = pyperclip.paste()
+        self.text = get_clipboard_text()
 
     def action_select_action_filter(self):
         filter = self.app.query_one("#action-filter").focus()

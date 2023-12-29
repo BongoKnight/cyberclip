@@ -4,6 +4,7 @@ import re
 import sys, os, subprocess
 from six import binary_type
 from urllib.parse import unquote
+from pathlib import Path
 
 CLIPBOARD_TYPE = {
     1: ["TEXT", "text/plain"],
@@ -112,12 +113,16 @@ def get_clipboard_files(folders=False):
         elif 14 in f:
             #14 is a custom datatype for excel, pyperclip handle the text representation
             files = [pyperclip.paste()] 
+        elif 49346 in f:
+            filepath = Path(__file__).parent / 'data/tmp.png'
+            with open(filepath, "wb+") as file:
+                file.write(win32clipboard.GetClipboardData(49346))
+                files = [str(filepath)]
         if folders:
             files = [f"📂{f}" for f in files if os.path.isdir(f)] if files else None
         else:
             files = [f"{get_file_icon(f)}{f}" for f in files if os.path.isfile(f)] if files else None
         win32clipboard.CloseClipboard()
-        print(files)
         return files
 
     if sys.platform.startswith('linux'):
@@ -144,7 +149,7 @@ def get_clipboard_data() -> dict:
             formats = get_clipboard_formats()
             clip_formats = {getattr(win32clipboard, attr):attr for attr in dir(win32clipboard) if not callable(getattr(win32clipboard, attr)) and attr.startswith("CF_")}
             for format in formats:
-                if format != 15:
+                if format != 15 and format != 49346:
                     datatype = clip_formats.get(format)
                     if datatype:
                         print(f"Data found : {clip_formats.get(format)}")
@@ -155,6 +160,7 @@ def get_clipboard_data() -> dict:
                             clip_data.update({format:win32clipboard.GetClipboardData(format)})
                         except:
                             clip_data.update({format:""})
+                
                 else:
                     if get_clipboard_files(folders=False) or get_clipboard_files(folders=True):
                         filepath_data = get_clipboard_files(folders=False) + get_clipboard_files(folders=True)
@@ -183,5 +189,7 @@ def get_clipboard_text():
     elif text_data:
         str_data = text_data
     else :
-        str_data =filepath_data
+        str_data = filepath_data
     return str_data
+
+print(get_clipboard_text())
