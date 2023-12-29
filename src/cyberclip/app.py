@@ -84,6 +84,9 @@ class ClipBrowser(App):
     def action_copy(self):
         pyperclip.copy(self.text)
 
+    def action_reset(self):
+        self.text = pyperclip.paste()
+
     def action_select_action_filter(self):
         filter = self.app.query_one("#action-filter").focus()
         filter.value = ""
@@ -96,10 +99,10 @@ class ClipBrowser(App):
     def check_TSV(self, event: TabbedContent.TabActivated):
         if event.tab.label_text == "TableView":
             df = pd.DataFrame()
-            parser = TSVParser.tsvParser(pyperclip.paste())
+            parser = TSVParser.tsvParser(self.text)
             if parser.extract():            
                 try:
-                    df = pd.read_clipboard(sep="\t",header=None)
+                    df = pd.read_csv(StringIO(self.text), sep="\t",header=None)
                     df.columns = [str(i) for i in df.columns]
                     self.app.call_after_refresh(self.update_dataframe, df)
                 except Exception as e:
