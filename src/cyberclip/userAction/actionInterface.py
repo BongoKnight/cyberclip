@@ -26,7 +26,6 @@ class actionInterface():
         self.description = "Quick description of the action."
         self.param = param_data
         self.complex_param = complex_param
-        self.complex_param_scheme = copy.deepcopy(complex_param)
         self.observables = {}
         self.results = {}
         self.conf = {}

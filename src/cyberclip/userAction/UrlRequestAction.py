@@ -6,6 +6,7 @@ import requests
 from urllib.parse import urlparse
 import ssl
 import socket
+import json
 
 class UrlToHtmlAction(actionInterface):
     """
@@ -44,7 +45,7 @@ class GetCertificatesAction(actionInterface):
 
     def verify_ssl_certificate(self, hostname, port=443):
         context = ssl.create_default_context()
-        with socket.create_connection((hostname, port)) as sock:
+        with socket.create_connection((hostname, port), timeout=0.7) as sock:
             with context.wrap_socket(sock, server_hostname=hostname) as ssock:
                 ssock.do_handshake()
                 cert = ssock.getpeercert()
@@ -53,11 +54,11 @@ class GetCertificatesAction(actionInterface):
     def execute(self) -> object:
         """Execute the action."""
         self.results = {}
-        observables = set(self.get_observables().get("ip") +  self.get_observables().get("domain"))
+        observables = set(self.get_observables().get("ip",[]) +  self.get_observables().get("domain",[]))
         for observable in observables:
             port = int(self.get_value("Port"))
             try:
-                self.results[observable] = self.verify_ssl_certificate(observable, port=port)
+                self.results[observable] = json.dumps(self.verify_ssl_certificate(observable, port=port))
             except Exception as e:
                 self.results[observable] = f"Error while getting the certificate : {e}, {port}"
         return self.results

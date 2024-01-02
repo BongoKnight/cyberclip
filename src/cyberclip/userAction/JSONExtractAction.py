@@ -12,8 +12,8 @@ A action module to extract data from an JSON.
 Use jsonpath module.
 
     """
-
-    def __init__(self, parsers = {}, supportedType = {"json","yaml"}, complex_param={"Selectors":[]}):
+    CONF = {"Selectors":{"type":"tags", "value":""}}
+    def __init__(self, parsers = {}, supportedType = {"json","yaml"}, complex_param=CONF):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
         self.description = "Extract from JSON/YAML with Path selector"
         self.results = {}

@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Label, Button, Input, Checkbox
@@ -77,38 +79,53 @@ class ParamScreen(Screen):
         for widget in self.query(".complex-input"):
             key = widget.label
             value = widget.value
-            params.update({key: value})
+            if isinstance(widget, SimpleInput):
+                params.update({key: {"value":value, "type":"text"}})
+            if isinstance(widget, TagsInput):
+                params.update({key: {"value":value, "type":"tags"}})
+            if isinstance(widget, SelectionInput):
+                params.update({key: {"value":value, "type":"fixedlist", "choices": widget.choices}})
+            if isinstance(widget, MultiSelect):
+                params.update({key: {"value":value, "type":"compactlist", "choices": widget.options}})
+            if isinstance(widget, Checkbox):
+                params.update({key: {"value":value, "type":"bool"}})
         return params
 
     def get_complex_param_widgets(self):
-        if self.action.complex_param_scheme:
+        if self.action.complex_param:
             widgets = []
-            stored_values = self.action.complex_param
-            for key, value in self.action.complex_param_scheme.items():
-                if isinstance(value, dict):
+            params = deepcopy(self.action.complex_param)
+            for key, value in params.items():
+                stored_values = self.action.get_value(key)
+                if isinstance(value, dict):                
+                    default_value = value.get("default", [])
+                    options = value.get("choices", [])
                     assert "type" in value.keys()
                     assert "value" in value.keys()
-                    real_value = value.get("value")
+                    real_value = self.action.get_value(key)
                     input_type = value.get("type")
                     self.action.complex_param[key] = real_value
-                    stored_values = self.action.complex_param
                     if input_type.lower() == "text":
-                        widgets.append(SimpleInput(label=key, value=stored_values.get(key,""), classes="complex-input"))
+                        widgets.append(SimpleInput(label=key, value=stored_values, classes="complex-input"))
                     elif input_type.lower() == "tags":
-                        widgets.append(TagsInput(label=key, value=stored_values.get(key,[]), classes="complex-input"))
+                        widgets.append(TagsInput(label=key, value=stored_values, classes="complex-input"))
                     elif input_type.lower() == "fixedlist":
-                        widgets.append(SelectionInput(label=key, choices=real_value, classes="complex-input"))
+                        widgets.append(SelectionInput(label=key, choices=options, classes="complex-input"))
                     elif input_type.lower() == "compactlist":
-                        widgets.append(MultiSelect(label=key, choices=real_value, classes="complex-input"))
+                        widgets.append(MultiSelect(label=key, options=options, classes="complex-input"))
                     elif input_type.lower() == "bool":
-                        widgets.append(Checkbox(label=key, value=real_value, classes="complex-input"))
+                        widgets.append(Checkbox(label=key, value=stored_values, classes="complex-input"))
                 if isinstance(value, str):
-                    widgets.append(SimpleInput(label=key, value=stored_values.get(key,""), classes="complex-input"))
+                    widgets.append(SimpleInput(label=key, value=stored_values, classes="complex-input"))
+                    self.action.complex_param.update({key:{"type":"text","value":stored_values}})
                 if isinstance(value,list):
                     if len(value) == 0:
-                        widgets.append(TagsInput(label=key, value=stored_values.get(key,[]), classes="complex-input"))
+                        widgets.append(TagsInput(label=key, value=stored_values, classes="complex-input"))
+                        self.action.complex_param.update({key:{"type":"tags","value":stored_values}})
                     else:
-                        widgets.append(SelectionInput(label=key, choices=value, classes="complex-input"))
+                        widgets.append(SelectionInput(label=key, choices=stored_values, classes="complex-input"))
+                        self.action.complex_param.update({key:{"type":"fixedlist","value":stored_values}})
                 if isinstance(value, bool):
                     widgets.append(Checkbox(label=key, value=value))
+                    self.action.complex_param.update({key:{"type":"bool","value":stored_values}})
             return widgets

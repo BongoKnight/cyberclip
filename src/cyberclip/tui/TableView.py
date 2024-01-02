@@ -211,7 +211,7 @@ class FiltrableDataFrame(Static):
     def __init__(self, df, **kwargs):
         super().__init__(**kwargs)
         self.datatable = DataFrameTable(df)
-        self.datatable.cursor_type = "cell"
+        self.datatable.cursor_type = "column"
         
         
     def on_mount(self):
