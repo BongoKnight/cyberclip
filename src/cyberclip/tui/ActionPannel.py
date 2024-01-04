@@ -95,7 +95,7 @@ class ActionCommands(Provider):
         for actionnable in self.actions:
             if isinstance(actionnable, actionInterface):
                 action_desc = actionnable.description
-                action_doc = actionnable.__doc__.splitlines()[0]
+                action_doc = actionnable.__doc__
                 scoreDesc = matcher.match(action_desc) 
                 scoreDoc = matcher.match(action_doc) 
 
@@ -104,11 +104,11 @@ class ActionCommands(Provider):
                         max(scoreDesc, scoreDoc),
                         matcher.highlight(action_desc),
                         partial(self.execute_action, actionnable),
-                        help=action_doc,
+                        help=action_doc.splitlines()[0],
                     )
             elif isinstance(actionnable, ParserInterface):
                 parser_desc = f"Extract {actionnable.parsertype}"
-                parser_doc = actionnable.extract.__doc__.splitlines()[0]
+                parser_doc = actionnable.extract.__doc__
                 scoreDesc = matcher.match(parser_desc) 
                 scoreDoc = matcher.match(parser_doc) 
 
@@ -117,7 +117,7 @@ class ActionCommands(Provider):
                         max(scoreDesc, scoreDoc),
                         matcher.highlight(parser_desc),
                         partial(self.execute_action, actionnable),
-                        help=parser_doc,
+                        help=parser_doc.splitlines()[0],
                     )
 
 class ActionPannel(Static):
