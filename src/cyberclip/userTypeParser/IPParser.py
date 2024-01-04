@@ -1,12 +1,3 @@
-"""Implementation of ParserInterface for ip strings.
-
-Code exemple ::
-    a = ipParser("1212.1.2.3")
-    b = ipParser("1.2.3[.]4")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import re
 try:
     from userTypeParser.ParserInterface import ParserInterface
@@ -14,9 +5,15 @@ except:
     from ParserInterface import ParserInterface
 
 class ipv4Parser(ParserInterface):
-    """Parser for ipv4."""
-    
-    
+    """Implementation of ParserInterface for ip strings.
+
+    Code exemple ::
+        a = ipParser("1212.1.2.3")
+        b = ipParser("1.2.3[.]4")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
+    """
     def __init__(self, text: str, parsertype="ip"):
         self.text = text
         self.parsertype = "ip"

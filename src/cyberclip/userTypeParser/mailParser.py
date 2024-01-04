@@ -1,18 +1,17 @@
-"""Implementation of ParserInterface for mail strings.
-
-Code exemple ::
-    a = mailParser("1.3.4.5")
-    b = mailParser("toto@domain.com")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
 
 class mailParser(ParserInterface):
-    """Parser for mail."""
+    """Implementation of ParserInterface for mail strings.
+
+    Code exemple ::
+        a = mailParser("1.3.4.5")
+        b = mailParser("toto@domain.com")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
+    """
 
     def __init__(self, text: str, parsertype="mail"):
         self.text = text

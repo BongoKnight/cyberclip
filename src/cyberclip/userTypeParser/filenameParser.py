@@ -1,12 +1,3 @@
-"""Implementation of ParserInterface for FileName strings.
-
-Code exemple ::
-    a = filenameParser("dsfsd sdfsdf sdfsdhj j")
-    b = filenameParser('C:/Users/svernin/AppData/Local/Temp/Sans titre.jpg')
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import re
 try:
     from userTypeParser.ParserInterface import ParserInterface
@@ -17,9 +8,15 @@ import os
 from pathlib import Path
 
 class filenameParser(ParserInterface):
-    """Parser for filename."""
-    
-    
+    """Implementation of ParserInterface for FileName strings.
+
+    Code exemple ::
+        a = filenameParser("dsfsd sdfsdf sdfsdhj j")
+        b = filenameParser('C:/Users/svernin/AppData/Local/Temp/Sans titre.jpg')
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
+    """
     def __init__(self, text: str, parsertype="filename"):
         self.text = text
         self.parsertype = "filename"

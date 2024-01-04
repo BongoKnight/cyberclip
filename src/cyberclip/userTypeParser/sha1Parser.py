@@ -1,12 +1,3 @@
-"""Implementation of ParserInterface for SHA1 strings.
-
-Code exemple ::
-    a = SHA1Parser("ccdf ")
-    b = SHA1Parser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import re
 try:
     from userTypeParser.ParserInterface import ParserInterface
@@ -14,7 +5,15 @@ except:
     from ParserInterface import ParserInterface
 
 class SHA1Parser(ParserInterface):
-    """Parser for SHA1."""
+    """Implementation of ParserInterface for SHA1 strings.
+
+    Code exemple ::
+        a = SHA1Parser("ccdf ")
+        b = SHA1Parser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
+    """
     
     
     def __init__(self, text: str, parsertype="sha1"):

@@ -1,18 +1,17 @@
-"""Implementation of ParserInterface for URL strings.
-
-Code exemple ::
-    a = URLParser("dsfsd sdfsdf sdfsdhj j")
-    b = URLParser("http://youpi.google.com/test.php?q=3Rte")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
 
 class URLParser(ParserInterface):
-    """Parser for URL."""
+    """Implementation of ParserInterface for URL strings.
+    
+    Code exemple ::
+        a = URLParser("dsfsd sdfsdf sdfsdhj j")
+        b = URLParser("http://youpi.google.com/test.php?q=3Rte")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
+    """
     
     
     def __init__(self, text: str, parsertype="url"):

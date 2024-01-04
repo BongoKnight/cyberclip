@@ -1,5 +1,3 @@
-"""Interface for clipboard parser."""
-
 class ParserInterface():
     """Parser Interface defines the minimum functions a parser needs to implement."""
     

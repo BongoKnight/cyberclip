@@ -8,10 +8,11 @@ import urllib
 
 class baseUrlAction(actionInterface):
     """
-    A action module, to return a link from a domain or an URL to the base dir.
-    For example :
-        - https://www.example.com/path/of/page returns https://www.example.com/
-        - www.example.com returns https://www.example.com/
+    A action module, to return a link from a domain or an URL to the base dir.  
+    For example : 
+
+    - `https://www.example.com/path/of/page` returns `https://www.example.com/`
+    - `www.example.com` returns `https://www.example.com/`
     """
     def __init__(self, parsers = {}, supportedType = {"url","domain","ip","ipv6"}):
         super().__init__(parsers = parsers, supportedType = supportedType)

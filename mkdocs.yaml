@@ -1,0 +1,75 @@
+site_name: Cyberclip
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - admonition
+  - def_list
+  - meta
+  - footnotes
+  - toc:
+      permalink: true
+      baselevel: 1
+  - markdown.extensions.attr_list
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets
+  - markdown.extensions.attr_list
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.tabs.sticky
+    - navigation.footer
+    - content.code.annotate
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      accent: blue
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+
+plugins:
+  search:
+  autorefs:
+  gen-files:
+    scripts:
+    - generate_doc.py
+  mkdocstrings:
+    default_handler: python
+    handlers:
+      python:
+        path: [src]
+        options:
+          merge_init_into_class: true
+          docstring_options:
+          ignore_init_summary: true
+          show_source: false
+          filters:
+            # Hide some methods that we don't want to be shown in the docs.
+            - "!generic"
+            - "!tools"
+            - "!^__str__$"
+            - "!^execute$"
+    watch:
+      - src/cyberclip
+      - generate_doc.py
+  exclude:
+    glob:
+      - "cyberclip/graveyard/**"
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn

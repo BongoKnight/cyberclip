@@ -76,7 +76,7 @@ class actionInterface():
 
     def __str__(self):
         """Visual representation of the action"""
-        return self.execute()
+        return str(self.results)
     
 
 

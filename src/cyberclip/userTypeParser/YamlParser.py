@@ -1,12 +1,3 @@
-"""Implementation of ParserInterface for Yaml strings.
-
-Code exemple ::
-    a = YamlParser("ccdf ")
-    b = YamlParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import yaml
 try:
     from userTypeParser.ParserInterface import ParserInterface
@@ -15,7 +6,16 @@ except:
 
 
 class YamlParser(ParserInterface):
-    """Parser for Yaml, use yaml.safe_load"""
+    """Implementation of ParserInterface for Yaml strings.  
+    Use `yaml.safe_load`
+
+    Code exemple ::
+        a = YamlParser("ccdf ")
+        b = YamlParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
+    """
     
     def __init__(self, text: str, parsertype="yaml"):
         self.text = text

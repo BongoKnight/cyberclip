@@ -1,18 +1,17 @@
-"""Implementation of ParserInterface for phone strings.
-
-Code exemple ::
-    a = phoneParser("dqdsdqsd")
-    b = phoneParser("70011223344")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
 
 class phoneParser(ParserInterface):
-    """Parser for phone."""
+    """Implementation of ParserInterface for phone strings.
+
+    Code exemple ::
+        a = phoneParser("dqdsdqsd")
+        b = phoneParser("70011223344")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
+    """
     
     
     def __init__(self, text: str, parsertype="phone"):

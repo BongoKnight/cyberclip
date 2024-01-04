@@ -1,19 +1,15 @@
-"""Implementation of ParserInterface for asnum strings.
-
-Code exemple ::
-    a = asnumParser("dqsdq. fdsf")
-    b = asnumParser("asnum.com")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
 
 class asnumParser(ParserInterface):
-    """
-    Parser for asnum.
+    """Implementation of ParserInterface for asnum strings.
+
+    Code exemple ::
+        a = asnumParser("dqsdq. fdsf")
+        b = asnumParser("AS2456")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
     """
     
     

@@ -1,19 +1,18 @@
-"""Implementation of ParserInterface for URL strings.
-
-Code exemple ::
-    a = URLParser("dsfsd sdfsdf sdfsdhj j")
-    b = URLParser("http://youpi.google.com/test.php?q=3Rte")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
 
 class MitreParser(ParserInterface):
-    """Parser for Mitre Att&ck TTP."""
-    
+    """Implementation of ParserInterface for URL strings.
+
+    Code exemple ::
+        a = URLParser("dsfsd sdfsdf sdfsdhj j")
+        b = URLParser("http://youpi.google.com/test.php?q=3Rte")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
+    """
+        
     
     def __init__(self, text: str, parsertype="mitre"):
         self.text = text

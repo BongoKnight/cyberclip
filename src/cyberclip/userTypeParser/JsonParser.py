@@ -1,12 +1,3 @@
-"""Implementation of ParserInterface for JSON strings.
-
-Code exemple ::
-    a = JsonParser("ccdf ")
-    b = JsonParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import json
 from json.decoder import JSONDecodeError
 import re
@@ -17,7 +8,16 @@ except:
 
 
 class JSONParser(ParserInterface):
-    """Parser for Json, use json.loads"""
+    """Implementation of ParserInterface for JSON strings.  
+    Use json.loads
+
+    Code exemple ::
+        a = JsonParser("ccdf ")
+        b = JsonParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
+    """
     
     def __init__(self, text: str, parsertype="json"):
         self.text = text

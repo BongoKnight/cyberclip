@@ -1,19 +1,16 @@
-"""Implementation of ParserInterface for Base64 strings.
-
-Code exemple ::
-    a = asnumParser("dqsdq. fdsf")
-    b = asnumParser("dG90bw==")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
 
 class B64Parser(ParserInterface):
-    """
-    Parser for base 64 text.
+    """Implementation of ParserInterface for Base64 strings.
+
+    Code exemple ::
+        a = asnumParser("dqsdq. fdsf")
+        b = asnumParser("dG90bw==")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
     """
     
     def __init__(self, text: str, parsertype="b64"):

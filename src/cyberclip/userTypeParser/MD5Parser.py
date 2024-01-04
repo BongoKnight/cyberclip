@@ -1,19 +1,17 @@
-"""Implementation of ParserInterface for md5 strings.
-
-Code exemple ::
-    a = md5Parser("1.3.4.5")
-    b = md5Parser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import re
 from userTypeParser.ParserInterface import ParserInterface
 
 
 class md5Parser(ParserInterface):
-    """Parser for md5."""
-    
+    """Implementation of ParserInterface for md5 strings.
+
+    Code exemple ::
+        a = md5Parser("1.3.4.5")
+        b = md5Parser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
+    """
     
     def __init__(self, text: str, parsertype="md5"):
         self.text = text

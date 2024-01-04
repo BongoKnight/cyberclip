@@ -22,3 +22,7 @@ log.log
 cyberclip.egg-info/*
 /dist/*
 /build/*
+/site/*
+/docs/*
+!/docs/static
+!/docs/*.md

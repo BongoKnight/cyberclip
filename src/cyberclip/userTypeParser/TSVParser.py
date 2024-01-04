@@ -1,12 +1,3 @@
-"""Implementation of ParserInterface for tsv strings.
-
-Code exemple ::
-    a = tsvParser("ccdf ")
-    b = tsvParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    print(a.extract(), a.contains())
-    print(b.extract(), b.contains())
-
-"""
 import re
 import pandas as pd
 from io import StringIO
@@ -14,8 +5,15 @@ from userTypeParser.ParserInterface import ParserInterface
 
 
 class tsvParser(ParserInterface):
-    """Parser for tsv."""
-    
+    """Implementation of ParserInterface for tsv strings.
+
+    Code exemple ::
+        a = tsvParser("ccdf ")
+        b = tsvParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        print(a.extract(), a.contains())
+        print(b.extract(), b.contains())
+
+    """    
     def __init__(self, text: str, parsertype="tsv"):
         self.text = text
         self.parsertype = "tsv"
