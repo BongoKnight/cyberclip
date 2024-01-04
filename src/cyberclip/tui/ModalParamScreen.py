@@ -96,13 +96,13 @@ class ParamScreen(Screen):
             widgets = []
             params = deepcopy(self.action.complex_param)
             for key, value in params.items():
-                stored_values = self.action.get_value(key)
+                stored_values = self.action.get_param_value(key)
                 if isinstance(value, dict):                
                     default_value = value.get("default", [])
                     options = value.get("choices", [])
                     assert "type" in value.keys()
                     assert "value" in value.keys()
-                    real_value = self.action.get_value(key)
+                    real_value = self.action.get_param_value(key)
                     input_type = value.get("type")
                     self.action.complex_param[key] = real_value
                     if input_type.lower() == "text":
