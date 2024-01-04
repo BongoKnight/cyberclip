@@ -121,5 +121,3 @@ class actionInterface():
         """
         return str(self.results)
     
-
-

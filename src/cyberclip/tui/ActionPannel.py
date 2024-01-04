@@ -8,11 +8,12 @@ from textual.command import Hit, Hits, Provider
 from functools import partial
 
 try:
-    from cyberclip.userAction.actionInterface import actionInterface
-    from cyberclip.userTypeParser.ParserInterface import ParserInterface
-except:
     from userAction.actionInterface import actionInterface
     from userTypeParser.ParserInterface import ParserInterface
+except:
+    from cyberclip.userAction.actionInterface import actionInterface
+    from cyberclip.userTypeParser.ParserInterface import ParserInterface
+
 
 
 class ActionButton(Static):
@@ -33,8 +34,8 @@ class ActionButton(Static):
     @on(Button.Pressed, "#action-button")
     def execute_option_action(self, event: Button.Pressed) -> None:
         """Event handler called when a  button is pressed."""
-        from tui.ModalParamScreen import ParamScreen
-        from tui.ContentView import ContentView
+        from .ModalParamScreen import ParamScreen
+        from .ContentView import ContentView
         if not self.action.complex_param :
             self.update_text()
         else :
@@ -44,7 +45,7 @@ class ActionButton(Static):
             self.app.push_screen(param_screen, self.handle_param)
 
     def update_text(self):
-        from tui.ContentView import ContentView
+        from .ContentView import ContentView
         contentView = self.app.query_one(ContentView)
         if contentView:
             if self.parent.ancestors[-1].query_one("#param-input").value:
@@ -71,9 +72,8 @@ class ActionCommands(Provider):
     
     def execute_action(self, actionnable: ParserInterface | actionInterface ) -> None:
         """Event handler called when a  button is pressed."""
-        from tui.ModalParamScreen import ParamScreen
-        from tui.ContentView import ContentView
-        if isinstance(actionnable, actionInterface):
+        from .ModalParamScreen import ParamScreen
+        if  "Action" in actionnable.__module__ :
             if not actionnable.complex_param :
                 self.app.text = str(actionnable)
             else :
@@ -81,7 +81,7 @@ class ActionCommands(Provider):
                 param_screen.border_title = f"Parameters for '{actionnable.description}' action."
                 param_screen.action = actionnable
                 self.app.push_screen(param_screen, partial(self.app.handle_param, actionnable))
-        elif isinstance(actionnable, ParserInterface):
+        elif "Parser" in actionnable.__module__:
             self.app.text = "\r\n".join(actionnable.extract())
 
     async def startup(self) -> None:  
@@ -93,7 +93,7 @@ class ActionCommands(Provider):
         """Search for action."""
         matcher = self.matcher(query)
         for actionnable in self.actions:
-            if isinstance(actionnable, actionInterface):
+            if  "Action" in actionnable.__module__ :
                 action_desc = actionnable.description
                 action_doc = actionnable.__doc__
                 scoreDesc = matcher.match(action_desc) 
@@ -106,7 +106,7 @@ class ActionCommands(Provider):
                         partial(self.execute_action, actionnable),
                         help=action_doc.splitlines()[0],
                     )
-            elif isinstance(actionnable, ParserInterface):
+            if  "Parser" in actionnable.__module__ :
                 parser_desc = f"Extract {actionnable.parsertype}"
                 parser_doc = actionnable.extract.__doc__
                 scoreDesc = matcher.match(parser_desc) 
@@ -137,7 +137,7 @@ class ActionPannel(Static):
         return new_action
 
     def on_input_changed(self, event: Input.Changed) -> None:
-        from tui.ContentView import ContentView
+        from .ContentView import ContentView
         actions = self.query(ActionButton)
         self.app.actions = self.app.query_one(ContentView).filter_action()
         for action in actions:

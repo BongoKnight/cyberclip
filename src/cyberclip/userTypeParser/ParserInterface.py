@@ -13,3 +13,4 @@ class ParserInterface():
     def extract(self) -> list:
         """Extract a list of objects of parsed type."""
         return self.objects
+    
