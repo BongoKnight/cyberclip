@@ -1947,7 +1947,7 @@
             Bases: <code><span title="actionInterface.actionInterface">actionInterface</span></code></p>
 
   
-      <p>A action module, to explain Mitre Att&amp;ck TTP Code.
+      <p>A action module, to explain Mitre Att&amp;ck TTP Code.<br />
 Return the name, and the Mitre URL of a tactic.</p>
 
 
@@ -1977,7 +1977,7 @@ Return the name, and the Mitre URL of a tactic.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Visual representation of the action</p>
+      <p>Returns a TSV representation of the dataframe returned by <code>execute</code></p>
 
   </div>
 
@@ -1997,7 +1997,23 @@ Return the name, and the Mitre URL of a tactic.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Execute the action.</p>
+      <p>Returns a pandas dataframe containing the following informations : </p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">mitre_id</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">mitre_url</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">T1547</td>
+<td style="text-align: left;">Boot or Logon Autostart Execution</td>
+<td style="text-align: left;">https://attack.mitre.org/techniques/T1547</td>
+</tr>
+</tbody>
+</table>
 
   </div>
 

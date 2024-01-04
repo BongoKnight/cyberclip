@@ -1828,7 +1828,6 @@ pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="
 <h1 id="adding-the-logic-behind-the-action">Adding the logic behind the action<a class="headerlink" href="#adding-the-logic-behind-the-action" title="Permanent link">&para;</a></h1>
 <p>Now in order to bring some usefullness to your action, you might want to define what your action do. Here your action should take a link in input and download video from the link. You have to define this behaviour inside the <code>execute</code> method.</p>
 <div class="highlight"><pre><span></span><code>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute the action.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_observables</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">ydl_opts</span> <span class="o">=</span> <span class="p">{</span>
