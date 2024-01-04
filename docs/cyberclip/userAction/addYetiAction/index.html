@@ -956,6 +956,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="searchYetiAction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#src.cyberclip.userAction.addYetiAction.searchYetiAction.__str__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __str__()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.cyberclip.userAction.addYetiAction.searchYetiAction.execute" class="md-nav__link">
+    <span class="md-ellipsis">
+      execute()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1846,6 +1870,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="searchYetiAction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#src.cyberclip.userAction.addYetiAction.searchYetiAction.__str__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __str__()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.cyberclip.userAction.addYetiAction.searchYetiAction.execute" class="md-nav__link">
+    <span class="md-ellipsis">
+      execute()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1899,12 +1947,79 @@
             Bases: <code><span title="actionInterface.actionInterface">actionInterface</span></code></p>
 
   
-      <p>A action module, to add observables contained in the keyboard to Yeti via the API.
-A config is needed :</p>
-<p>Yeti:
-- url: http://127.0.0.1:5000
-- api-key: <api-key></p>
+      <p>A action module, to add observables contained in a text to Yeti via the API.</p>
 
+<details class="note" open>
+  <summary>Note</summary>
+  <p>A config is needed :</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Yeti</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://127.0.0.1:5000</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">api-key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;api-key&gt;</span>
+</code></pre></div>
+</details>
+
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>Source</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>From where the data come from</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>Threat</code></td>
+          <td>
+                <code>`list` of `str`</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of associated threats</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>Campaigns</code></td>
+          <td>
+                <code>`list` of `str`</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of associated campaigns</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>Tags</code></td>
+          <td>
+                <code>`list` of `str`</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of associated tags</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+<details class="warning" open>
+  <summary>Warning</summary>
+  <p>These attributes are the description of the <code>complex_param</code> attribute of the action.</p>
+</details>
 
   
 
@@ -1917,6 +2032,46 @@ A config is needed :</p>
 
 
 
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="src.cyberclip.userAction.addYetiAction.searchYetiAction.__str__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__str__</span><span class="p">()</span></code>
+
+<a href="#src.cyberclip.userAction.addYetiAction.searchYetiAction.__str__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Visual representation of the action</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="src.cyberclip.userAction.addYetiAction.searchYetiAction.execute" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">execute</span><span class="p">()</span></code>
+
+<a href="#src.cyberclip.userAction.addYetiAction.searchYetiAction.execute" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Execute the action.</p>
+
+  </div>
+
+</div>
 
 
 

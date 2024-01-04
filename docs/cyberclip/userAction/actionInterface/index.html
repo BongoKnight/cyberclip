@@ -939,6 +939,24 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#src.cyberclip.userAction.actionInterface.actionInterface.__str__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __str__()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.cyberclip.userAction.actionInterface.actionInterface.execute" class="md-nav__link">
+    <span class="md-ellipsis">
+      execute()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#src.cyberclip.userAction.actionInterface.actionInterface.get_observables" class="md-nav__link">
     <span class="md-ellipsis">
       get_observables()
@@ -1865,6 +1883,24 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#src.cyberclip.userAction.actionInterface.actionInterface.__str__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __str__()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.cyberclip.userAction.actionInterface.actionInterface.execute" class="md-nav__link">
+    <span class="md-ellipsis">
+      execute()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#src.cyberclip.userAction.actionInterface.actionInterface.get_observables" class="md-nav__link">
     <span class="md-ellipsis">
       get_observables()
@@ -1927,12 +1963,135 @@
   <div class="doc doc-contents ">
 
   
-      <p>Parser Interface defines the minimum functions a parser needs to implement.</p>
-  
-      <p>parsers is a list of objects that implements ParserInterface.
-supportedType is a list of type defined in the varaible <code>parsertype</code> that are supported by the current action.
-param is a small textual parameter typically to pass to a simple script which is not mandatory, such as flags.
-complex_param are used to generate a TUI to ask for them or can be entered as is, typically for file name, config, etc...</p>
+      <p>Action Interface defines the minimum functions a parser needs to implement.</p>
+<ul>
+<li><code>execute</code> : The logic part of the action, this method define what the action does. </li>
+<li><code>__str__</code> : Visual representation of the action after being executed.</li>
+</ul>
+
+
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>parsers</code></td>
+          <td>
+                <code>list of ParserInterface</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A list of parsers interface, these are used to 
+extract observales from text</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>observables</code></td>
+          <td>
+                <code>list of str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A list of observables extracted by the parsers</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>conf</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A configuration extracted from <code>conf.yaml</code>, this store data needed 
+for the action to be executed (API Key for example) </p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>supportedType</code></td>
+          <td>
+                <code>list of str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A list of type defined in the varaible <code>parsertype</code> 
+that are supported by the current action.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>results</code></td>
+          <td>
+                <code>list of object</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Storing the result of the action execution</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>While overwriting <code>execute</code> method in a class which inherits from <code>ActionInterface</code>, 
+you should modify the <code>results</code> attributes in order to return a dictionnary where 
+keys are the parsed observable and values are the results of the action.</p>
+</details>  
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>param_data</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A small textual parameter typically to pass to a simple script which is not mandatory, such as flags.</p>
+            </div>
+          </td>
+          <td>
+                <code>&#39;&#39;</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>complex_param</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A dictionnary of value needed for executing the action properly typically a filename, config options, users choices, etc... This parameter is parsed by</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
 
 
   
@@ -1953,6 +2112,71 @@ complex_param are used to generate a TUI to ask for them or can be entered as is
 
 
 
+<h3 id="src.cyberclip.userAction.actionInterface.actionInterface.__str__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__str__</span><span class="p">()</span></code>
+
+<a href="#src.cyberclip.userAction.actionInterface.actionInterface.__str__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Visual representation of the action</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="src.cyberclip.userAction.actionInterface.actionInterface.execute" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">execute</span><span class="p">()</span></code>
+
+<a href="#src.cyberclip.userAction.actionInterface.actionInterface.execute" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Execute the action</p>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>results</code></td>          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Returns a dictionary consisting of the observables
+parsed in text and the results of the action for each one of it.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
 <h3 id="src.cyberclip.userAction.actionInterface.actionInterface.get_observables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">get_observables</span><span class="p">()</span></code>
 
@@ -1962,11 +2186,42 @@ complex_param are used to generate a TUI to ask for them or can be entered as is
   <div class="doc doc-contents ">
   
 
-<details class="populate-the-observables-with-a-dict-of-this-form-" open>
-  <summary>Populate the observables with a dict of this form</summary>
-  <p><Parser_type>:[<list of observables of this type>]</p>
-</details>      <p>Reset the results variables.</p>
 
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>self.observables (dict): Populate the <code>self.observables</code> by a dictionnary with the following structure :<br />
+{<code>&lt;Parser_type&gt;</code>:[<code>&lt;list of observables of this type&gt;</code>]}<br />
+Reset the <code>self.results</code> variables.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+<details class="info" open>
+  <summary>Info</summary>
+  <p>This method is implemented to simplify the writting of new action. If you want to differientiate how an action handle different type of observables (ie IP addresses and domain), you might use something like this in your <code>execute</code> method :<br />
+<div class="highlight"><pre><span></span><code><span class="bp">self</span><span class="o">.</span><span class="n">observables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_observables</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">observables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ip&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+    <span class="o">&lt;</span><span class="n">behaviour</span> <span class="n">regarding</span> <span class="n">IP</span> <span class="n">address</span><span class="o">&gt;</span>
+<span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">observables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;domain&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+    <span class="o">&lt;</span><span class="n">behaviour</span> <span class="n">regarding</span> <span class="n">Domain</span> <span class="n">Name</span><span class="o">&gt;</span>
+</code></pre></div></p>
+</details>
   </div>
 
 </div>
