@@ -74,7 +74,6 @@ class AsToCidrAction(actionInterface):
         self.description = "AS Number to CIDR"
 
     def execute(self) -> object:
-        """Execute the action."""
         self.observables = self.get_observables()
         if self.observables.get("asnum", []):
             if len(AS_DB.columns):
@@ -95,7 +94,6 @@ class AsToCidrAction(actionInterface):
             return []
 
     def __str__(self):
-        """Visual representation of the action"""
         self.execute()
         lines = []
         for asnum, infos in self.results.items():
@@ -114,7 +112,6 @@ class IpToAsAction(actionInterface):
         self.description = "IP to AS Number"
 
     def execute(self) -> object:
-        """Execute the action."""
         self.observables = self.get_observables()
         if self.observables.get("ip", []):
             if len(AS_DB.columns):
@@ -143,7 +140,6 @@ class IpToAsAction(actionInterface):
         return self.results
 
     def __str__(self):
-        """Visual representation of the action"""
         self.execute()
         lines = []
         for ip, infos in self.results.items():

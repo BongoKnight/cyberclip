@@ -65,6 +65,7 @@ plugins:
             - "!tools"
             #- "!^__str__$"
             #- "!^execute$"
+
 watch:
   - src/cyberclip
   - generate_doc.py

@@ -5,10 +5,10 @@ except:
 import base64
 
 class B64DecodeAction(actionInterface):
-    """
-    A action module, to decode base 64.
-    For example :
-        - dG90bw== returns toto
+    """A action module, to decode base 64.  
+    For example : 
+    
+    - `dG90bw==` returns `toto`
     """
     def __init__(self, parsers = {}, supportedType = {"b64"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
@@ -16,7 +16,6 @@ class B64DecodeAction(actionInterface):
         self.decoded_b64 = []
         
     def execute(self) -> object:
-        """Execute the action."""
         self.base_url = {}
         self.observables = self.get_observables()
         if self.observables.get("b64"):
@@ -25,7 +24,6 @@ class B64DecodeAction(actionInterface):
 
     
     def __str__(self):
-        """Visual representation of the action"""
         self.execute()
         results = []
         for key, value in self.decoded_b64.items():
@@ -37,10 +35,10 @@ class B64DecodeAction(actionInterface):
         return  "\n".join(results)
 
 class B64EncodeAction(actionInterface):
-    """
-    A action module, to encode in base 64.
+    """A action module, to encode in base 64.  
     For example :
-        - toto returns dG90bw==
+    
+    - `toto` returns `dG90bw==`
     """
     def __init__(self, parsers = {}, supportedType = {"text"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
@@ -48,7 +46,6 @@ class B64EncodeAction(actionInterface):
         self.encoded_b64 = []
         
     def execute(self) -> object:
-        """Execute the action."""
         self.base_url = {}
         self.observables = self.get_observables()
         if self.observables.get("text"):
@@ -60,7 +57,6 @@ class B64EncodeAction(actionInterface):
 
     
     def __str__(self):
-        """Visual representation of the action"""
         self.execute()
         results = []
         for key, value in self.encoded_b64.items():

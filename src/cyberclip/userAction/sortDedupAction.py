@@ -11,7 +11,6 @@ class sortDedupAction(actionInterface):
         self.description = "Deduplicate and sort lines."
 
     def execute(self) -> object:
-        """Execute the action."""
         self.observables = self.get_observables()
         if self.observables.get("text"):
             lines = list(set(self.observables.get("text")[0].splitlines()))
@@ -20,7 +19,6 @@ class sortDedupAction(actionInterface):
 
     
     def __str__(self):
-        """Visual representation of the action"""
         return  self.execute()
 
 if __name__=='__main__':

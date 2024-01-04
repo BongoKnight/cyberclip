@@ -103,11 +103,22 @@ class actionInterface():
         Returns:
             results (dict): Returns a dictionary consisting of the observables
                 parsed in text and the results of the action for each one of it. 
+
+        Note:
+            Values of the returned dict could be wathever you need. The key of the dict are used to make join
+            between dataset in the table view of the TUI. 
         """
         return self.results
 
     def __str__(self):
-        """Visual representation of the action"""
+        """Return a textual representation of the action results. By default returns
+        the `str` representation of `self.results`. However you could make some pretty printing here, 
+        such as Markdown, TSV or any other string representation that fulfill your needs.
+
+        Note:
+            This textual representation is displayed in the Terminal User Interface (TUI) when you execute the action. 
+            This method is used to provides feedback. 
+        """
         return str(self.results)
     
 

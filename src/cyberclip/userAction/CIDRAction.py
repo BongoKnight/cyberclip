@@ -17,8 +17,7 @@ def explode_to(network, prefixlen=24):
     return [str(nwk) for sublist in subnets for nwk in sublist]
 
 class ToCIDR24Action(actionInterface):
-    """
-    A action module, to return a list of /24 CIDR from a bigger CIDR.
+    """A action module, to return a list of /24 CIDR from a bigger CIDR.
     """
     def __init__(self, parsers = {}, supportedType = {"cidr", "ip"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
@@ -26,7 +25,6 @@ class ToCIDR24Action(actionInterface):
         self.exploded_cidr = {}
         
     def execute(self) -> object:
-        """Execute the action."""
         self.exploded_cidr = {}
         self.observables = self.get_observables()
         for cidr in self.observables.get("cidr", []):
@@ -37,7 +35,6 @@ class ToCIDR24Action(actionInterface):
         return self.exploded_cidr
     
     def __str__(self):
-        """Visual representation of the action"""
         self.execute()
         return  "\n".join([f'{key}: {value}' for key, value in self.exploded_cidr.items() if value!=""])
 

@@ -7,11 +7,11 @@ import re
 
 
 class sortAction(actionInterface):    
-    """
-    A action module, to sort lines of a text.
+    """A action module, to sort lines of a text.  
     Parameter can be passed over : 
-        - if desc or reverse in param revert the order
-        - if num, int, version in param sort by number
+
+    - if desc or reverse in param revert the order
+    - if num, int, version in param sort by number
     """
 
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
@@ -19,7 +19,6 @@ class sortAction(actionInterface):
         self.description = "Sort lines."
         
     def execute(self) -> object:
-        """Execute the action."""
         lines = []
         self.observables = self.get_observables()
         if self.observables.get("text"):

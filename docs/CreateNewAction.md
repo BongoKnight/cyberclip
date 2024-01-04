@@ -55,7 +55,6 @@ Now in order to bring some usefullness to your action, you might want to define 
 
 ```python
     def execute(self) -> object:
-        """Execute the action."""
         self.get_observables()
         self.results = {}
         ydl_opts = {

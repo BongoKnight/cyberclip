@@ -12,7 +12,6 @@ class URLOpenAction(actionInterface):
         self.description = "Open URL in browser."
         
     def execute(self) -> object:
-        """Execute the action."""
         lines = []
         self.observables = {}
         self.observables = self.get_observables()
@@ -23,7 +22,6 @@ class URLOpenAction(actionInterface):
         return "\n".join([i for i in lines])
     
     def __str__(self):
-        """Visual representation of the action"""
         return self.execute()
 
 if __name__=='__main__':

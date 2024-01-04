@@ -6,8 +6,7 @@ except:
 from collections import Counter
 
 class countAction(actionInterface):    
-    """
-    A action module, to count lines contained in a text.
+    """A action module, to count lines contained in a text.
 
     Return :
         <number_of_occurences>\t<occurence>
@@ -27,7 +26,6 @@ class countAction(actionInterface):
 
     
     def __str__(self):
-        """Visual representation of the action"""
         counts = self.execute()
         return  "\n".join([f"{count}\t{line}" for line, count in counts.items()])
 

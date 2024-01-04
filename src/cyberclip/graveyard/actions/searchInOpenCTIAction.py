@@ -49,7 +49,6 @@ class searchInOpenCTIAction(actionInterface):
             return indexed_result
     
     def __str__(self):
-        """Visual representation of the action"""
         out = self.execute()
         return "\r\n".join([f"{i} found in OpenCTI." for i in out.keys()])
 

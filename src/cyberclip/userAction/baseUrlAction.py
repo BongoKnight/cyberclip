@@ -7,8 +7,7 @@ import os
 import urllib
 
 class baseUrlAction(actionInterface):
-    """
-    A action module, to return a link from a domain or an URL to the base dir.  
+    """A action module, to return a link from a domain or an URL to the base dir.  
     For example : 
 
     - `https://www.example.com/path/of/page` returns `https://www.example.com/`
@@ -20,7 +19,6 @@ class baseUrlAction(actionInterface):
         self.base_url = {}
         
     def execute(self) -> object:
-        """Execute the action."""
         self.base_url = {}
         self.observables = self.get_observables()
         if self.observables.get("url"):
@@ -35,7 +33,6 @@ class baseUrlAction(actionInterface):
 
     
     def __str__(self):
-        """Visual representation of the action"""
         self.execute()
         return  "\n".join([value for key, value in self.base_url.items() if value!=""])
 

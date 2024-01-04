@@ -15,8 +15,7 @@ Classes:
 """
 
 class ExtractTextAction(actionInterface):
-    """
-    A action module to extract text from files contained in the clipboard.  
+    """A action module to extract text from files contained in the clipboard.  
     Make use of textract lib.
     """
     def __init__(self, parsers = {}, supportedType = {"filename"}):
@@ -25,7 +24,6 @@ class ExtractTextAction(actionInterface):
         self.results = {}
         
     def execute(self) -> object:
-        """Execute the action."""
         import textract
         self.results = {}
         self.observables = self.get_observables()
@@ -37,7 +35,6 @@ class ExtractTextAction(actionInterface):
                     self.results.update({filename: f"Error while processing file : {str(e)}"})
     
     def __str__(self):
-        """Visual representation of the action"""
         self.execute()
         results = []
         for filename, text in self.results.items():
@@ -48,8 +45,7 @@ class ExtractTextAction(actionInterface):
         return  "\n\n".join(results)
 
 class CalculateHashAction(actionInterface):
-    """
-    A action module to calculate hashes from files contained in the clipboard.  
+    """A action module to calculate hashes from files contained in the clipboard.  
     Default : MD5 and SHA1
     """
     CONF =  {"Hashes":{"type":"tags","value":["MD5","SHA1"]}}
@@ -59,7 +55,6 @@ class CalculateHashAction(actionInterface):
         self.results = {}
         
     def execute(self) -> object:
-        """Execute the action."""
         self.results = {}
         self.observables = self.get_observables()
         if filenames := self.observables.get("filename", []):
@@ -88,7 +83,6 @@ class CalculateHashAction(actionInterface):
     
     
     def __str__(self):
-        """Visual representation of the action"""
         self.execute()
         lines = []
         for filename, hashes in self.results.items():

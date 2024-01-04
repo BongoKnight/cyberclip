@@ -4,9 +4,9 @@ except:
     from actionInterface import actionInterface
 
 class toSqlSearchAction(actionInterface):    
-    """A action module, to transform lines to an Python list or an IN SQL querry.
-    For example if the text contain two lines with : a and b
-    It will return "a","b".
+    """A action module, to transform lines to an Python list or an IN SQL querry.  
+    For example if the text contain two lines with : a and b  
+    It will return "a","b".  
     """
 
     def __init__(self, parsers = {}, supportedType = {"text"}):
@@ -15,7 +15,6 @@ class toSqlSearchAction(actionInterface):
 
         
     def execute(self) -> object:
-        """Execute the action."""
         self.observables = self.get_observables()
         if self.observables.get("text"):
             lines = list(set(self.observables.get("text")[0].splitlines()))
@@ -24,7 +23,6 @@ class toSqlSearchAction(actionInterface):
 
     
     def __str__(self):
-        """Visual representation of the action"""
         return  self.execute()
 
 if __name__=='__main__':

@@ -9,8 +9,7 @@ import socket
 import json
 
 class UrlToHtmlAction(actionInterface):
-    """
-    A action module to recover HTML from an URL.
+    """A action module to recover HTML from an URL.  
     Perform a get request on the URL with a desktop-like User-Agent.
     """
 
@@ -19,7 +18,6 @@ class UrlToHtmlAction(actionInterface):
         self.description = "URL to HTML"
         
     def execute(self) -> object:
-        """Execute the action."""
         urls = set(self.parsers.get("url").extract())
         results = {}
         for url in urls:
@@ -35,9 +33,7 @@ class UrlToHtmlAction(actionInterface):
 
 
 class GetCertificatesAction(actionInterface):
-    """
-    A action module to recover certificate from Domain or IP.
-    """
+    """A action module to recover certificate from Domain or IP."""
     CONF = {"Port":{"type":"text", "value":"443"}}
     def __init__(self, parsers = {}, supportedType = {"domain","ip"}, complex_param = CONF):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
@@ -52,7 +48,6 @@ class GetCertificatesAction(actionInterface):
                 return cert
 
     def execute(self) -> object:
-        """Execute the action."""
         self.results = {}
         observables = set(self.get_observables().get("ip",[]) +  self.get_observables().get("domain",[]))
         for observable in observables:
@@ -68,8 +63,7 @@ class GetCertificatesAction(actionInterface):
         return "\r\n".join(f"{observable}\t{str(certif)}" for observable, certif in self.results.items())
 
 class UrlToFaviconHashAction(actionInterface):
-    """
-    A action module to recover mmh3 hash of a favicon for a domain or Url.
+    """A action module to recover mmh3 hash of a favicon for a domain or Url.  
     Perform a get request on the URL with a desktop-like User-Agent.
     """
 
@@ -78,7 +72,6 @@ class UrlToFaviconHashAction(actionInterface):
         self.description = "Favicon hash (mmh3)"
         
     def execute(self) -> object:
-        """Execute the action."""
         results = {}
         self.observables = self.get_observables()
         for url in self.observables.get("url", []):
@@ -109,7 +102,6 @@ class UrlToFaviconHashAction(actionInterface):
 
 
     def __str__(self):
-        """Visual representation of the action"""
         lines = []
         hashes = self.execute()
         for observable, hash in hashes.items():

@@ -1,5 +1,8 @@
 import re
-from userTypeParser.ParserInterface import ParserInterface
+try:
+    from userTypeParser.ParserInterface import ParserInterface
+except:
+    from ParserInterface import ParserInterface
 
 
 class MitreParser(ParserInterface):

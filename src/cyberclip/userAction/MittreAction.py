@@ -31,8 +31,7 @@ except Exception as e:
 
 
 class MitreAction(actionInterface):
-    """
-    A action module, to explain Mitre Att&ck TTP Code.
+    """A action module, to explain Mitre Att&ck TTP Code.  
     Return the name, and the Mitre URL of a tactic.
     """
 
@@ -41,7 +40,13 @@ class MitreAction(actionInterface):
         self.description = "Mitre tactic to Mittre description."
         
     def execute(self) -> object:
-        """Execute the action."""
+        """
+        Returns a pandas dataframe containing the following informations : 
+
+        | mitre_id   | name                              | mitre_url                                 |
+        |:-----------|:----------------------------------|:------------------------------------------|
+        | T1547      | Boot or Logon Autostart Execution | https://attack.mitre.org/techniques/T1547 |
+        """
         lines = []
         self.observables = self.get_observables()
         mitre_techniques = self.observables.get("mitre")
@@ -51,7 +56,7 @@ class MitreAction(actionInterface):
             return pd.DataFrame(columns=["mitre_id","name","mitre_url"])
     
     def __str__(self):
-        """Visual representation of the action"""
+        """Returns a TSV representation of the dataframe returned by `execute`"""
         df = self.execute()
         return  df[['mitre_id','name', 'mitre_url']].to_csv(sep="\t", index=None)
 

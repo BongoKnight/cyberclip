@@ -5,9 +5,8 @@ except:
 import re
 
 class findReplaceAction(actionInterface):    
-    """
-A action module to search and replace using regex.sub().
-Enter the regex as a param.
+    """A action module to search and replace using regex.sub().  
+    Enter the regex as a param.
     """
 
     def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={"Search":"","Replace":""}):
@@ -15,7 +14,8 @@ Enter the regex as a param.
         self.description = "Find and replace"
         
     def execute(self) -> object:
-        """Execute the action."""
+        """Find a regex pattern and replace it.
+        """
         self.observables = self.get_observables()
         if self.observables.get("text"):
             text = self.observables.get("text")[0]
@@ -25,7 +25,6 @@ Enter the regex as a param.
 
     
     def __str__(self):
-        """Visual representation of the action"""
         return  self.execute()
 
 if __name__=='__main__':

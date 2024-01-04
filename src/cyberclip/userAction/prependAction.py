@@ -4,8 +4,8 @@ except:
     from actionInterface import actionInterface
 
 class prependAction(actionInterface):   
-    """
-    A action module, to prepend data to a given text.
+    """A action module, to prepend data to a given text.
+    
     Usefull for adding header to data. Add the text to add as a param.
     """
 
@@ -15,8 +15,7 @@ class prependAction(actionInterface):
 
         
     def execute(self) -> object:
-        """
-        Add a line of text at the beginning of a text.
+        """Add a line of text at the beginning of a text.
         
         Return:
             text (str): Text with prepended data

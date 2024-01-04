@@ -28,8 +28,7 @@ class asnumParser(ParserInterface):
             return False
     
     def extract(self):
-        """
-        Return all asnum contained in text.
+        """Return all asnum contained in text.
         
         Return:
             asmums (list(str)): A list of as number with the following format : AS<Num> or as<num>

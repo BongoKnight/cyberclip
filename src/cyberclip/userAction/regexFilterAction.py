@@ -5,8 +5,7 @@ except:
 import re
 
 class regexFilterAction(actionInterface):    
-    """
-    A action module to filter lines matching a regex.
+    """A action module to filter lines matching a regex.  
     Enter the regex as a param.
     """
 
@@ -15,7 +14,6 @@ class regexFilterAction(actionInterface):
         self.description = "Filter with Regex"
         
     def execute(self) -> object:
-        """Execute the action."""
         lines = []
         self.observables = self.get_observables()
         if self.observables.get("text"):
@@ -24,7 +22,6 @@ class regexFilterAction(actionInterface):
 
     
     def __str__(self):
-        """Visual representation of the action"""
         return  self.execute()
 
 if __name__=='__main__':

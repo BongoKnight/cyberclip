@@ -29,8 +29,7 @@ class B64Parser(ParserInterface):
             return False
     
     def extract(self):
-        """
-        Return all base64 lines contained in text.
+        """Return all base64 lines contained in text.
         
         Return:
             b64 (list(str)): A list of as number with the following format : AS<Num> or as<num>

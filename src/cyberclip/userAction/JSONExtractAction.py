@@ -7,9 +7,8 @@ import json
 import yaml
 
 class JSONExtractAction(actionInterface):
-    """
-A action module to extract data from an JSON.
-Use jsonpath module.
+    """A action module to extract data from an JSON.  
+    Use jsonpath module.
 
     """
     CONF = {"Selectors":{"type":"tags", "value":""}}
@@ -31,7 +30,6 @@ Use jsonpath module.
         return self.results
         
     def execute(self) -> object:
-        """Execute the action."""
         self.results = {}
         self.observables = self.get_observables()
         if self.observables.get("json"):
@@ -43,7 +41,6 @@ Use jsonpath module.
         return self.results
     
     def __str__(self):
-        """Visual representation of the action"""
         lines = []
         filtered_jsons = self.execute()
         for json_objects, extract in filtered_jsons.items():

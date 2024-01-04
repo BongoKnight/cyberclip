@@ -27,7 +27,6 @@ class searchYetiAction(actionInterface):
 
 
     def execute(self) -> object:
-        """Execute the action."""
         self.lines = []
         self.observables = self.get_observables()
         for obs_type in self.supportedType:
@@ -46,7 +45,6 @@ class searchYetiAction(actionInterface):
         return
     
     def __str__(self):
-        """Visual representation of the action"""
         self.execute()
         return "\n".join(self.lines)
 

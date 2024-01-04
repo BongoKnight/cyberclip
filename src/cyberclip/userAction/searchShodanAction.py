@@ -45,7 +45,6 @@ class searchInShodanAction(actionInterface):
         return results
     
     def __str__(self):
-        """Visual representation of the action"""
         return json.dumps(self.execute())
 
 if __name__=='__main__':

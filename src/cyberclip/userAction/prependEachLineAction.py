@@ -4,8 +4,7 @@ except:
     from actionInterface import actionInterface
 
 class prependEachLineAction(actionInterface):   
-    """
-    A action module, to prepend data to all the lines of a given text.
+    """A action module, to prepend data to all the lines of a given text.
     Enter the text to preprend as a param.
     """ 
 
@@ -14,8 +13,7 @@ class prependEachLineAction(actionInterface):
         self.description = "Prepend text on each line."
         
     def execute(self) -> object:
-        """
-        Add a line of text at the end of each line of a text.
+        """Add a line of text at the end of each line of a text.
         
         Return:
             text (str): Text with prepended data
@@ -27,7 +25,6 @@ class prependEachLineAction(actionInterface):
 
     
     def __str__(self):
-        """Add a line of text at the beginning of a text."""
         return  self.execute()
 
 if __name__=='__main__':

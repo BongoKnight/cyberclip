@@ -12,7 +12,6 @@ class extractAction(actionInterface):
         self.exception = exception
 
     def __str__(self):
-        """Visual representation of the action"""
         self.execute()
         extracted_items = []
         for key, value in self.observables.items():
@@ -21,7 +20,6 @@ class extractAction(actionInterface):
         return "\n".join(extracted_items)
         
     def execute(self) -> object:
-        """Execute the action."""
         for parser_name, parser in self.parsers.items():
             if parser_name not in self.exception:
                 self.observables.update({parser_name:parser.extract()})

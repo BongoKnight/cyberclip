@@ -6,8 +6,7 @@ except:
 import re
 
 class reverseRegexFilterAction(actionInterface):   
-    """
-    A action module to delete lines matching a regex.
+    """A action module to delete lines matching a regex.  
     Enter the regex as a param.
     """
     def __init__(self, parsers = {}, supportedType = {"text"}, param_data=""):
@@ -16,7 +15,6 @@ class reverseRegexFilterAction(actionInterface):
 
         
     def execute(self) -> object:
-        """Execute the action."""
         lines = []
         self.observables = self.get_observables()
         if self.observables.get("text"):
@@ -25,7 +23,6 @@ class reverseRegexFilterAction(actionInterface):
 
     
     def __str__(self):
-        """Visual representation of the action"""
         return  self.execute()
 
 if __name__=='__main__':

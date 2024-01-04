@@ -14,7 +14,6 @@ for path in sorted(src.rglob("*.py")):
         module_path = path.relative_to(src).with_suffix("")  
         doc_path = path.relative_to(src).with_suffix(".md")
         full_doc_path = Path("docs", doc_path)
-        full_doc_path.parent.mkdir(parents=True, exist_ok=True)
 
         parts = list(module_path.parts)
 

@@ -5,12 +5,12 @@ except:
 from bs4 import BeautifulSoup
 
 class HtmlExtractAction(actionInterface):
-    """
-    A action module to extract tags from an HTML document.
-    Extract paragraph and title by default
+    """A action module to extract tags from an HTML document.  
+    Extract paragraph and title by default  
     For example :
-        `td > b` : Extract all the bold tags inside a table
-        `#password` : Extract all the Html tags with the #password id 
+
+    - `td > b` : Extract all the bold tags inside a table
+    - `#password` : Extract all the Html tags where the id property value is `password` 
     """
 
     def __init__(self, parsers = {}, supportedType = {"html"}, param_data="h1, h2, h3, h4, h5, p"):
@@ -18,7 +18,6 @@ class HtmlExtractAction(actionInterface):
         self.description = "Extract tags from HTML with CSS selector"
 
     def execute(self) -> object:
-        """Execute the action."""
         self.observables = {}
         html_texts = self.parsers.get("html").extract()
         if html_texts:
@@ -29,7 +28,7 @@ class HtmlExtractAction(actionInterface):
         return self.observables
     
     def __str__(self):
-        """Visual representation of the action"""
+        """Visual representation of the action."""
         lines = []
         filtered_dom = self.execute()
         for html_text, html_extract in filtered_dom.items():
@@ -38,12 +37,12 @@ class HtmlExtractAction(actionInterface):
         return  "\r\n".join(lines)
 
 class HtmlExtractTextAction(actionInterface):
-    """
-    A action module to extract text from an HTML document.
-    Extract paragraph and title by default
-    For example :
-        `td > b` : Extract all the bold text inside a table
-        `#password` : Extract text from all the Html tags with the #password id 
+    """A action module to extract text from an HTML document.  
+    Extract paragraph and title by default  
+    For example :  
+
+    - `td > b` : Extract all the bold text inside a table
+    - `#password` : Extract text from all the Html tags where the id property value is `password`
     """
 
     def __init__(self, parsers = {}, supportedType = {"html"}, param_data="h1, h2, h3, h4, h5, p"):
@@ -51,7 +50,6 @@ class HtmlExtractTextAction(actionInterface):
         self.description = "Extract text from HTML with CSS selector"
 
     def execute(self) -> object:
-        """Execute the action."""
         self.observables = {}
         html_texts = self.parsers.get("html").extract()
         if html_texts:
@@ -62,7 +60,6 @@ class HtmlExtractTextAction(actionInterface):
         return self.observables
     
     def __str__(self):
-        """Visual representation of the action"""
         lines = []
         filtered_dom = self.execute()
         for html_text, html_extract in filtered_dom.items():
