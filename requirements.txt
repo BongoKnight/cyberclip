@@ -1,5 +1,5 @@
 antlr4-python3-runtime==4.9.3
-beautifulsoup4==4.12.2
+beautifulsoup4==4.8.0
 cachetools
 certifi==2023.11.17
 charset-normalizer==3.3.2
@@ -38,7 +38,7 @@ rich==13.7.0
 setuptools==69.0.3
 shodan==1.31.0
 simplejson==3.19.2
-six==1.16.0
+six==1.12.0
 soupsieve==2.5
 stix2==3.0.1
 stix2-patterns==2.0.0
