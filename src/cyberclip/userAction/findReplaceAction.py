@@ -19,8 +19,8 @@ Enter the regex as a param.
         self.observables = self.get_observables()
         if self.observables.get("text"):
             text = self.observables.get("text")[0]
-            search_regex = self.get_value('Search')
-            replace_regex = self.get_value('Replace')
+            search_regex = self.get_param_value('Search')
+            replace_regex = self.get_param_value('Replace')
             return re.sub(search_regex, replace_regex, text, flags= re.MULTILINE)
 
     

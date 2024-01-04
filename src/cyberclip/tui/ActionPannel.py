@@ -28,7 +28,7 @@ class ActionButton(Static):
         yield Button(self.action_name, id="action-button", classes="")
     
     def on_mount(self) -> None:
-        self.query_one(Button).tooltip = self.action.__doc__
+        self.query_one(Button).tooltip = self.action.__doc__.splitlines()[0]
 
     @on(Button.Pressed, "#action-button")
     def execute_option_action(self, event: Button.Pressed) -> None:
@@ -95,7 +95,7 @@ class ActionCommands(Provider):
         for actionnable in self.actions:
             if isinstance(actionnable, actionInterface):
                 action_desc = actionnable.description
-                action_doc = actionnable.__doc__
+                action_doc = actionnable.__doc__.splitlines()[0]
                 scoreDesc = matcher.match(action_desc) 
                 scoreDoc = matcher.match(action_doc) 
 
@@ -108,7 +108,7 @@ class ActionCommands(Provider):
                     )
             elif isinstance(actionnable, ParserInterface):
                 parser_desc = f"Extract {actionnable.parsertype}"
-                parser_doc = actionnable.__doc__
+                parser_doc = actionnable.extract.__doc__.splitlines()[0]
                 scoreDesc = matcher.match(parser_desc) 
                 scoreDoc = matcher.match(parser_doc) 
 

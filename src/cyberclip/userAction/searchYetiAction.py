@@ -8,12 +8,16 @@ from yaml.loader import SafeLoader
 import requests
 
 class searchYetiAction(actionInterface):
-    """A action module, to search observables contained in the keyboard to Yeti API.
-A config is needed :
+    """A action module, to search for observables contained in a text against the Yeti API.
 
-Yeti:
-- url: http://127.0.0.1:5000
-- api-key: <api-key>
+    Note:
+        A config is needed :
+
+        ```yaml
+        Yeti:
+        - url: http://127.0.0.1:5000
+        - api-key: <api-key>
+        ```
     """
     
     def __init__(self, parsers ={}, supportedType = {"ip","ipv6","domain","mail","url"}):

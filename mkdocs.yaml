@@ -57,18 +57,18 @@ plugins:
           docstring_options:
           ignore_init_summary: true
           show_source: false
+          show_docstring_modules: true
+          docstring_parser: google
           filters:
             # Hide some methods that we don't want to be shown in the docs.
             - "!generic"
             - "!tools"
-            - "!^__str__$"
-            - "!^execute$"
-    watch:
-      - src/cyberclip
-      - generate_doc.py
-  exclude:
-    glob:
-      - "cyberclip/graveyard/**"
+            #- "!^__str__$"
+            #- "!^execute$"
+watch:
+  - src/cyberclip
+  - generate_doc.py
+
 validation:
   omitted_files: warn
   absolute_links: warn

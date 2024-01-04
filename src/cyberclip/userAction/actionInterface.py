@@ -12,14 +12,33 @@ from userTypeParser.ParserInterface import ParserInterface
 """Interface for action module."""
 
 class actionInterface():
-    """Parser Interface defines the minimum functions a parser needs to implement."""
+    """Action Interface defines the minimum functions a parser needs to implement.
+
+    - `execute` : The logic part of the action, this method define what the action does. 
+    - `__str__` : Visual representation of the action after being executed.
+
+    Attributes:
+        parsers (list of ParserInterface): A list of parsers interface, these are used to 
+            extract observales from text
+        observables (list of str): A list of observables extracted by the parsers
+        conf (dict): A configuration extracted from `conf.yaml`, this store data needed 
+            for the action to be executed (API Key for example) 
+        supportedType (list of str):  A list of type defined in the varaible `parsertype` 
+            that are supported by the current action.
+        results (list of object): Storing the result of the action execution
+
+    Note:
+        While overwriting `execute` method in a class which inherits from `ActionInterface`, 
+        you should modify the `results` attributes in order to return a dictionnary where 
+        keys are the parsed observable and values are the results of the action.
+
+    """
     
-    def __init__(self, parsers = {}, supportedType = {}, param_data : str = "", complex_param : dict = {}):
+    def __init__(self, parsers: list[ParserInterface] = {}, supportedType: list[str] = {}, param_data: str = "", complex_param: dict = {}):
         """
-        parsers is a list of objects that implements ParserInterface.
-        supportedType is a list of type defined in the varaible `parsertype` that are supported by the current action.
-        param is a small textual parameter typically to pass to a simple script which is not mandatory, such as flags.
-        complex_param are used to generate a TUI to ask for them or can be entered as is, typically for file name, config, etc... 
+        Args: 
+            param_data (str): A small textual parameter typically to pass to a simple script which is not mandatory, such as flags.
+            complex_param (dict): A dictionnary of value needed for executing the action properly typically a filename, config options, users choices, etc... This parameter is parsed by  
         """
         self.supportedType = supportedType
         self.parsers = parsers
@@ -29,13 +48,6 @@ class actionInterface():
         self.observables = {}
         self.results = {}
         self.conf = {}
-        
-    def execute(self) -> dict:
-        """Execute the action
-        
-        Return a dict of matches and values.
-        """
-        return {}
     
     def load_conf(self, conf_name, path='../data/conf.yml'):
         conf = {}
@@ -54,9 +66,20 @@ class actionInterface():
     
     def get_observables(self) -> dict:
         """
-        Populate the observables with a dict of this form :
-            <Parser_type>:[<list of observables of this type>]
-        Reset the results variables.
+        Returns:
+            self.observables (dict): Populate the `self.observables` by a dictionnary with the following structure :  
+                {`<Parser_type>`:[`<list of observables of this type>`]}  
+                Reset the `self.results` variables.
+
+        Info:
+            This method is implemented to simplify the writting of new action. If you want to differientiate how an action handle different type of observables (ie IP addresses and domain), you might use something like this in your `execute` method :  
+            ```python
+            self.observables = self.get_observables()
+            for ip in self.observables.get("ip", []):
+                <behaviour regarding IP address>
+            for ip in self.observables.get("domain", []):
+                <behaviour regarding Domain Name>
+            ``` 
         """
         self.observables = {}
         self.results = {}
@@ -65,7 +88,7 @@ class actionInterface():
                 self.observables[parser.parsertype]=parser.extract()
         return self.observables
     
-    def get_value(self, config_name):
+    def get_param_value(self, config_name):
         config = self.complex_param.get(config_name)
         if isinstance(config, dict):
             return config.get("value","")
@@ -73,6 +96,15 @@ class actionInterface():
             return config
         else:
             return ""
+
+    def execute(self) -> dict:
+        """Execute the action
+        
+        Returns:
+            results (dict): Returns a dictionary consisting of the observables
+                parsed in text and the results of the action for each one of it. 
+        """
+        return self.results
 
     def __str__(self):
         """Visual representation of the action"""

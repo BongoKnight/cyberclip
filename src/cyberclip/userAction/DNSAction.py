@@ -40,7 +40,7 @@ class DNSAction(actionInterface):
         if self.observables.get("domain"):
             for domain in self.observables.get("domain"):
                 dns_reccords = {}
-                for type in self.get_value("Reccords"):
+                for type in self.get_param_value("Reccords"):
                     try:
                         dns_reccords.update({type:",".join([ip.to_text() for ip in resolver.resolve(domain, type)])})
                     except:

@@ -22,7 +22,7 @@ Use jsonpath module.
         if json_objects:
             for json_str in json_objects:
                 extract = {}
-                for selector in self.get_value("Selectors"):
+                for selector in self.get_param_value("Selectors"):
                     try:
                         extract[selector] = jsonpath(json.loads(json_str), selector)
                     except Exception as e:

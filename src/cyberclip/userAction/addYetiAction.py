@@ -9,12 +9,25 @@ from yaml.loader import SafeLoader
 import requests
 
 class searchYetiAction(actionInterface):
-    """A action module, to add observables contained in the keyboard to Yeti via the API.
-A config is needed :
+    """A action module, to add observables contained in a text to Yeti via the API.
 
-Yeti:
-- url: http://127.0.0.1:5000
-- api-key: <api-key>
+    Note:
+        A config is needed :
+
+        ```yaml
+        Yeti:
+        - url: http://127.0.0.1:5000
+        - api-key: <api-key>
+        ```
+
+    Attributes:
+        Source (str): From where the data come from
+        Threat (`list` of `str`, optional): List of associated threats
+        Campaigns (`list` of `str`, optional): List of associated campaigns
+        Tags (`list` of `str`, optional): List of associated tags
+
+    Warning: 
+        These attributes are the description of the `complex_param` attribute of the action.
     """
     
     def __init__(self, parsers ={}, supportedType = {"ip","ipv6","domain","mail","url"}, complex_param = {"Source":"", "Threat":[], "Campaign":[], "Tags":[]}):
@@ -29,10 +42,10 @@ Yeti:
         self.get_observables()
         for obs_type in self.supportedType:
             observables = self.observables.get(obs_type,[])
-            tags = self.get_value("Tags")
-            source = self.get_value("Source")
-            campaigns = self.get_value("Campaign")
-            threats = self.get_value("Threat")
+            tags = self.get_param_value("Tags")
+            source = self.get_param_value("Source")
+            campaigns = self.get_param_value("Campaign")
+            threats = self.get_param_value("Threat")
             if threats:
                 for threat in threats:
                     tags.append(f"threat{threat}")

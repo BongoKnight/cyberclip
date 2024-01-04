@@ -56,7 +56,7 @@ class GetCertificatesAction(actionInterface):
         self.results = {}
         observables = set(self.get_observables().get("ip",[]) +  self.get_observables().get("domain",[]))
         for observable in observables:
-            port = int(self.get_value("Port"))
+            port = int(self.get_param_value("Port"))
             try:
                 self.results[observable] = json.dumps(self.verify_ssl_certificate(observable, port=port))
             except Exception as e:

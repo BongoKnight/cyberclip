@@ -66,8 +66,7 @@ get_AS_data()
 get_IPv6_AS_data()
 
 class AsToCidrAction(actionInterface):
-    """
-    Return a list of CIDR depending of an Autonomous System.
+    """Return a list of CIDR depending of an Autonomous System.
     """
     
     def __init__(self, parsers = {}, supportedType = {"asnum"}):
@@ -107,8 +106,7 @@ class AsToCidrAction(actionInterface):
 
 
 class IpToAsAction(actionInterface):
-    """
-    Return Autonomous System information refering to an IP.
+    """Return Autonomous System information refering to an IP.
     """
     
     def __init__(self, parsers = {}, supportedType = {"ipv6","ip"}):

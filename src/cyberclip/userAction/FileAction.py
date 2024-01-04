@@ -6,9 +6,17 @@ except:
 import hashlib
 import json
 
+"""FileAction.
+
+Classes:
+    ExtractTextAction: try to extract text from file thanks to `textract`
+    CalculateHashAction: return hash of file
+
+"""
+
 class ExtractTextAction(actionInterface):
     """
-    A action module to extract text from files contained in the clipboard.
+    A action module to extract text from files contained in the clipboard.  
     Make use of textract lib.
     """
     def __init__(self, parsers = {}, supportedType = {"filename"}):
@@ -41,7 +49,7 @@ class ExtractTextAction(actionInterface):
 
 class CalculateHashAction(actionInterface):
     """
-    A action module to calculate hashes from files contained in the clipboard.
+    A action module to calculate hashes from files contained in the clipboard.  
     Default : MD5 and SHA1
     """
     CONF =  {"Hashes":{"type":"tags","value":["MD5","SHA1"]}}
@@ -59,7 +67,7 @@ class CalculateHashAction(actionInterface):
                 with open(filename, 'rb') as file:
                     filecontent = file.read()
                     hashes = {}
-                    for hash in self.get_value("Hashes"):
+                    for hash in self.get_param_value("Hashes"):
                         try:
                             if hash.lower() == "sha1":
                                 hash_str = hashlib.sha1(filecontent).hexdigest()

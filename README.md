@@ -1,11 +1,21 @@
+# Installation and documentation 
+
+You may want to see some screens records, documentation or even a features tour, everything is available here :
+
+[https://bongoknight.github.io/cyberclip/](https://bongoknight.github.io/cyberclip/)
+
+# Screen recording
+
+![textual](https://user-images.githubusercontent.com/22347055/209771427-53017604-acfe-4543-9eb3-dad905229ce1.gif)
+
+
 # To do
 
 - [x] Make the script installable with pip+git
-- [ ] MKDocs on GitHub
+- [x] MKDocs on GitHub
 - [ ] Recipes panes :
 	- [ ] Loading of all actions
 	- [ ] Refactoring of actions options (complex_data)
-	- [ ] 
 - [x] Make a gitignore
 - [x] Add an history (Undo et Redo buttons)
 - [x] Add a command palette
