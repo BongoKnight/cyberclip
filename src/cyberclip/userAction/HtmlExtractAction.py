@@ -13,8 +13,8 @@ class HtmlExtractAction(actionInterface):
     - `#password` : Extract all the Html tags where the id property value is `password` 
     """
 
-    def __init__(self, parsers = {}, supportedType = {"html"}, param_data="h1, h2, h3, h4, h5, p"):
-        super().__init__(parsers = parsers, supportedType = supportedType, param_data = param_data)
+    def __init__(self, parsers = {}, supportedType = {"html"}, complex_param={"CSS selectors":{"value":["h1", "h2", "h3", "h4", "h5", "p"], "type":"tags"}}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
         self.description = "Extract tags from HTML with CSS selector"
 
     def execute(self) -> object:
@@ -22,9 +22,13 @@ class HtmlExtractAction(actionInterface):
         html_texts = self.parsers.get("html").extract()
         if html_texts:
             for html_text in html_texts:
+                selected = {}
                 soup = BeautifulSoup(html_text, "html.parser")
-                filtered_dom = soup.select(self.param)
-                self.observables.update({html_text:filtered_dom})
+                filters = self.get_param_value("CSS selectors")
+                for css_selector in filters:
+                    filtered_dom = soup.select(css_selector)
+                    selected.update({css_selector:filtered_dom})
+                self.observables.update({html_text:selected})
         return self.observables
     
     def __str__(self):
@@ -32,8 +36,9 @@ class HtmlExtractAction(actionInterface):
         lines = []
         filtered_dom = self.execute()
         for html_text, html_extract in filtered_dom.items():
-            for item in html_extract:
-                lines.append(str(item))
+            for item in html_extract.values():
+                for html_fragment in item:
+                    lines.append(str(html_fragment))
         return  "\r\n".join(lines)
 
 class HtmlExtractTextAction(actionInterface):
@@ -45,8 +50,8 @@ class HtmlExtractTextAction(actionInterface):
     - `#password` : Extract text from all the Html tags where the id property value is `password`
     """
 
-    def __init__(self, parsers = {}, supportedType = {"html"}, param_data="h1, h2, h3, h4, h5, p"):
-        super().__init__(parsers = parsers, supportedType = supportedType, param_data = param_data)
+    def __init__(self, parsers = {}, supportedType = {"html"}, complex_param = {"CSS selectors":{"value":["p"], "type":"tags"}}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param = complex_param)
         self.description = "Extract text from HTML with CSS selector"
 
     def execute(self) -> object:
@@ -54,17 +59,22 @@ class HtmlExtractTextAction(actionInterface):
         html_texts = self.parsers.get("html").extract()
         if html_texts:
             for html_text in html_texts:
+                selected = {}
                 soup = BeautifulSoup(html_text, "html.parser")
-                filtered_dom = soup.select(self.param)
-                self.observables.update({html_text:filtered_dom})
+                filters = self.get_param_value("CSS selectors")
+                for css_selector in filters:
+                    filtered_dom = soup.select(css_selector)
+                    selected.update({css_selector:filtered_dom})
+                self.observables.update({html_text:selected})
         return self.observables
     
     def __str__(self):
         lines = []
         filtered_dom = self.execute()
         for html_text, html_extract in filtered_dom.items():
-            for item in html_extract:
-                lines.append(str(item.string))
+            for item in html_extract.values():
+                for html_fragment in item:
+                    lines.append(str(html_fragment.string))
         return  "\r\n".join(lines)
 
 
@@ -73,5 +83,7 @@ if __name__=='__main__':
     from userTypeParser.HtmlParser import HtmlParser
     data = "Hello, <b>world</b>"
     text_parser = HtmlParser(data)
-    a = str(HtmlExtractAction({"html":text_parser},["html"], param_data="b"))
-    print(a, text_parser.objects)
+    a = str(HtmlExtractAction({"html":text_parser},["html"], complex_param={"CSS selectors":{"value":["b"], "type":"tags"}}))
+    b = str(HtmlExtractTextAction({"html":text_parser},["html"], complex_param={"CSS selectors":{"value":["b"], "type":"tags"}}))
+
+    print(a, b, text_parser.objects)

@@ -38,7 +38,17 @@ except:
 
 
 class ClipBrowser(App):
-    """Textual clipboard browser app."""
+    """This class implements the `App` class from `textual`. It defines the layout of the Terminal 
+    User Interface (TUI).  
+
+    Attributes:
+        text (str): Store the text available in all the application, this text is usually 
+            updated with data contained in the clipboard.
+        parser (clipParser): A text parser that parse text to extract valuable data (thanks to `userTypeParser`) 
+            and execute action based on the data extracted (thanks to `userAction`).
+        
+    
+    """
     CSS_PATH = "app.scss"
     COMMANDS = {ActionCommands}
     SCREENS = {"conf": ConfigScreen}
@@ -60,7 +70,17 @@ class ClipBrowser(App):
         self.actions = []
 
     def compose(self) -> ComposeResult:
-        """Compose our UI."""
+        """Compose the main UI. Generate three tabs corresponding to the three modes of the application :
+        
+        - Main view which displays the content of keyboard, parser extractors on left and actions on right.
+        - Table view for sorting and filtering results of action or to enrich tabular data/files.
+        - Rules view for managing rules to apply to data (chains of actions with defined parameters), 
+        the rules became new actions available in the command pallette. 
+
+        Warning: 
+            Table and rule views are a WIP.
+
+        """
         self.console.set_window_title("📝CyberClip👩‍💻")
         with TabbedContent():
             with TabPane("📝CyberClip👩‍💻"):

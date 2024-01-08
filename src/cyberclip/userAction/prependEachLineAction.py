@@ -8,8 +8,8 @@ class prependEachLineAction(actionInterface):
     Enter the text to preprend as a param.
     """ 
 
-    def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
-        super().__init__(parsers = parsers, supportedType = supportedType, param_data = param_data)
+    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param: dict={"Text to prepend":{"type":"text","value":""}}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param = complex_param)
         self.description = "Prepend text on each line."
         
     def execute(self) -> object:
@@ -21,7 +21,7 @@ class prependEachLineAction(actionInterface):
         self.observables = self.get_observables()
         if self.observables.get("text"):
             text = self.observables.get("text")[0].splitlines()
-            return "\r\n".join([self.param.replace("\\t","\t") + line for line in text])
+            return "\r\n".join([self.get_param_value("Text to prepend").replace("\\t","\t") + line for line in text])
 
     
     def __str__(self):
@@ -31,5 +31,5 @@ if __name__=='__main__':
     from userTypeParser.TextParser import TextParser
     data = "b\nb\na"
     text_parser = TextParser(data)
-    a = str(prependEachLineAction([text_parser],["text"]))
+    a = str(prependEachLineAction({"text":text_parser},["text"], complex_param={"Text to prepend":{"type":"text","value":"c"}}))
     print(a)

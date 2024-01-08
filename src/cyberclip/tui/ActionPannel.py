@@ -48,9 +48,6 @@ class ActionButton(Static):
         from .ContentView import ContentView
         contentView = self.app.query_one(ContentView)
         if contentView:
-            if self.parent.ancestors[-1].query_one("#param-input").value:
-                self.action.param = self.parent.ancestors[-1].query_one("#param-input").value
-            self.parent.ancestors[-1].query_one("#param-input").value = ""
             try:
                 self.app.text = str(self.action)
             except Exception as e:

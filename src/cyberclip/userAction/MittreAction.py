@@ -35,7 +35,7 @@ class MitreAction(actionInterface):
     Return the name, and the Mitre URL of a tactic.
     """
 
-    def __init__(self, parsers = {}, supportedType = {"mitre"}, param_data=""):
+    def __init__(self, parsers = {}, supportedType = {"mitre"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Mitre tactic to Mittre description."
         

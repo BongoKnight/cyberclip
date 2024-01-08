@@ -9,8 +9,8 @@ class regexOrAction(actionInterface):
     It will return a|b.  
     """
 
-    def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
-        super().__init__(parsers = parsers, supportedType = supportedType, param_data = param_data)
+    def __init__(self, parsers = {}, supportedType = {"text"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "To Regex OR search"
         
     def execute(self) -> object:

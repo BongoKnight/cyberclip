@@ -112,5 +112,5 @@ if __name__=='__main__':
     from userTypeParser.HtmlParser import HtmlParser
     data = "Hello, <b>world</b>"
     text_parser = HtmlParser(data)
-    a = str(UrlToHtmlAction({"html":text_parser},["html"], param_data="b"))
+    a = str(UrlToHtmlAction({"html":text_parser},["html"]))
     print(a, text_parser.objects)

@@ -11,8 +11,8 @@ class appendEachLineAction(actionInterface):
     """A action module, to append data to each line of a given text.  
     Add the text to add as a param.
     """ 
-    def __init__(self, parsers = {}, supportedType = {"text"}, param_data: str =""):
-        super().__init__(parsers = parsers, supportedType = supportedType, param_data = param_data)
+    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param: dict = {"Text to add":{"type":"text","value":""}}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
         self.description = "Append text on each line."
 
     def execute(self) -> object:
@@ -24,7 +24,7 @@ class appendEachLineAction(actionInterface):
         self.observables = self.get_observables()
         if self.observables.get("text"):
             text = self.observables.get("text")[0].splitlines()
-            return "\r\n".join([line + self.param.replace("\\t","\t") for line in text])
+            return "\r\n".join([line + self.get_param_value("Text to add").replace("\\t","\t") for line in text])
 
     
     def __str__(self):

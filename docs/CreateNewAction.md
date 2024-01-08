@@ -29,8 +29,7 @@ except:
 import youtube_dl
 
 class downloadVideoAction(actionInterface):
-    """
-A action module, to download video from an URL.
+    """A action module, to download video from an URL.
 Use of the youtube-dl.
     """
     def __init__(self, parsers = {}, supportedType = {"url"}):

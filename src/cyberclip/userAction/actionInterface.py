@@ -34,16 +34,14 @@ class actionInterface():
 
     """
     
-    def __init__(self, parsers: list[ParserInterface] = {}, supportedType: list[str] = {}, param_data: str = "", complex_param: dict = {}):
+    def __init__(self, parsers: list[ParserInterface] = {}, supportedType: list[str] = {}, complex_param: dict = {}):
         """
         Args: 
-            param_data (str): A small textual parameter typically to pass to a simple script which is not mandatory, such as flags.
             complex_param (dict): A dictionnary of value needed for executing the action properly typically a filename, config options, users choices, etc... This parameter is parsed by  
         """
         self.supportedType = supportedType
         self.parsers = parsers
         self.description = "Quick description of the action."
-        self.param = param_data
         self.complex_param = complex_param
         self.observables = {}
         self.results = {}

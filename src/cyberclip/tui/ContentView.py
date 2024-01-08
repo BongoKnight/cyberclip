@@ -19,10 +19,6 @@ class ContentView(Static):
         row-span: 5;
         height: 1fr;
     }
-    #param-input{
-        row-span:1;
-        dock: bottom;
-    }
     #clip-content{
         width: 100%;
         border: $accent;
@@ -36,9 +32,8 @@ class ContentView(Static):
         """Create child widgets of a dataLoader.""" 
         yield Vertical(
             ContentToolbar(),
-            ScrollableContainer(TextArea(self.initial_text ,name="Content", id="clip-content")),
-            Input(placeholder="Add additional parameter for custom action.",id="param-input")
-        )
+            ScrollableContainer(TextArea(self.initial_text ,name="Content", id="clip-content"))
+            )
 
     def filter_action(self):
         from tui.DataTypePannel import DataTypeButton
