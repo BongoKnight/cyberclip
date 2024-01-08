@@ -13,7 +13,7 @@ class HtmlExtractAction(actionInterface):
     - `#password` : Extract all the Html tags where the id property value is `password` 
     """
 
-    def __init__(self, parsers = {}, supportedType = {"html"}, complex_param={"CSS selectors":{"value":["h1", "h2", "h3", "h4", "h5", "p"], "type":"tags"}}):
+    def __init__(self, parsers = {}, supportedType = {"html"}, complex_param={"CSS selectors":{"value":["p"], "type":"tags"}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
         self.description = "Extract tags from HTML with CSS selector"
 

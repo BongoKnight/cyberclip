@@ -18,19 +18,22 @@ class UrlToHtmlAction(actionInterface):
         self.description = "URL to HTML"
         
     def execute(self) -> object:
-        urls = set(self.parsers.get("url").extract())
-        results = {}
+        urls = set(self.parsers.get("url",[]).extract())
+        self.results = {}
         for url in urls:
             try:
                 headers = {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0',
                 }
                 response = requests.get(url, headers=headers)
-                results.update({url:response.text})
+                self.results.update({url:response.text})
             except:
-                results.update({url:""})
-        return results
+                self.results.update({url:""})
+        return self.results
 
+    def __str__(self):
+        self.execute()
+        return "\n".join([html for html in self.results.values()])
 
 class GetCertificatesAction(actionInterface):
     """A action module to recover certificate from Domain or IP."""

@@ -117,5 +117,5 @@ class actionInterface():
             This textual representation is displayed in the Terminal User Interface (TUI) when you execute the action. 
             This method is used to provides feedback. 
         """
-        return str(self.results)
+        return str(self.execute())
     
