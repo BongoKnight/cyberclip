@@ -82,15 +82,15 @@ class ClipBrowser(App):
 
         """
         self.console.set_window_title("📝CyberClip👩‍💻")
-        with TabbedContent():
-            with TabPane("📝CyberClip👩‍💻"):
+        with TabbedContent(id="maintabs"):
+            with TabPane("📝CyberClip👩‍💻", id="clipview"):
                 yield Grid(
                     DataLoader(id="left-pannel"),
                     ContentView(id="content-view"),
                     ActionPannel(id="action-pannel"),
                     id="maingrid"
                 )
-            with TabPane('TableView', id="table-view"):
+            with TabPane('TableView', id="tableview"):
                 yield FiltrableDataFrame(pd.DataFrame(), id="main-table")
             with TabPane('Recipes'):
                 yield Label("Recipes")
@@ -129,9 +129,11 @@ class ClipBrowser(App):
                     self.app.call_after_refresh(self.update_dataframe, df)
                 except Exception as e:
                     self.app.notify(f"Error : {str(e)}",title="Error while loading data...",timeout=5, severity="error")
-    
+        if event.tab.label_text == "📝CyberClip👩‍💻":
+            self.parser.parseData(self.text)
+
     def update_dataframe(self, df):
-        tab = self.query_one("#table-view")
+        tab = self.query_one("#tableview")
         tab.remove_children()
         tab.mount(FiltrableDataFrame(pd.DataFrame(df), id="main-table"))
 
@@ -141,7 +143,15 @@ class ClipBrowser(App):
     def handle_param(self, action : actionInterface , complex_param : dict):
         if complex_param :
             action.complex_param = complex_param
+        if self.query_one("#maintabs", TabbedContent).active == "clipview":
             self.text = str(action)
+        elif self.query_one("#maintabs", TabbedContent).active == "tableview":
+            dataframe = self.query_one(FiltrableDataFrame)
+            column_name = dataframe.datatable.df.columns[dataframe.datatable.cursor_column]
+            new_column_name = f"{action.__class__.__name__}_{column_name}"
+            dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: self.parser.apply_actionable(action, str(text), complex_param), na_action="ignore")
+            dataframe.datatable.update_displayed_df(dataframe.datatable.df)
+        
     
 
 def main():

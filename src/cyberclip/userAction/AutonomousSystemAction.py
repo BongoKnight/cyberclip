@@ -103,6 +103,48 @@ class AsToCidrAction(actionInterface):
         return "\n".join(lines)  
 
 
+class AsInformationAction(actionInterface):
+    """Return information about an Autonomous System.
+    """
+    
+    def __init__(self, parsers = {}, supportedType = {"asnum"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
+        self.description = "AS Number information"
+
+    def execute(self) -> object:
+        self.observables = self.get_observables()
+        if self.observables.get("asnum", []):
+            if len(AS_DB.columns):
+                AS_numbers = self.observables.get("asnum", [])
+                for as_num in AS_numbers:
+                    int_as = int(re.search(r"\d+",as_num).group())
+                    AS_RANGE = AS_DB.loc[AS_DB["as_num"]==int_as]
+                    AS_RANGE = AS_RANGE[["as_num","as_info","as_loc","CIDRS"]]
+                    AS_RANGE = AS_RANGE.groupby(['as_num','as_info','as_loc']).agg(sum).reset_index()
+                    response = AS_RANGE.loc[AS_RANGE["as_num"]==int_as].to_dict(orient="records")
+                    if len(response)>0:
+                        infos = response[0]
+                        self.results.update({as_num:infos})
+                return self.results
+            else:
+                return self.observables.get("asnum", [])
+        else:
+            return []
+
+    def __str__(self):
+        self.execute()
+        lines = []
+        for asnum, infos in self.results.items():
+            cidrs = infos.get("CIDRS",[])
+            infos_cidr = " ".join([cidr.compressed for cidr in cidrs])
+            nb_cidrs = len(cidrs)
+            clean_infos = infos.copy()
+            clean_infos.update({"CIDRS":infos_cidr,"Nb of CIDR":nb_cidrs})
+            info = "\t".join([str(data) for data in clean_infos.values()])
+            lines.append(f"{asnum}\t{info}")
+        return "\n".join(lines)  
+
+
 class IpToAsAction(actionInterface):
     """Return Autonomous System information refering to an IP.
     """
@@ -150,7 +192,7 @@ class IpToAsAction(actionInterface):
 
 if __name__=='__main__':
     from userTypeParser.ASNumberParser import asnumParser
-    data = "ip\tinfo\n154.0.123.1 as2356"
+    data = "ip\tinfo\n154.0.123.1 as64286"
     text_parser = asnumParser(data)
-    a = str(AsToCidrAction({"asnum":text_parser},["asnum"]))
+    a = str(AsInformationAction({"asnum":text_parser},["asnum"]))
     print(a, text_parser.objects)

@@ -122,7 +122,7 @@ class clipParser():
                         self.matches.update({instance.parsertype: instance.extract()})
                         # Adding parser in a dict of all parsers relative to the input
                         self.parsers.update({instance.parsertype:instance})
-                        self.log.debug("Paste contains {}".format(instance.parsertype))
+                        self.log.debug("Text contains {}".format(instance.parsertype))
                         self.detectedType.add(instance.parsertype)
 
         # Load all actions
@@ -141,10 +141,27 @@ class clipParser():
                     if hasattr(instance, "description"):
                         # Adding action in a dict of all parsers relative to the input
                         self.actions.update({instance.description : instance})
-                        self.log.debug("Paste contains {}".format(instance.description))
+                        self.log.debug("Text might trigger an action : {}".format(instance.description))
 
         self.results = {"matches" : self.matches, "detectedType" : self.detectedType, "actions": self.actions, "parsers":self.parsers}
         return self.results
+    
+    def apply_actionable(self, actionable, text, complex_param = {}):
+        self.parseData(text)
+        if  "Action" in actionable.__module__ :
+            if action := self.actions.get(actionable.description):
+                if complex_param:
+                    action.complex_param = complex_param
+                result = action.execute()
+                if isinstance(result, str):
+                    return result
+                elif isinstance(result, dict) and (mergedresult := result.get(text)):
+                    return mergedresult
+                else:
+                    return result
+        elif "Parser" in actionable.__module__:
+            if parser := self.parsers.get(actionable.parsertype):
+                return ", ".join(parser.extract())
 
 
 if __name__=='__main__':

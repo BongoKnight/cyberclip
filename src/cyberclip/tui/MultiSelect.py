@@ -87,7 +87,6 @@ class MultiSelect(Static):
                         new_options[index] = (f"{FALSE_EMOTE} " + option[1], option[1])
                     self.options = new_options
                     event.control.set_options(new_options)
-                    break
         self.post_message(self.Changed(self))
 
 

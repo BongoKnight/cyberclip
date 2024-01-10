@@ -117,19 +117,21 @@ class DataFrameTable(DataTable):
         self.add_df(dataframe)
         self.sort_ascending = {}
 
-    def add_df(self, df: pd.DataFrame, replace_df = True):
+    def add_df(self, df: pd.DataFrame, replace_df = False):
         """Add DataFrame data to DataTable."""
+        if replace_df:
+            self.df = df
         self.displayed_df = df
         self.add_columns(*self._add_df_columns())
         self.add_rows(self._add_df_rows()[0:])
         return self
 
-    def update_df(self, df: pd.DataFrame):
+    def update_displayed_df(self, df: pd.DataFrame, replace_df = False):
         """Update DataFrameTable with a new DataFrame."""
         # Clear existing datatable
         self.clear(columns=True)
         # Redraw table with new dataframe
-        self.add_df(df)
+        self.add_df(df, replace_df)
 
     def _add_df_rows(self) -> None:
         return self._get_df_rows()
@@ -151,7 +153,7 @@ class DataFrameTable(DataTable):
         self.sort_ascending[column_name] = not self.sort_ascending.get(column_name, False)
         sort_order = self.sort_ascending[column_name]
         self.displayed_df = self.displayed_df.sort_values(by=column_name, ascending=sort_order)
-        self.update_df(self.displayed_df)
+        self.update_displayed_df(self.displayed_df)
 
     def filter_table(self, filters : DataFrameFilters):
         df = self.df[self.displayed_df.columns]
@@ -163,7 +165,7 @@ class DataFrameTable(DataTable):
                     df = df[df.apply(lambda row: match_value(str(row[column_name]), filter.value), axis=1) == False]
                 else:
                     df = df[df.apply(lambda row: match_value(str(row[column_name]), filter.value), axis=1) == True]
-        self.update_df(df)
+        self.update_displayed_df(df)
 
 class FiltrableDataFrame(Static):
     DEFAULT_CSS = """
@@ -283,7 +285,7 @@ class FiltrableDataFrame(Static):
             input_field.value = ''
             reverse_search.value = False
         if reset_df: 
-            self.datatable.update_df(self.datatable.df)
+            self.datatable.update_displayed_df(self.datatable.df)
         self.update_input_size()
 
 
@@ -299,7 +301,7 @@ class FiltrableDataFrame(Static):
                 input[0].styles.hidden = False
             else:
                 # Add inputs if needed
-                self.query_one("#filter-container").mount(input := FilterInput(id=f"#filter-input-{input_index}"))
+                self.query_one("#filter-container").mount(input := FilterInput(id=f"filter-input-{input_index}"))
                 input.styles.width = column.content_width + 2
                 input.styles.hidden = False
         # Hide too many inputs
@@ -315,7 +317,7 @@ class FiltrableDataFrame(Static):
             columns_to_drop = set(self.datatable.df.columns) - set(event.multi_select.value)
             df = self.datatable.df
             clean_df = df.drop(columns=columns_to_drop, axis=1)
-            self.datatable.update_df(clean_df)
+            self.datatable.update_displayed_df(clean_df)
             self.clean_filters(reset_df=False)
 
     @on(Select.Changed, "#groupby")
@@ -323,10 +325,10 @@ class FiltrableDataFrame(Static):
         df = self.datatable.df
         if event.value and event.value in df.columns:
             clean_df = df.groupby([f"{event.value}"], as_index=False).count()
-            self.datatable.update_df(clean_df)
+            self.datatable.update_displayed_df(clean_df)
             self.clean_filters(reset_df=False)
         elif event.value == None:
-            self.datatable.update_df(self.datatable.df)
+            self.datatable.update_displayed_df(self.datatable.df)
             self.clean_filters()
         else:
             self.app.notify(f"Error while grouping by {event.value}",   severity="error")

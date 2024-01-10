@@ -31,7 +31,7 @@ class B64DecodeAction(actionInterface):
                 try:
                     results.append(f"{key}\n{str(value, encoding='utf-8')}")
                 except:
-                    results.append(f"{key}\n{value}")
+                    results.append(f"{value}")
         return  "\n".join(results)
 
 class B64EncodeAction(actionInterface):

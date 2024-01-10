@@ -2,7 +2,7 @@ import re
 from textual import on
 from textual.reactive import var
 from textual.containers import  VerticalScroll
-from textual.widgets import Static, Button, Input
+from textual.widgets import Static, Button, Input, TabbedContent
 from textual.app import ComposeResult
 from textual.command import Hit, Hits, Provider
 from functools import partial
@@ -67,19 +67,44 @@ class ActionCommands(Provider):
         parser = list(self.app.parser.parsers.values())
         return actions + parser
     
-    def execute_action(self, actionnable: ParserInterface | actionInterface ) -> None:
+    def execute_action(self, actionable: ParserInterface | actionInterface ) -> None:
         """Event handler called when a  button is pressed."""
         from .ModalParamScreen import ParamScreen
-        if  "Action" in actionnable.__module__ :
-            if not actionnable.complex_param :
-                self.app.text = str(actionnable)
-            else :
-                param_screen = ParamScreen()
-                param_screen.border_title = f"Parameters for '{actionnable.description}' action."
-                param_screen.action = actionnable
-                self.app.push_screen(param_screen, partial(self.app.handle_param, actionnable))
-        elif "Parser" in actionnable.__module__:
-            self.app.text = "\r\n".join(actionnable.extract())
+        from .ContentView import ContentView
+        from .TableView import FiltrableDataFrame
+        
+        if self.app.query_one(TabbedContent).active == "clipview":
+            if self.app.query(ContentView):
+                if  "Action" in actionable.__module__ :
+                    if not actionable.complex_param :
+                        self.app.text = str(actionable)
+                    else :
+                        param_screen = ParamScreen()
+                        param_screen.border_title = f"Parameters for '{actionable.description}' action."
+                        param_screen.action = actionable
+                        self.app.push_screen(param_screen, partial(self.app.handle_param, actionable))
+                elif "Parser" in actionable.__module__:
+                    self.app.text = "\r\n".join(actionable.extract())
+    
+        elif self.app.query_one(TabbedContent).active == "tableview":
+            dataframe = self.app.query_one(FiltrableDataFrame)
+            if dataframe.visible:
+                column_name = dataframe.datatable.df.columns[dataframe.datatable.cursor_column]
+                if  "Action" in actionable.__module__ :
+                    new_column_name = f"{actionable.__class__.__name__}_{column_name}"
+                    if not actionable.complex_param :
+                        dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: self.app.parser.apply_actionable(actionable, str(text)), na_action="ignore")
+                        dataframe.datatable.update_displayed_df(dataframe.datatable.df)
+                    else:
+                        param_screen = ParamScreen()
+                        param_screen.border_title = f"Parameters for '{actionable.description}' action."
+                        param_screen.action = actionable
+                        self.app.push_screen(param_screen, partial(self.app.handle_param, actionable))
+                elif "Parser" in actionable.__module__:
+                    new_column_name = f"{actionable.parsertype}_{column_name}"
+                    dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: self.app.parser.apply_actionable(actionable, str(text)), na_action="ignore")
+                    dataframe.datatable.update_displayed_df(dataframe.datatable.df, replace_df=True)
+
 
     async def startup(self) -> None:  
         """Called once when the command palette is opened, prior to searching."""
