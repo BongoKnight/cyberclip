@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+from os import system
 from typing import TypeAlias
 import re
 
@@ -203,7 +204,7 @@ class FiltrableDataFrame(Static):
         overflow: hidden scroll;
     }
 
-    #copy, #copy-table, #clean-filter {
+    #copy, #copy-table, #clean-filter, #visidata {
         margin-top: 1
     }
     """
@@ -224,13 +225,14 @@ class FiltrableDataFrame(Static):
     def compose(self) -> ComposeResult:
         with Horizontal(id="table-option"):
             with RadioSet(id="selectmode") as radioset:
-                    yield RadioButton("cell", value=True)
+                    yield RadioButton("cell")
                     yield RadioButton("row")
-                    yield RadioButton("column")
+                    yield RadioButton("column", value=True)
                     radioset.border_title = "Select :"
-            yield Button("Copy selected",id="copy", variant="primary")
-            yield Button("Copy table",id="copy-table", variant="primary")
-            yield Button("Reset",id="clean-filter", variant="error")
+            yield Button("Copy selected", id="copy", variant="primary")
+            yield Button("Copy table", id="copy-table", variant="primary")
+            yield Button("Open in visidata", id="visidata", variant="success")
+            yield Button("Reset", id="clean-filter", variant="error")
             with Vertical() :
                 yield Select([], prompt="Group by...", id="groupby")
                 yield MultiSelect("", [], [], prompt="Columns to show...", id="columnselect")
@@ -276,6 +278,15 @@ class FiltrableDataFrame(Static):
     @on(Button.Pressed, "#copy-table")
     def copy_table_to_clipboard(self):
         pyperclip.copy(self.datatable.displayed_df.to_csv(sep="\t",index=False))
+
+    @on(Button.Pressed, "#visidata")
+    def open_in_visidata(self):
+        file = Path(__file__).parent / "../data/tmp.csv"
+        self.datatable.displayed_df.to_csv(file, index=False)
+        with self.app.suspend():
+            system(f"python -m visidata {file}")
+        with open(file, "r") as f:
+            self.app.text = f.read()
 
     @on(Button.Pressed, "#clean-filter")
     def clean_filters(self, reset_df = True):
