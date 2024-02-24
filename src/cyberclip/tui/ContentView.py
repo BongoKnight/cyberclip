@@ -26,7 +26,6 @@ class ContentView(Static):
     """
 
     initial_text = "Waiting for Update..."
-    text_history = var([])
 
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader.""" 
@@ -73,9 +72,6 @@ class ContentView(Static):
         textArea = self.query_one(TextArea)
         textArea.clear()
         textArea.insert(str(new_text))
-        if new_text not in self.text_history:
-            self.text_history.append(new_text)
-            self.text_history = self.text_history[-20:]
         
         self.app.parser.parseData(new_text)
         parser_types = self.app.parser.detectedType

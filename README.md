@@ -17,7 +17,8 @@ You may want to see some screens records, documentation or even a features tour,
 	- [ ] Loading of all actions
 	- [ ] Refactoring of actions options (complex_data)
 - [x] Make a gitignore
-- [x] Add an history (Undo et Redo buttons)
+- [x] Add an history (Undo et Redo buttons) :
+	- [x] Now done in baseline Textarea
 - [x] Add a command palette
 - [x] Filtering of types :
 	- [x] Button to filter actions per type
@@ -63,18 +64,21 @@ You may want to see some screens records, documentation or even a features tour,
 	- [x] For HTML
 	- [x] For JSON
 	- [x] For Yaml
+	- [ ] For uuid
 	- [ ] For JWT
 	- [ ] For lat long coordinates (maybe as a tutorial)
 	- [ ] For tabular data (CSV, TSV, Markdown)
 		- [x] Import in pandas dataframe
 			-[x] Ok for TSV
-		- [ ] (WIP) Allow enrichment of dataframe (Another UI for entering the conf?) (and so of it's visual representation)
-			- [ ] From SQLite
-			- [ ] From CSV
-			- [ ] From MISP
-			- [ ] From SQLite
+		- [x] (WIP) Allow enrichment of dataframe (Another UI for entering the conf?) (and so of it's visual representation)
+			- [-] ~~From SQLite~~
+			- [-] ~~From CSV~~
+			- [-] ~~From MISP~~
+			- [-] ~~From SQLite~~
+			- [x] From action from command palette
 		- [x] Update sort action for DataFrame
-		- [x] Write filter and stats action for DataFrame (possibility to open dataframe in visidata?)
+		- [x] Write filter and stats action for DataFrame
+		- [ ] set first line as column name
 	- [x] For AS Number
 		- [ ] AS to Regex
 		- [x] AS range

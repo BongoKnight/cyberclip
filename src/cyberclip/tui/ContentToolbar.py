@@ -25,8 +25,6 @@ class ContentToolbar(Static):
     def on_mount(self) -> None:
         self.query_one("#copy-button").tooltip = "Copy text to clipboard"
         self.query_one("#clear-button").tooltip = "Delete the whole text"
-        self.query_one("#previous-button").tooltip = "Undo"
-        self.query_one("#next-button").tooltip = "Redo"
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         from tui.ContentView import ContentView
@@ -35,15 +33,7 @@ class ContentToolbar(Static):
             pyperclip.copy(self.app.text)
         if button_id == "clear-button":
             self.app.text = ""
-        elif button_id == "previous-button":
-            if self.app.text in self.app.contentview.text_history:
-                index = self.app.contentview.text_history.index(self.app.text)
-                self.app.text = self.app.contentview.text_history[max(0, index - 1)]
-        elif button_id == "next-button":
-            if self.app.text in self.app.contentview.text_history:
-                index = self.app.contentview.text_history.index(self.app.text)
-                self.app.text = self.app.contentview.text_history[min(len(self.app.contentview.text_history)-1, index + 1)]
-    
+
     @on(Select.Changed)
     def select_changed(self, event: Select.Changed) -> None:
         from tui.ContentView import ContentView
