@@ -31,7 +31,7 @@ class ContentView(Static):
         """Create child widgets of a dataLoader.""" 
         yield Vertical(
             ContentToolbar(),
-            ScrollableContainer(TextArea(self.initial_text ,name="Content", id="clip-content"))
+            ScrollableContainer(TextArea(self.initial_text, name="Content", id="clip-content", show_line_numbers=True))
             )
 
     def filter_action(self):

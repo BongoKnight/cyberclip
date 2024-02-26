@@ -17,8 +17,6 @@ class ContentToolbar(Static):
             yield Horizontal(
                 Button("📋", id="copy-button", classes="small-button"),
                 Button("❌", id="clear-button", classes="small-button"),
-                Button(u"\u21A9", id="previous-button", classes="small-button"),
-                Button(u"\u21AA", id="next-button", classes="small-button"),
                 #Select([(markup, markup) for markup in MARKUP_TYPES], classes="markup", prompt="Show as...")
             )
 
