@@ -11,13 +11,16 @@ MARKUP_TYPES = ["actionscript3","apache","applescript","asp","bash","brainfuck",
 class ContentToolbar(Static):
 
     DEFAULT_CSS = """
+        #copy-button, #clear-button {
+            margin-top: 1;
+        }
 
     """
     def compose(self) -> ComposeResult:
             yield Horizontal(
                 Button("📋", id="copy-button", classes="small-button"),
                 Button("❌", id="clear-button", classes="small-button"),
-                #Select([(markup, markup) for markup in MARKUP_TYPES], classes="markup", prompt="Show as...")
+                Select([(markup, markup) for markup in MARKUP_TYPES], classes="markup", prompt="Show as...")
             )
 
     def on_mount(self) -> None:
@@ -38,7 +41,3 @@ class ContentToolbar(Static):
         content_view = self.app.query_one(ContentView)
         if event.value:
             content_view.query_one("#clip-content").langage = event.value
-        else :
-            textArea = content_view.query_one(TextArea)
-            textArea.clear()
-            textArea.insert(str(self.app.text))

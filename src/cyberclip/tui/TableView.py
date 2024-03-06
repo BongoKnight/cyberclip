@@ -284,7 +284,8 @@ class FiltrableDataFrame(Static):
         file = Path(__file__).parent / "../data/tmp.csv"
         self.datatable.displayed_df.to_csv(file, index=False)
         with self.app.suspend():
-            system(f"python -m visidata {file}")
+            file = str(file.absolute()).replace("C://","/mnt/c/")
+            system(f"wsl.exe -e ~/.venv/bin/python3 -m visidata {file}")
         with open(file, "r") as f:
             self.app.text = f.read()
 

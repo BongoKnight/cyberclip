@@ -1,5 +1,5 @@
 import pyperclip
-from textual import events, work
+from textual import events, work, on
 from textual.reactive import var, reactive
 from textual.containers import  Vertical, ScrollableContainer
 from textual.widgets import Static,  Button, Input, Switch, Label, Select, TextArea
@@ -64,14 +64,13 @@ class ContentView(Static):
                 else:
                     action_button.visible = False
                     action_button.add_class("no-height")
-
+    
     def update_text(self, new_text: str) -> None:
         """Called when the text attribute changes."""
         from tui.DataTypePannel import DataTypeButton, DataLoader
         from tui.ActionPannel import ActionPannel, ActionButton
         textArea = self.query_one(TextArea)
-        textArea.clear()
-        textArea.insert(str(new_text))
+        textArea.replace(str(new_text), (0,0), (textArea.document.line_count, len(textArea.document.get_line(textArea.document.line_count-1))))
         
         self.app.parser.parseData(new_text)
         parser_types = self.app.parser.detectedType
