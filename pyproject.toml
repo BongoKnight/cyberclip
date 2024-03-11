@@ -62,7 +62,7 @@ dependencies = [
   "setuptools==69.0.3",
   "shodan==1.31.0",
   "simplejson==3.19.2",
-  "six==1.12.0",
+  "six==1.16.0",
   "soupsieve==2.5",
   "stix2-patterns==2.0.0",
   "stix2==3.0.1",

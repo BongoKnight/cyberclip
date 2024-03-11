@@ -4,9 +4,12 @@ title: "Getting started"
 
 # Installation
 
+I only tested the installation using pipx :
+
 ```bash
 # Windows users might need to specify the full python.exe path
-python -m pip install "cyberclip @ git+https://github.com/BongoKnight/cyberclip"
+python -m pip install pipx
+python3 -m pipx install "cyberclip @ git+https://github.com/BongoKnight/cyberclip"
 ```
 
 - Create the config in `cyberclip/data/config.yml` from the `cyberclip/data/config.yml.bak`
