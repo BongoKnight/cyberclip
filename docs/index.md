@@ -8,9 +8,11 @@ I only tested the installation using pipx :
 
 ```bash
 # Windows users might need to specify the full python.exe path
-python -m pip install pipx
-python3 -m pipx install "cyberclip @ git+https://github.com/BongoKnight/cyberclip"
+python.exe -m pip install pipx
+python.exe -m pipx install "cyberclip @ git+https://github.com/BongoKnight/cyberclip"
 ```
+
+> You might need to use `python.exe -m pipx ensurepath` in order to add the binary to your PATH.
 
 - Create the config in `cyberclip/data/config.yml` from the `cyberclip/data/config.yml.bak`
 - Add customs parser/actions in the `private` directory under `cyberclip/userAction` and `cyberclip/userTypeParser`, some example will be added in the "Getting started" tutoriel and in the `graveyard` directory.
