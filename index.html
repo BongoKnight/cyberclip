@@ -1788,9 +1788,12 @@
 <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
 <p>I only tested the installation using pipx :</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Windows users might need to specify the full python.exe path</span>
-python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pipx
-python3<span class="w"> </span>-m<span class="w"> </span>pipx<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;cyberclip @ git+https://github.com/BongoKnight/cyberclip&quot;</span>
+python.exe<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pipx
+python.exe<span class="w"> </span>-m<span class="w"> </span>pipx<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;cyberclip @ git+https://github.com/BongoKnight/cyberclip&quot;</span>
 </code></pre></div>
+<blockquote>
+<p>You might need to use <code>python.exe -m pipx ensurepath</code> in order to add the binary to your PATH.</p>
+</blockquote>
 <ul>
 <li>Create the config in <code>cyberclip/data/config.yml</code> from the <code>cyberclip/data/config.yml.bak</code></li>
 <li>Add customs parser/actions in the <code>private</code> directory under <code>cyberclip/userAction</code> and <code>cyberclip/userTypeParser</code>, some example will be added in the "Getting started" tutoriel and in the <code>graveyard</code> directory.</li>
