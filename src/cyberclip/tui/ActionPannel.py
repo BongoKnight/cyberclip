@@ -42,7 +42,7 @@ class ActionButton(Static):
             param_screen = ParamScreen()
             param_screen.border_title = f"Parameters for '{self.action.description}' action."
             param_screen.action = self.action
-            self.app.push_screen(param_screen, self.handle_param)
+            self.app.push_screen(param_screen, partial(self.app.handle_param, self.action))
 
     def update_text(self):
         from .ContentView import ContentView

@@ -58,8 +58,8 @@ class ParamScreen(Screen):
         yield Vertical(
             VerticalScroll(*self.get_complex_param_widgets()),
             Horizontal(
-                Button("Cancel", variant="error", id="cancel"),
-                Button("Save params", variant="primary", id="save"), id="submit"
+                Button("Save params", variant="primary", id="save"),
+                Button("Cancel", variant="error", id="cancel"), id="submit"
             ),
             id="dialog"
         )
