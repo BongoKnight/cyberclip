@@ -36,7 +36,7 @@ class ToCIDR24Action(actionInterface):
     
     def __str__(self):
         self.execute()
-        return  "\n".join([f'{key}: {value}' for key, value in self.exploded_cidr.items() if value!=""])
+        return  "\n".join([f'{key}\t{value}' for key, value in self.exploded_cidr.items() if value!=""])
 
 if __name__=='__main__':
     from userTypeParser.IPParser import CIDRParser

@@ -32,20 +32,21 @@ class searchInShodanAction(actionInterface):
 
         
     def execute(self) -> object:
-        results = []
+        self.results = {}
         self.observables = self.get_observables()
         if self.api:
             if self.observables.get("ip"):
                 for ip in self.observables.get("ip"):
                     try:
-                        results.append(self.api.host(ip))
+                        self.results[ip]=(self.api.host(ip))
                         time.sleep(1.1)
                     except:
                         pass
-        return results
+        return self.results
     
     def __str__(self):
-        return json.dumps(self.execute())
+        self.execute()
+        return "\n".join(f"{k}\t{v}" for k,v in self.results.items())
 
 if __name__=='__main__':
     from userTypeParser.IPParser import ipv4Parser
