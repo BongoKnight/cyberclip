@@ -13,9 +13,18 @@ You may want to see some screens records, documentation or even a features tour,
 
 - [x] Make the script installable with pip+git
 - [x] MKDocs on GitHub
-- [ ] Recipes panes :
-	- [ ] Loading of all actions
-	- [ ] Refactoring of actions options (complex_data)
+- [x] Recipes panes :
+	- [x] Loading of all actions
+	- [x] Refactoring of actions options (complex_data)
+	- [x] Add recipes to Command palette
+	- [x] Handle Parser in recipes
+	- [x] Add remove recipe
+	- [x] Recipes persistance
+	- [ ] HAndle recipe in Table tab
+	- [ ] Improve the recipe discoverability in command palette
+	- [ ] Write example recipes :
+		- [ ] Opened port in Shodan
+		- [ ] Certificate + NS info for a domain
 - [x] Make a gitignore
 - [x] Add an history (Undo et Redo buttons) :
 	- [x] Now done in baseline Textarea
@@ -64,6 +73,8 @@ You may want to see some screens records, documentation or even a features tour,
 	- [x] For HTML
 	- [x] For JSON
 	- [x] For Yaml
+	- [x] For CVE Number
+	- [ ] For RFC Number
 	- [ ] For uuid
 	- [ ] For JWT
 	- [ ] For lat long coordinates (maybe as a tutorial)

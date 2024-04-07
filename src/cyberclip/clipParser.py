@@ -7,6 +7,7 @@ import userTypeParser.private
 import userAction
 import userAction.private
 
+import re
 import os
 import logging
 from pathlib import Path
@@ -14,9 +15,11 @@ from pathlib import Path
         
 class clipParser():
     
-    def __init__(self):
+    def __init__(self, include="", exclude=""):
         self.actions = dict()
         self.parsers = dict()
+        self.include = include
+        self.exclude = exclude
         self.data = ""
         self.parsers = dict()
         self.actions = dict()
@@ -39,7 +42,7 @@ class clipParser():
         self.privateActionModuleImport = self.moduleLoader(userAction.private, 'userAction.private')
         self.results = {}
 
-    def moduleLoader(self, module_instance, module_name):
+    def moduleLoader(self, module_instance, module_name, include=".", exclude=""):
         """
         Load all class defined in `module_name` directory.
     
@@ -52,7 +55,7 @@ class clipParser():
         files = os.listdir(module_instance.__path__[0])
         for file in files :
             parserModules = []
-            if file.endswith(".py") and file != "__init__.py":
+            if self.verify_filename(file):
                 parserModuleName = file.split(".")[0]
                 parserModules.append(parserModuleName)
                 self.log.info(f"Importing {parserModuleName} from {module_name}")
@@ -63,7 +66,7 @@ class clipParser():
                     self.log.error(f"Error while loading {parserModules} from {file} : {e}")
         return parserModuleImport
 
-    def loadAction(self):
+    def loadAction(self, include=".", exclude=""):
         """
         Load all actions defined in `action` directory.
     
@@ -77,7 +80,7 @@ class clipParser():
         actionModuleImport = []
         for file in files :
             actionModules = []
-            if file.endswith(".py") and file != "__init__.py":
+            if self.verify_filename(file):
                 actionModule = file.split(".")[0]
                 actionModules.append(actionModule)
                 self.log.info(f"Importing {actionModule} action")
@@ -89,7 +92,44 @@ class clipParser():
                     self.log.error(f"Error while loading {actionModules} from {file} : {e}")
         return actionModuleImport
         
-    
+    def load_all(self):
+        self.parsers = dict()
+        self.actions = dict()
+        data = ""
+
+        # Load all parsers
+        parserModules = dict((name, m) for name, m
+                           in getmembers(self.parserModuleImport, ismodule))
+        privateParserModules = dict((name, m) for name, m
+                           in getmembers(self.privateParserModuleImport, ismodule))
+        parserModules.update(privateParserModules)
+
+        for parserModule in parserModules.keys():
+            classes = dict((name, c) for name, c 
+                           in getmembers(parserModules[parserModule], isclass))
+            for className in classes.keys():
+                if "Parser" in className:
+                    instance = classes[className](data)
+                    self.parsers.update({instance.parsertype:instance})
+
+        # Load all actions
+        actionModules = dict((name, m) for name, m
+                    in getmembers(self.ActionModuleImport, ismodule))
+        privateActionModules = dict((name, m) for name, m
+                    in getmembers(self.privateActionModuleImport, ismodule))
+        actionModules.update(privateActionModules)
+
+        for actionModule in actionModules.keys():
+            classes = dict((name, c) for name, c 
+                           in getmembers(actionModules[actionModule], isclass))
+            for className in classes.keys():
+                if "Action" in className:
+                    instance = classes[className](self.parsers)
+                    if hasattr(instance, "description"):
+                        # Adding action in a dict of all parsers relative to the input
+                        self.actions.update({instance.description : instance})
+                        self.log.debug("Text might trigger an action : {}".format(instance.description))
+
     def parseData(self, data):
         """
         Handle textual datas and return a dict containing matches and type of data detected.
@@ -163,6 +203,21 @@ class clipParser():
             if parser := self.parsers.get(actionable.parsertype):
                 return ", ".join(parser.extract())
 
+    def verify_filename(self, file):
+        is_valid = True
+        if not (re.search(r"(Action|Parser)", file) or file.endswith(".py")):
+            is_valid = False
+        if"__init__" in file:
+            is_valid = False
+        if self.exclude:
+            if re.search(self.exclude, file):
+                is_valid = False
+        if self.include:
+            if not re.search(self.include, file):
+                is_valid = False
+            else:
+                is_valid = True
+        return is_valid
 
 if __name__=='__main__':
     a = clipParser()

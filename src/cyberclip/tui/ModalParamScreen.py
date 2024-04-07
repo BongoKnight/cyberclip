@@ -92,8 +92,8 @@ class ParamScreen(Screen):
         return params
 
     def get_complex_param_widgets(self):
+        widgets = []
         if self.action.complex_param:
-            widgets = []
             params = deepcopy(self.action.complex_param)
             for key, value in params.items():
                 stored_values = self.action.get_param_value(key)
@@ -128,4 +128,4 @@ class ParamScreen(Screen):
                 if isinstance(value, bool):
                     widgets.append(Checkbox(label=key, value=value))
                     self.action.complex_param.update({key:{"type":"bool","value":stored_values}})
-            return widgets
+        return widgets

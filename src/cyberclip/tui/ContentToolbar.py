@@ -32,6 +32,7 @@ class ContentToolbar(Static):
         button_id = event.button.id
         if button_id == "copy-button":
             pyperclip.copy(self.app.text)
+            self.app.notify("Copied to clipboard!")
         if button_id == "clear-button":
             self.app.text = ""
 

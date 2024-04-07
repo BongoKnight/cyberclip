@@ -10,9 +10,11 @@ from functools import partial
 try:
     from userAction.actionInterface import actionInterface
     from userTypeParser.ParserInterface import ParserInterface
+    from tui.RecipesPannel import Recipe
 except:
     from cyberclip.userAction.actionInterface import actionInterface
     from cyberclip.userTypeParser.ParserInterface import ParserInterface
+    from cyberclip.tui.RecipesPannel import Recipe
 
 
 
@@ -53,21 +55,18 @@ class ActionButton(Static):
             except Exception as e:
                 self.app.notify(f"Error : {e}", severity="error",timeout=5)
 
-    def handle_param(self, complex_param : dict):
-        if complex_param :
-            self.action.complex_param = complex_param
-            self.update_text()
 
 class ActionCommands(Provider):
     """A command provider to return all actions for the current text."""
 
-    def recover_actions(self) -> list[actionInterface | ParserInterface]:
+    def recover_actions(self) -> list[actionInterface | ParserInterface | Recipe]:
         """Get a list of all actions."""
         actions = list(self.app.parser.actions.values())
         parser = list(self.app.parser.parsers.values())
-        return actions + parser
+        recipes = self.app.recipes
+        return actions + parser + recipes
     
-    def execute_action(self, actionable: ParserInterface | actionInterface ) -> None:
+    def execute_action(self, actionable: ParserInterface | actionInterface | Recipe) -> None:
         """Event handler called when a  button is pressed."""
         from .ModalParamScreen import ParamScreen
         from .ContentView import ContentView
@@ -85,6 +84,8 @@ class ActionCommands(Provider):
                         self.app.push_screen(param_screen, partial(self.app.handle_param, actionable))
                 elif "Parser" in actionable.__module__:
                     self.app.text = "\r\n".join(actionable.extract())
+                elif isinstance(actionable, Recipe):
+                    actionable.execute_recipe(self.app)
     
         elif self.app.query_one(TabbedContent).active == "tableview":
             dataframe = self.app.query_one(FiltrableDataFrame)
@@ -140,6 +141,18 @@ class ActionCommands(Provider):
                         matcher.highlight(parser_desc),
                         partial(self.execute_action, actionnable),
                         help=parser_doc.splitlines()[0],
+                    )
+            if isinstance(actionnable, Recipe):
+                recipe_desc = actionnable.name
+                recipe_doc = actionnable.description
+                scoreDesc = matcher.match(action_desc) 
+                scoreDoc = matcher.match(action_doc) 
+                if scoreDesc > 0 or scoreDoc > 0:
+                    yield Hit(
+                        max(scoreDesc, scoreDoc),
+                        matcher.highlight(recipe_desc),
+                        partial(self.execute_action, actionnable),
+                        help=recipe_doc.splitlines()[0] if recipe_doc else "",
                     )
 
 class ActionPannel(Static):

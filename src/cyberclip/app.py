@@ -1,11 +1,12 @@
 import sys
-from typing import Type
 import pyperclip
 from io import StringIO
 import pandas as pd
+from pathlib import Path
+import yaml
+import asyncio
 
-
-from textual import on
+from textual import on, work
 from textual.reactive import var, reactive
 from textual._path import CSSPathType
 from textual.app import App, CSSPathType, ComposeResult
@@ -19,6 +20,7 @@ try:
     from cyberclip.tui.ContentView import ContentView
     from cyberclip.tui.ActionPannel import ActionPannel, ActionCommands
     from cyberclip.tui.TableView import FiltrableDataFrame
+    from cyberclip.tui.RecipesPannel import RecipesPannel, RecipeButton, Recipe
     from cyberclip.userTypeParser import TSVParser
     from cyberclip.clipParser import clipParser
     from cyberclip.userAction import actionInterface
@@ -29,6 +31,7 @@ except:
     from tui.ContentView import ContentView
     from tui.ActionPannel import ActionPannel, ActionCommands
     from tui.TableView import FiltrableDataFrame
+    from tui.RecipesPannel import RecipesPannel, RecipeButton, Recipe
     from userTypeParser import TSVParser
     from clipParser import clipParser
     from userAction import actionInterface
@@ -62,8 +65,16 @@ class ClipBrowser(App):
         ("ctrl+e", "push_screen('conf')", "Edit config")
     ]
 
-    parser = var(clipParser())
-    text= reactive("Waiting for Update...")
+    parser = var(clipParser(exclude="."))
+    recipe_parser = var(clipParser(exclude="."))
+    #parser = var(clipParser())
+    text = reactive("Waiting for Update...")
+    try:
+        with open(Path(__file__).parent / 'data/recipes.yml', "r", encoding="utf8") as f:
+            recipes = var([Recipe(recipe_dict=i) for i in yaml.safe_load(f.read())])
+    except Exception as e:
+        recipes = var([])
+        print("Error loading recipes...", e)
 
     def __init__(self, driver_class: type[Driver] | None = None, css_path: CSSPathType | None = None, watch_css: bool = False):
         super().__init__(driver_class, css_path, watch_css)
@@ -92,8 +103,8 @@ class ClipBrowser(App):
                 )
             with TabPane('TableView', id="tableview"):
                 yield FiltrableDataFrame(pd.DataFrame(), id="main-table")
-            with TabPane('Recipes'):
-                yield Label("Recipes")
+            with TabPane('Recipes', id="recipes"):
+                yield RecipesPannel()
         yield Footer()
 
     def action_quit(self):
@@ -105,6 +116,7 @@ class ClipBrowser(App):
 
     def action_copy(self):
         pyperclip.copy(self.text)
+        self.notify("Copied in clipboard!")
 
     def action_reset(self):
         self.text = get_clipboard_text()
@@ -112,6 +124,13 @@ class ClipBrowser(App):
     def action_select_action_filter(self):
         filter = self.app.query_one("#action-filter").focus()
         filter.value = ""
+
+    async def on_mount(self):
+        asyncio.create_task(self.update_parsers())
+
+    async def update_parsers(self):
+        self.parser = clipParser()
+        self.recipe_parser = clipParser()
 
     @property
     def contentview(self):
@@ -131,6 +150,10 @@ class ClipBrowser(App):
                     self.app.notify(f"Error : {str(e)}",title="Error while loading data...",timeout=5, severity="error")
         if event.tab.label_text == "📝CyberClip👩‍💻":
             self.parser.parseData(self.text)
+        if event.tab.label_text == "Recipes":
+            self.query_one(RecipesPannel).refresh_recipes()
+            if querybuttons:= self.query(RecipeButton):
+                querybuttons[0].press()
 
     def update_dataframe(self, df):
         tab = self.query_one("#tableview")
@@ -151,8 +174,9 @@ class ClipBrowser(App):
             new_column_name = f"{action.__class__.__name__}_{column_name}"
             dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: self.parser.apply_actionable(action, str(text), complex_param), na_action="ignore")
             dataframe.datatable.update_displayed_df(dataframe.datatable.df)
+
         
-    
+
 
 def main():
     ClipBrowser().run()
