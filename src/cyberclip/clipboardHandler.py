@@ -4,6 +4,20 @@ import sys, os, subprocess
 from six import binary_type
 from urllib.parse import unquote
 from pathlib import Path
+from bs4 import BeautifulSoup
+
+
+"""Random weird cases :
+
+- Copying from Google Chrome only returns one data type :
+
+Detected format : 49346 -> b'Version:0.9\r\nStartHTML:0000000416\r\nEndHTML:0000001075\r\nStartFragment:0000000452\r\nEndFragment:0000001039\r\nSourceURL:https://www.google.com/search?q=python+if+name+%3D%3D+main&rlz=1C1LZQR_frFR1104FR1104&oq=python+if+na&gs_lcrp=EgZjaHJvbWUqBwgAEAAYgAQyBwgAEAAYgAQyBggBEEUYOTIHCAIQABiABDIHCAMQABiABDIHCAQQABiABDIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCDQxMzFqMGo0qAIAsAIB&sourceid=chrome&ie=UTF-8\r\n<html>\r\n<body>\r\n<!--StartFragment--><span style="color: rgb(77, 81, 86); font-family: arial, sans-serif; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 
+400; letter-spacing: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; background-color: rgb(255, 255, 255); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;">Then it executes the code from the file.</span><!--EndFragment-->\r\n</body>\r\n</html>\x00'
+
+"""
+
+
+
 
 CLIPBOARD_TYPE = {
     1: ["TEXT", "text/plain"],
@@ -139,7 +153,7 @@ def get_clipboard_files(folders=False):
         print(files)
         return files
 
-def get_clipboard_data() -> dict:
+def get_clipboard_data(debug=False) -> dict:
     clip_data = {}
     if sys.platform.startswith('win'):
         import win32clipboard
@@ -148,6 +162,9 @@ def get_clipboard_data() -> dict:
             formats = get_clipboard_formats()
             clip_formats = {getattr(win32clipboard, attr):attr for attr in dir(win32clipboard) if not callable(getattr(win32clipboard, attr)) and attr.startswith("CF_")}
             for format in formats:
+                if debug:
+                    print(f"Detected format : {format} -> {str(win32clipboard.GetClipboardData(format))}")
+
                 if format != 15 and format != 49346:
                     datatype = clip_formats.get(format)
                     if datatype:
@@ -159,11 +176,19 @@ def get_clipboard_data() -> dict:
                             clip_data.update({format:win32clipboard.GetClipboardData(format)})
                         except:
                             clip_data.update({format:""})
-                
-                else:
-                    if get_clipboard_files(folders=False) or get_clipboard_files(folders=True):
-                        filepath_data = get_clipboard_files(folders=False) + get_clipboard_files(folders=True)
-                        clip_data.update({15: filepath_data})
+                if format== 49346:
+                    try:
+                        data = win32clipboard.GetClipboardData(format).decode("utf-8")
+                        if data.contains("StartHTML"):
+                            match = re.search('<!--StartFragment-->(?P<fragment>.*)<!--EndFragment-->', data)
+                            clip_data.update({1:match.group("fragment")})
+                        else:
+                            if get_clipboard_files(folders=False) or get_clipboard_files(folders=True):
+                                filepath_data = get_clipboard_files(folders=False) + get_clipboard_files(folders=True)
+                                clip_data.update({15: filepath_data})
+                    except:
+                        pass
+
         except Exception as e:
             print(e)
         finally:
@@ -190,3 +215,6 @@ def get_clipboard_text():
     else :
         str_data = filepath_data
     return str_data
+
+if __name__=="__main__":
+    get_clipboard_data(debug=True)
