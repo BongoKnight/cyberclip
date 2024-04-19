@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from textual import on
+from textual.app import App
 from textual.screen import ModalScreen
 from textual.message import Message
 from textual.reactive import var, reactive
@@ -102,10 +103,13 @@ class Recipe:
         assert type(value) == list
         self.recipe_dict["steps"] = value
 
-    def execute_recipe(self, app):
+    def execute_recipe(self, app: App, step_index=0):
         from .ModalParamScreen import ParamScreen
         nb_step = len(self.steps)
-        for index, step in enumerate(self.steps):
+        if step_index < nb_step:
+            step = self.steps[step_index]
+            app.notify(f"Step {step_index+1}/{nb_step}")
+            app.refresh()
             app.recipe_parser.load_all()
             app.recipe_parser.parseData(app.text)
             if step.find_actionnable(app, step.actionnableName):
@@ -121,10 +125,11 @@ class Recipe:
                         app.push_screen(param_screen, partial(app.handle_param, step.actionnable.actionnable))
                 elif step.actionnable.type == "parser":
                     app.text = "\r\n".join(step.actionnable.actionnable.extract())
-                app.notify(f"Step {index+1}/{nb_step}")
             else:
                 app.notify(f"Error retrievig action : {step.actionnableName}", severity="warning")
-
+            self.execute_recipe(app, step_index=step_index+1)
+        else:
+            app.recipe_parser.load_all()
 
 
 class RecipesPannel(Static):
@@ -351,7 +356,7 @@ class SelectActionnableScreen(ModalScreen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "cancel":
-            self.dismiss()
+            self.dismiss({})
         else:
             select = self.query_one(Select)
             self.dismiss(result=select.value if not select.is_blank() else None)
@@ -365,6 +370,9 @@ class RecipeWidget(Static):
     .name{
         height: 3;
     }
+    #option{
+        height: 3;
+    }
     """
     button = var(RecipeButton())
     def compose(self) -> ComposeResult:
@@ -376,7 +384,7 @@ class RecipeWidget(Static):
             step_widget.step = step
             steps_widgets.append(step_widget)
         yield VerticalScroll(*steps_widgets, id="stepslist")
-        yield Horizontal(Button("Add step", variant="primary", id="add_step"), Button("Delete recipe", variant="error", id="delete_recipe"))
+        yield Horizontal(Button("Add step", variant="primary", id="add_step"), Button("Delete recipe", variant="error", id="delete_recipe"), id="option")
 
 
     @on(Button.Pressed, "#add_step")

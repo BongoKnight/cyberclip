@@ -66,7 +66,7 @@ class ActionCommands(Provider):
         recipes = self.app.recipes
         return actions + parser + recipes
     
-    def execute_action(self, actionable: ParserInterface | actionInterface | Recipe) -> None:
+    async def execute_action(self, actionable: ParserInterface | actionInterface | Recipe) -> None:
         """Event handler called when a  button is pressed."""
         from .ModalParamScreen import ParamScreen
         from .ContentView import ContentView
@@ -122,38 +122,62 @@ class ActionCommands(Provider):
                 scoreDesc = matcher.match(action_desc) 
                 scoreDoc = matcher.match(action_doc) 
 
+
                 if scoreDesc > 0 or scoreDoc > 0:
-                    yield Hit(
-                        max(scoreDesc, scoreDoc),
-                        matcher.highlight(action_desc),
-                        partial(self.execute_action, actionnable),
-                        help=action_doc.splitlines()[0],
-                    )
+                    if scoreDesc == max(scoreDesc, scoreDoc):
+                        yield Hit(
+                            scoreDesc,
+                            matcher.highlight(action_desc),
+                            partial(self.execute_action, actionnable),
+                            help=action_doc.splitlines()[0],
+                        )
+                    else:
+                        yield Hit(
+                            scoreDoc,
+                            matcher.highlight(action_desc),
+                            partial(self.execute_action, actionnable),
+                            help=action_doc.splitlines()[0],
+                        )                        
             if  "Parser" in actionnable.__module__ :
                 parser_desc = f"Extract {actionnable.parsertype}"
                 parser_doc = actionnable.extract.__doc__
                 scoreDesc = matcher.match(parser_desc) 
                 scoreDoc = matcher.match(parser_doc) 
-
                 if scoreDesc > 0 or scoreDoc > 0:
-                    yield Hit(
-                        max(scoreDesc, scoreDoc),
-                        matcher.highlight(parser_desc),
-                        partial(self.execute_action, actionnable),
-                        help=parser_doc.splitlines()[0],
-                    )
+                    if scoreDesc == max(scoreDesc, scoreDoc):
+                        yield Hit(
+                            scoreDesc,
+                            matcher.highlight(parser_desc),
+                            partial(self.execute_action, actionnable),
+                            help=parser_doc.splitlines()[0],
+                        )
+                    else:
+                        yield Hit(
+                            scoreDoc,
+                            matcher.highlight(parser_desc),
+                            partial(self.execute_action, actionnable),
+                            help=parser_doc.splitlines()[0],
+                        )
             if isinstance(actionnable, Recipe):
                 recipe_desc = actionnable.name
                 recipe_doc = actionnable.description
-                scoreDesc = matcher.match(action_desc) 
-                scoreDoc = matcher.match(action_doc) 
+                scoreDesc = matcher.match(recipe_desc) 
+                scoreDoc = matcher.match(recipe_doc) 
                 if scoreDesc > 0 or scoreDoc > 0:
-                    yield Hit(
-                        max(scoreDesc, scoreDoc),
-                        matcher.highlight(recipe_desc),
-                        partial(self.execute_action, actionnable),
-                        help=recipe_doc.splitlines()[0] if recipe_doc else "",
-                    )
+                    if scoreDesc == max(scoreDesc, scoreDoc):
+                        yield Hit(
+                            scoreDesc,
+                            matcher.highlight(recipe_desc),
+                            partial(self.execute_action, actionnable),
+                            help=recipe_doc.splitlines()[0] if recipe_doc else "",
+                        )
+                    else:
+                        yield Hit(
+                            scoreDoc,
+                            matcher.highlight(recipe_desc),
+                            partial(self.execute_action, actionnable),
+                            help=recipe_doc.splitlines()[0] if recipe_doc else "",
+                        )        
 
 class ActionPannel(Static):
     BINDINGS = [("escape", "clean_filter", "Clear the filter value."),]

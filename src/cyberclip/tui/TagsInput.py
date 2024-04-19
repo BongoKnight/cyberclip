@@ -60,25 +60,27 @@ class Tag(Static):
         border: none;
         background: $primary;
         height: 1;
-        width: auto;
-        min-width: 3;
     }
 
     Tag > Button:hover {
         background: $primary-lighten-1;
-        color: white;
+        border: none;
+        height: 1;
     }
 
     Tag > #tag-value {
-        min-width: 10;
+        width: auto;
     }
-    
+    Tag > #delete {
+        max-width: 3;
+        border: none;
+        height: 1;
+    }
     Tag {
         margin-top: 1;
         margin-left: 1;
         layout: horizontal;
         height: 4;
-        max-width: 30;
         width: auto;
     }
     """
@@ -91,7 +93,7 @@ class Tag(Static):
 
     def compose(self) -> ComposeResult:
         yield Button(self.value, id="tag-value")
-        yield Button("❌")
+        yield Button("❌", id="delete")
 
     @on(Button.Pressed)
     def edit_tag(self, event : Button.Pressed):

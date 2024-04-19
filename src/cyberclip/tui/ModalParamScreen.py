@@ -70,9 +70,9 @@ class ParamScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "cancel":
-            self.dismiss({})
+            self.app.pop_screen()
         else:
-            self.dismiss(self.return_parameters())
+            self.dismiss(result=self.return_parameters())
             
     def return_parameters(self):
         params = {}
@@ -88,7 +88,7 @@ class ParamScreen(Screen):
             if isinstance(widget, MultiSelect):
                 params.update({key: {"value":value, "type":"compactlist", "choices": widget.options}})
             if isinstance(widget, Checkbox):
-                params.update({key: {"value":value, "type":"bool"}})
+                params.update({str(widget.label): {"value":value, "type":"bool"}})
         return params
 
     def get_complex_param_widgets(self):
@@ -102,9 +102,7 @@ class ParamScreen(Screen):
                     options = value.get("choices", [])
                     assert "type" in value.keys()
                     assert "value" in value.keys()
-                    real_value = self.action.get_param_value(key)
                     input_type = value.get("type")
-                    self.action.complex_param[key] = real_value
                     if input_type.lower() == "text":
                         widgets.append(SimpleInput(label=key, value=stored_values, classes="complex-input"))
                     elif input_type.lower() == "tags":
@@ -113,7 +111,7 @@ class ParamScreen(Screen):
                         widgets.append(SelectionInput(label=key, choices=options, classes="complex-input"))
                     elif input_type.lower() == "compactlist":
                         widgets.append(MultiSelect(label=key, options=options, classes="complex-input"))
-                    elif input_type.lower() == "bool":
+                    elif input_type.lower() == "bool" or input_type.lower() == "boolean":
                         widgets.append(Checkbox(label=key, value=stored_values, classes="complex-input"))
                 if isinstance(value, str):
                     widgets.append(SimpleInput(label=key, value=stored_values, classes="complex-input"))

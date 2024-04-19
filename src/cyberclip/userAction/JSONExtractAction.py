@@ -35,7 +35,7 @@ class JSONExtractAction(actionInterface):
         if self.observables.get("json"):
             json_objects = self.observables.get("json")
             self.filter_json(json_objects)          
-        if self.observables.get("yaml"):
+        if self.observables.get("yaml") and not self.observables.get("json"):
             json_objects = [json.dumps(yaml.safe_load(yaml_str)) for yaml_str in self.observables.get("yaml")]
             self.filter_json(json_objects)        
         return self.results

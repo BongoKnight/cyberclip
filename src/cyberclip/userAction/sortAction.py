@@ -27,7 +27,7 @@ class sortAction(actionInterface):
             lines = self.observables.get("text")[0].splitlines()
             lines.sort()
             if self.get_param_value("Numeric sort"):
-                lines.sort(lines, key=lambda s: int(re.search(r'^(\s*\d+)', s).group()) if re.search(r'^(\s*\d+)', s) else 0)       
+                lines.sort(key=lambda s: int(re.search(r'^(\s*\d+)', s).group()) if re.search(r'^(\s*\d+)', s) else 0)       
             if self.get_param_value("Reverse sort"):
                 lines.sort(reverse=True)
             return "\n".join([i for i in lines])

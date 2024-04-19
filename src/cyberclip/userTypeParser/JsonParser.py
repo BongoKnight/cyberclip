@@ -48,10 +48,10 @@ class JSONParser(ParserInterface):
     
     def extract(self):
         """Return all JSON contained in text."""
+        self.objects = []
         try:
             self.objects = json.loads(self.text)
         except :
-            self.objects = []
             for match in re.findall(r'(\{.*\})', self.text):
                 try:
                     if json.loads(match[0]):
@@ -60,8 +60,8 @@ class JSONParser(ParserInterface):
                     pass
             for line in self.text.splitlines():
                 try:
-                    if json.loads(line):
-                        self.objects.append(json.loads(line))
+                    if json_obj:=json.loads(line):
+                        self.objects.append(json_obj)
                 except JSONDecodeError as e:
                     pass
         return [json.dumps(self.objects, indent=4)]

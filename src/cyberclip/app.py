@@ -163,7 +163,9 @@ class ClipBrowser(App):
     def watch_text(self, new_text: str) -> None:
         self.query_one(ContentView).update_text(new_text)
 
-    def handle_param(self, action : actionInterface , complex_param : dict):
+    def handle_param(self, action : actionInterface , complex_param : dict | None):
+        if complex_param == None:
+            return
         if complex_param :
             action.complex_param = complex_param
         if self.query_one("#maintabs", TabbedContent).active == "clipview":
@@ -175,7 +177,7 @@ class ClipBrowser(App):
             dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: self.parser.apply_actionable(action, str(text), complex_param), na_action="ignore")
             dataframe.datatable.update_displayed_df(dataframe.datatable.df)
 
-        
+    
 
 
 def main():

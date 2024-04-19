@@ -1,4 +1,3 @@
-import win32clipboard
 import pyperclip
 import re
 import sys, os, subprocess
