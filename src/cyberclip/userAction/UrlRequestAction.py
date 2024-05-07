@@ -18,7 +18,7 @@ class UrlToHtmlAction(actionInterface):
         self.description = "URL to HTML"
         
     def execute(self) -> object:
-        urls = set(self.parsers.get("url",[]).extract())
+        urls = set(self.observables.get("url", []))
         self.results = {}
         for url in urls:
             try:
@@ -29,7 +29,10 @@ class UrlToHtmlAction(actionInterface):
                 self.results.update({url:response.text})
             except:
                 self.results.update({url:""})
-        return self.results
+        if self.results:
+            return self.results
+        else:
+            return ""
 
     def __str__(self):
         self.execute()
