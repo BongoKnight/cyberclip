@@ -57,11 +57,11 @@ class extractRegexGroupAction(actionInterface):
         self.observables = self.get_observables()
         if self.observables.get("text"):
             text = self.observables.get("text")[0]
-            matches = re.findall(self.get_param_value("Regex"), text)
-            if matches and isinstance(matches[0], str):
-                return "\n".join([i for i in re.findall(self.get_param_value("Regex"), text)])
-            else:
-                return "\n".join(["\t".join(i) for i in re.findall(self.get_param_value("Regex"), text)])
+            matches = re.finditer(self.get_param_value("Regex"), text, re.MULTILINE)
+            results = []
+            for matchNum, match in enumerate(matches, start=1):
+                results.append("\t".join(match.groups()))
+            return "\n".join(results)
         else:
             return ""
         
