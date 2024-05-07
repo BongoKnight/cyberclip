@@ -72,7 +72,7 @@ class Tag(Static):
         width: auto;
     }
     Tag > #delete {
-        max-width: 3;
+        width: 3;
         border: none;
         height: 1;
     }
