@@ -176,16 +176,16 @@ def get_clipboard_data(debug=False) -> dict:
                             clip_data.update({format:win32clipboard.GetClipboardData(format)})
                         except:
                             clip_data.update({format:""})
-                if format== 49346:
+                if format == 49346:
                     try:
                         data = win32clipboard.GetClipboardData(format).decode("utf-8")
-                        if data.contains("StartHTML"):
+                        if get_clipboard_files(folders=False) or get_clipboard_files(folders=True):
+                            filepath_data = get_clipboard_files(folders=False) + get_clipboard_files(folders=True)
+                            clip_data.update({15: filepath_data})
+                        elif data.contains("StartHTML"):
                             match = re.search('<!--StartFragment-->(?P<fragment>.*)<!--EndFragment-->', data)
-                            clip_data.update({1:match.group("fragment")})
-                        else:
-                            if get_clipboard_files(folders=False) or get_clipboard_files(folders=True):
-                                filepath_data = get_clipboard_files(folders=False) + get_clipboard_files(folders=True)
-                                clip_data.update({15: filepath_data})
+                            if text:= match.group("fragment"):
+                                clip_data.update({1:text})
                     except:
                         pass
 
