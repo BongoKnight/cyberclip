@@ -21,14 +21,14 @@ class URLParser(ParserInterface):
         
     def contains(self):
         """Return true if text contains at least one URL."""
-        if re.search(r"\b(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:([\-a-zA-Z0-9+&@#\/%=~_|$?!:,.]*)|[a-z\-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:([a-z\-A-Z0-9+&@#\/%=~_|$?!:,.]*)|[a-zA-Z0-9\-+&@#\/%=~_|$])",self.text) :
+        if re.search(r"\b(?:(?:h(tt|xx)ps?|ftp|file):\/\/|www\.|ftp\.)(?:([\-a-zA-Z0-9+&@#\/%=~_|$?!:,.]*)|[a-z\-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:([a-z\-A-Z0-9+&@#\/%=~_|$?!:,.]*)|[a-zA-Z0-9\-+&@#\/%=~_|$])",self.text) :
             return True
         else :
             return False
     
     def extract(self):
         """Return all URL contained in text."""
-        URLsIter = re.finditer(r"\b(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:([\-a-zA-Z0-9+&@#\/%=~_|$?!:,.]*)|[a-z\-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:([a-z\-A-Z0-9+&@#\/%=~_|$?!:,.]*)|[a-zA-Z0-9\-+&@#\/%=~_|$])", self.text)
+        URLsIter = re.finditer(r"\b(?:(?:h(tt|xx)ps?|ftp|file):\/\/|www\.|ftp\.)(?:([\-a-zA-Z0-9+&@#\/%=~_|$?!:,.]*)|[a-z\-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:([a-z\-A-Z0-9+&@#\/%=~_|$?!:,.]*)|[a-zA-Z0-9\-+&@#\/%=~_|$])", self.text)
         URLs = [URL.group() for URL in URLsIter]
         self.objects = URLs
         return URLs

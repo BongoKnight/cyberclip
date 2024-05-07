@@ -20,15 +20,15 @@ class md5Parser(ParserInterface):
         
     def contains(self):
         """Return true if text contains at least one md5."""
-        if re.search(r"\b[0-9a-f]{32}\b",self.text) :
+        if re.search(r"\b([0-9a-f]{32}|[0-9A-F]{32})\b",self.text) :
             return True
         else :
             return False
     
     def extract(self):
         """Return all md5 contained in text."""
-        md5sIter = re.finditer(r"\b[0-9a-f]{32}\b", self.text)
-        md5s = [md5.group() for md5 in md5sIter]
+        md5sIter = re.finditer(r"\b([0-9a-f]{32}|[0-9A-F]{32})\b", self.text)
+        md5s = [md5.group(1) for md5 in md5sIter]
         self.objects = md5s
         return md5s
         
