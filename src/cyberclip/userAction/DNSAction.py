@@ -14,7 +14,7 @@ class DNSAction(actionInterface):
     """A action module, to return reverse DNS for an IP, and DNS for a domain.  
     For a domain the a list of DNS reccord can be specified (default A) : ie. AAA,SPF,TXT.
     """
-    CONF = {"Reccords":{"type":"tags","value":["A","TXT"]}}
+    CONF = {"Reccords":{"type":"tags","value":["A","TXT","SOA","NS","MX"]}}
     def __init__(self, parsers = {}, supportedType = {"ipv6","ip","domain"}, complex_param = CONF):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
         self.description = "DNS/Reverse DNS"

@@ -27,8 +27,8 @@ class UrlToHtmlAction(actionInterface):
                 }
                 response = requests.get(url, headers=headers)
                 self.results.update({url:response.text})
-            except:
-                self.results.update({url:""})
+            except Exception as e:
+                self.results.update({url:str(e)})
         if self.results:
             return self.results
         else:
