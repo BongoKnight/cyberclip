@@ -12,3 +12,5 @@ Yeti:
 - api-key: <api-key>
 Shodan:
 - api-key: "<Shodan API Key>"
+VirusTotal:
+- api-key: "<VT API Key>"
