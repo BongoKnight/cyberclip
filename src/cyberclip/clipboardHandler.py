@@ -17,6 +17,12 @@ Detected format : 49346 -> b'Version:0.9\r\nStartHTML:0000000416\r\nEndHTML:0000
 """
 
 
+# TODO handle Image in clipboard
+"""
+    a = get_clipboard_data(debug=True)
+    with open("a.txt","wb") as f:
+        f.write(a.get(49278)) 
+"""
 
 
 CLIPBOARD_TYPE = {
@@ -115,21 +121,12 @@ def get_clipboard_files(folders=False):
         import win32clipboard  # pylint: disable=import-error
         win32clipboard.OpenClipboard()
         f = get_clipboard_formats()
-        if win32clipboard.CF_HDROP in f:
-            files = win32clipboard.GetClipboardData(win32clipboard.CF_HDROP)
-        elif win32clipboard.CF_UNICODETEXT in f:
-            files = [win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)]
-        elif win32clipboard.CF_TEXT in f:
-            files = [win32clipboard.GetClipboardData(win32clipboard.CF_TEXT)]
-        elif win32clipboard.CF_OEMTEXT in f:
-            files = [win32clipboard.GetClipboardData(win32clipboard.CF_OEMTEXT)]
-        elif 14 in f:
-            #14 is a custom datatype for excel, pyperclip handle the text representation
-            files = [pyperclip.paste()] 
-        elif 49346 in f:
+        if 15 in f:
+            files = list(win32clipboard.GetClipboardData(15))
+        elif 49278 in f:
             filepath = Path(__file__).parent / 'data/tmp.png'
             with open(filepath, "wb+") as file:
-                file.write(win32clipboard.GetClipboardData(49346))
+                file.write(win32clipboard.GetClipboardData(49278))
                 files = [str(filepath)]
         if folders:
             files = [f"📂{f}" for f in files if os.path.isdir(f)] if files else None
@@ -164,8 +161,7 @@ def get_clipboard_data(debug=False) -> dict:
             for format in formats:
                 if debug:
                     print(f"Detected format : {format} -> {str(win32clipboard.GetClipboardData(format))}")
-
-                if format != 15 and format != 49346:
+                if format != 49346:
                     datatype = clip_formats.get(format)
                     if datatype:
                         print(f"Data found : {clip_formats.get(format)}")
@@ -176,13 +172,14 @@ def get_clipboard_data(debug=False) -> dict:
                             clip_data.update({format:win32clipboard.GetClipboardData(format)})
                         except:
                             clip_data.update({format:""})
-                if format == 49346:
+                if format == 14:
+                    #14 is a custom datatype for excel, pyperclip handle the text representation
+                    clip_data.update({1:pyperclip.paste()})
+
+                if format == 49346 or format == 49278:
                     try:
                         data = win32clipboard.GetClipboardData(format).decode("utf-8")
-                        if get_clipboard_files(folders=False) or get_clipboard_files(folders=True):
-                            filepath_data = get_clipboard_files(folders=False) + get_clipboard_files(folders=True)
-                            clip_data.update({15: filepath_data})
-                        elif data.contains("StartHTML"):
+                        if data.contains("StartHTML"):
                             match = re.search('<!--StartFragment-->(?P<fragment>.*)<!--EndFragment-->', data)
                             if text:= match.group("fragment"):
                                 clip_data.update({1:text})
@@ -205,16 +202,18 @@ def get_clipboard_data(debug=False) -> dict:
 
 def get_clipboard_text():
     data = get_clipboard_data()
+    print(data)
     text_data = data.get(1,"") # 1 is textual data in Windows clipboard
     utf8_data = data.get(13,"") # 13 is UTF8 data in Windows clipboard
-    filepath_data = "\r\n".join(data.get(15, [])) # 15 is file data in textual Clipboard
+    filepath_data = "\n".join(data.get(15, [])) # 15 is file data in textual Clipboard
     if utf8_data:
         str_data = utf8_data
     elif text_data:
         str_data = text_data
-    else :
+    else:
         str_data = filepath_data
     return str_data
 
 if __name__=="__main__":
-    get_clipboard_data(debug=True)
+    a = get_clipboard_data(debug=False)
+    print(get_clipboard_text())
