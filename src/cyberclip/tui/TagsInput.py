@@ -58,6 +58,7 @@ class Tag(Static):
     DEFAULT_CSS = """
     Tag > Button {
         border: none;
+        min-width: 3;
         background: $primary;
         height: 1;
     }
@@ -68,14 +69,6 @@ class Tag(Static):
         height: 1;
     }
 
-    Tag > #tag-value {
-        width: auto;
-    }
-    Tag > #delete {
-        width: 3;
-        border: none;
-        height: 1;
-    }
     Tag {
         margin-top: 1;
         margin-left: 1;
