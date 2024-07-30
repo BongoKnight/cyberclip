@@ -64,6 +64,7 @@ class ClipBrowser(App):
         ("ctrl+r", "reset", "Reset content view to clipboard content."),
         ("ctrl+e", "push_screen('conf')", "Edit config")
     ]
+    CLOSE_TIMEOUT = None
 
     parser = var(clipParser(exclude="."))
     recipe_parser = var(clipParser(exclude="."))
@@ -163,7 +164,7 @@ class ClipBrowser(App):
     def watch_text(self, new_text: str) -> None:
         self.query_one(ContentView).update_text(new_text)
 
-    def handle_param(self, action : actionInterface , complex_param : dict | None):
+    async def handle_param(self, action : actionInterface , complex_param : dict | None):
         if complex_param == None:
             return
         if complex_param :
@@ -174,14 +175,15 @@ class ClipBrowser(App):
             dataframe = self.query_one(FiltrableDataFrame)
             column_name = dataframe.datatable.df.columns[dataframe.datatable.cursor_column]
             new_column_name = f"{action.__class__.__name__}_{column_name}"
-            dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: self.parser.apply_actionable(action, str(text), complex_param), na_action="ignore")
+            dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.app.parser.apply_actionable(action, str(text)) for text in dataframe.datatable.df[column_name]))
             dataframe.datatable.update_displayed_df(dataframe.datatable.df)
 
     
 
 
 def main():
-    ClipBrowser().run()
+    cyberClip = ClipBrowser()
+    cyberClip.run()
 
 if __name__ == "__main__":
     main()

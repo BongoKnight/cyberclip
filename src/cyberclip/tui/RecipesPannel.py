@@ -102,34 +102,36 @@ class Recipe:
     def steps(self, value):
         assert type(value) == list
         self.recipe_dict["steps"] = value
+    
+    async def update_text(self, app: App, text: str):
+        app.text = text
 
-    def execute_recipe(self, app: App, step_index=0):
+    async def execute_recipe(self, app: App, step_index=0):
         from .ModalParamScreen import ParamScreen
         nb_step = len(self.steps)
         if step_index < nb_step:
             step = self.steps[step_index]
             app.notify(f"Step {step_index+1}/{nb_step}")
-            app.refresh()
-            app.recipe_parser.load_all()
+            await app.recipe_parser.load_all()
             app.recipe_parser.parseData(app.text)
             if step.find_actionnable(app, step.actionnableName):
                 if step.actionnable.type == "action":
                     if step.usePreset:
                         if step.params:
                             step.actionnable.actionnable.complex_param = step.params
-                        app.text = str(step.actionnable.actionnable)                     
+                            await self.update_text(app, str(step.actionnable.actionnable))              
                     else:
                         param_screen = ParamScreen()
                         param_screen.border_title = f"Parameters for {step.actionnable.description}."
                         param_screen.action = step.actionnable.actionnable
                         app.push_screen(param_screen, partial(app.handle_param, step.actionnable.actionnable))
                 elif step.actionnable.type == "parser":
-                    app.text = "\r\n".join(step.actionnable.actionnable.extract())
+                    await self.update_text(app, "\r\n".join(step.actionnable.actionnable.extract()))
+                await self.execute_recipe(app, step_index=step_index+1)
             else:
                 app.notify(f"Error retrievig action : {step.actionnableName}", severity="warning")
-            self.execute_recipe(app, step_index=step_index+1)
         else:
-            app.recipe_parser.load_all()
+            await app.recipe_parser.load_all()
 
 
 class RecipesPannel(Static):

@@ -1,4 +1,7 @@
 import re
+import time
+import asyncio
+
 from textual import on
 from textual.reactive import var
 from textual.containers import  VerticalScroll
@@ -85,7 +88,8 @@ class ActionCommands(Provider):
                 elif "Parser" in actionable.__module__:
                     self.app.text = "\r\n".join(actionable.extract())
                 elif isinstance(actionable, Recipe):
-                    actionable.execute_recipe(self.app)
+                    await asyncio.gather(actionable.execute_recipe(self.app))
+
     
         elif self.app.query_one(TabbedContent).active == "tableview":
             dataframe = self.app.query_one(FiltrableDataFrame)
@@ -94,7 +98,7 @@ class ActionCommands(Provider):
                 if  "Action" in actionable.__module__ :
                     new_column_name = f"{actionable.__class__.__name__}_{column_name}"
                     if not actionable.complex_param :
-                        dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: self.app.parser.apply_actionable(actionable, str(text)), na_action="ignore")
+                        dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.app.parser.apply_actionable(actionable, str(text)) for text in dataframe.datatable.df[column_name]))
                         dataframe.datatable.update_displayed_df(dataframe.datatable.df)
                     else:
                         param_screen = ParamScreen()
@@ -103,7 +107,8 @@ class ActionCommands(Provider):
                         self.app.push_screen(param_screen, partial(self.app.handle_param, actionable))
                 elif "Parser" in actionable.__module__:
                     new_column_name = f"{actionable.parsertype}_{column_name}"
-                    dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: self.app.parser.apply_actionable(actionable, str(text)), na_action="ignore")
+                    dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.app.parser.apply_actionable(actionable, str(text)) for text in dataframe.datatable.df[column_name]))
+                    #dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: asyncio.get_running_loop().create_task(self.app.parser.apply_actionable(actionable, str(text))).result(), na_action="ignore")
                     dataframe.datatable.update_displayed_df(dataframe.datatable.df, replace_df=True)
 
 
