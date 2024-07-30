@@ -23,6 +23,7 @@ class clipParser():
         self.data = ""
         self.parsers = dict()
         self.actions = dict()
+        self.results = {}
         self.matches = {}
         self.detectedType = set()
 
@@ -36,11 +37,11 @@ class clipParser():
         # add formatter to ch
         self.ch.setFormatter(self.formatter)
         self.log.addHandler(self.ch)
+
         self.parserModuleImport = self.moduleLoader(userTypeParser, 'userTypeParser')
         self.privateParserModuleImport = self.moduleLoader(userTypeParser.private, 'userTypeParser.private')
         self.ActionModuleImport = self.moduleLoader(userAction, 'userAction')
-        self.privateActionModuleImport = self.moduleLoader(userAction.private, 'userAction.private')
-        self.results = {}
+        self.privateActionModuleImport = self.moduleLoader(userAction.private, 'userAction.private') 
 
     def moduleLoader(self, module_instance, module_name, include=".", exclude=""):
         """
@@ -48,51 +49,28 @@ class clipParser():
     
         Returns
         -------
-         __import__('module_name',fromlist=parserModules)
+         __import__('module_name',fromlist=module_instance)
     
         """
-        parserModuleImport = []
+        modules_imports = []
         files = os.listdir(module_instance.__path__[0])
         for file in files :
-            parserModules = []
+            modules = []
             if self.verify_filename(file):
-                parserModuleName = file.split(".")[0]
-                parserModules.append(parserModuleName)
-                self.log.info(f"Importing {parserModuleName} from {module_name}")
+                module_mainname = file.split(".")[0]
+                modules.append(module_mainname)
+                self.log.info(f"Importing {module_mainname} from {module_name}")
                 # import all parser parserModule from file
                 try:
-                    parserModuleImport = __import__(f'{module_name}',fromlist=parserModules)
+                    modules_imports = __import__(f'{module_name}',fromlist=modules)
                 except Exception as e:
-                    self.log.error(f"Error while loading {parserModules} from {file} : {e}")
-        return parserModuleImport
-
-    def loadAction(self, include=".", exclude=""):
-        """
-        Load all actions defined in `action` directory.
-    
-        Returns
-        -------
-        __import__('userAction',fromlist=actionModules)    
-        """
-
-        files = os.listdir(userAction.__path__[0])
-        files+= os.listdir(userAction.private.__path__[0])
-        actionModuleImport = []
-        for file in files :
-            actionModules = []
-            if self.verify_filename(file):
-                actionModule = file.split(".")[0]
-                actionModules.append(actionModule)
-                self.log.info(f"Importing {actionModule} action")
-                # import all parser parserModule from file
-                try:
-                    actionModuleImport+= __import__('userAction',fromlist=actionModules)
-                    actionModuleImport+= __import__('userAction.private',fromlist=actionModules)
-                except Exception as e:
-                    self.log.error(f"Error while loading {actionModules} from {file} : {e}")
-        return actionModuleImport
+                    self.log.error(f"Error while loading {modules} from {file} : {e}")
+        return modules_imports
         
-    def load_all(self):
+    async def create_instance(self, classes, class_name, arg):
+        return classes[class_name](arg)
+
+    async def load_all(self):
         self.parsers = dict()
         self.actions = dict()
         data = ""
@@ -109,7 +87,7 @@ class clipParser():
                            in getmembers(parserModules[parserModule], isclass))
             for className in classes.keys():
                 if "Parser" in className:
-                    instance = classes[className](data)
+                    instance = await self.create_instance(classes, className, data)
                     self.parsers.update({instance.parsertype:instance})
 
         # Load all actions
@@ -124,7 +102,7 @@ class clipParser():
                            in getmembers(actionModules[actionModule], isclass))
             for className in classes.keys():
                 if "Action" in className:
-                    instance = classes[className](self.parsers)
+                    instance = await self.create_instance(classes, className, self.parsers)
                     if hasattr(instance, "description"):
                         # Adding action in a dict of all parsers relative to the input
                         self.actions.update({instance.description : instance})
@@ -186,7 +164,7 @@ class clipParser():
         self.results = {"matches" : self.matches, "detectedType" : self.detectedType, "actions": self.actions, "parsers":self.parsers}
         return self.results
     
-    def apply_actionable(self, actionable, text, complex_param = {}):
+    async def apply_actionable(self, actionable, text, complex_param = {}):
         self.parseData(text)
         if  "Action" in actionable.__module__ :
             if action := self.actions.get(actionable.description):
