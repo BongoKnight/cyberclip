@@ -16,11 +16,11 @@ class UrlToHtmlAction(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"url"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "URL to HTML"
+
         
     def execute(self) -> object:
-        urls = set(self.observables.get("url", []))
         self.results = {}
-        for url in urls:
+        for url in self.get_observables().get("url", []):
             try:
                 headers = {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0',
@@ -29,10 +29,8 @@ class UrlToHtmlAction(actionInterface):
                 self.results.update({url:response.text})
             except Exception as e:
                 self.results.update({url:str(e)})
-        if self.results:
-            return self.results
-        else:
-            return ""
+        return self.results
+
 
     def __str__(self):
         self.execute()
