@@ -18,8 +18,8 @@ class HtmlExtractAction(actionInterface):
         self.description = "Extract tags from HTML with CSS selector"
 
     def execute(self) -> object:
-        self.observables = {}
-        html_texts = self.parsers.get("html").extract()
+        html_texts = self.get_observables().get("html")
+        self.results = {}
         if html_texts:
             for html_text in html_texts:
                 selected = {}
@@ -28,8 +28,8 @@ class HtmlExtractAction(actionInterface):
                 for css_selector in filters:
                     filtered_dom = soup.select(css_selector)
                     selected.update({css_selector:filtered_dom})
-                self.observables.update({html_text:selected})
-        return self.observables
+                self.results.update({html_text:selected})
+        return self.results
     
     def __str__(self):
         """Visual representation of the action."""
@@ -55,8 +55,8 @@ class HtmlExtractTextAction(actionInterface):
         self.description = "Extract text from HTML with CSS selector"
 
     def execute(self) -> object:
-        self.observables = {}
-        html_texts = self.parsers.get("html").extract()
+        self.results = {}
+        html_texts = self.get_observables().get("html")
         if html_texts:
             for html_text in html_texts:
                 selected = {}
@@ -65,8 +65,8 @@ class HtmlExtractTextAction(actionInterface):
                 for css_selector in filters:
                     filtered_dom = soup.select(css_selector)
                     selected.update({css_selector:filtered_dom})
-                self.observables.update({html_text:selected})
-        return self.observables
+                self.results.update({html_text:selected})
+        return self.results
     
     def __str__(self):
         lines = []
@@ -74,7 +74,7 @@ class HtmlExtractTextAction(actionInterface):
         for html_text, html_extract in filtered_dom.items():
             for item in html_extract.values():
                 for html_fragment in item:
-                    lines.append(str(html_fragment.string))
+                    lines.append(html_fragment.get_text())
         return  "\r\n".join(lines)
 
 

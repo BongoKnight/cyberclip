@@ -79,6 +79,45 @@ class prependEachLineAction(actionInterface):
     def __str__(self):
         return  self.execute()
 
+class toLowerCaseAction(actionInterface):   
+    """A action module, to lower case a text.
+    """ 
+
+    def __init__(self, parsers = {}, supportedType = {"text"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
+        self.description = "To lower case"
+        
+    def execute(self) -> object:
+        """Add a line of text at the end of each line of a text.
+        
+        Return:
+            text (str): Text lower cased
+        """
+        self.observables = self.get_observables()
+        text = self.observables.get("text","")[0].lower()
+        return text
+
+class toUperCaseAction(actionInterface):   
+    """A action module, to UPPER case a text.
+    """ 
+
+    def __init__(self, parsers = {}, supportedType = {"text"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
+        self.description = "To UPPER case"
+        
+    def execute(self) -> object:
+        """Add a line of text at the end of each line of a text.
+        
+        Return:
+            text (str): Text upper cased
+        """
+        self.observables = self.get_observables()
+        text = self.observables.get("text","")[0].upper()
+        return text
+
+    def __str__(self):
+        return  self.execute()
+
 
 if __name__=='__main__':
     from userTypeParser.TextParser import TextParser

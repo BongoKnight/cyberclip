@@ -3,7 +3,7 @@ from functools import partial
 from dataclasses import dataclass
 from pathlib import Path
 
-from textual import on
+from textual import on, work
 from textual.app import App
 from textual.screen import ModalScreen
 from textual.message import Message
@@ -103,35 +103,40 @@ class Recipe:
         assert type(value) == list
         self.recipe_dict["steps"] = value
     
-    async def update_text(self, app: App, text: str):
-        app.text = text
 
-    async def execute_recipe(self, app: App, step_index=0):
+    async def execute_recipe(self, app: App, text=None, step_index=0):
+        # TODO always use handleParam
         from .ModalParamScreen import ParamScreen
+        new_text = ""
         nb_step = len(self.steps)
+        if text == None:
+             new_text = app.text
+        else:
+            new_text = text
+        app.recipe_parser.parseData(new_text)
+        await app.recipe_parser.load_all()
         if step_index < nb_step:
             step = self.steps[step_index]
-            app.notify(f"Step {step_index+1}/{nb_step}")
-            await app.recipe_parser.load_all()
-            app.recipe_parser.parseData(app.text)
             if step.find_actionnable(app, step.actionnableName):
                 if step.actionnable.type == "action":
                     if step.usePreset:
                         if step.params:
                             step.actionnable.actionnable.complex_param = step.params
-                            await self.update_text(app, str(step.actionnable.actionnable))              
+                            new_text = await app.recipe_parser.apply_actionable(step.actionnable.actionnable, new_text)
+                            return await self.execute_recipe(app, text=new_text, step_index=step_index+1)         
                     else:
                         param_screen = ParamScreen()
                         param_screen.border_title = f"Parameters for {step.actionnable.description}."
                         param_screen.action = step.actionnable.actionnable
-                        app.push_screen(param_screen, partial(app.handle_param, step.actionnable.actionnable))
+                        new_text = await app.push_screen(param_screen, partial(app.handle_param, step.actionnable.actionnable))
+                        return await self.execute_recipe(app, text=new_text, step_index=step_index+1)
                 elif step.actionnable.type == "parser":
-                    await self.update_text(app, "\r\n".join(step.actionnable.actionnable.extract()))
-                await self.execute_recipe(app, step_index=step_index+1)
+                    new_text = "\r\n".join(step.actionnable.actionnable.extract())
+                    return await self.execute_recipe(app, text=new_text, step_index=step_index+1)
             else:
                 app.notify(f"Error retrievig action : {step.actionnableName}", severity="warning")
         else:
-            await app.recipe_parser.load_all()
+            return new_text
 
 
 class RecipesPannel(Static):
