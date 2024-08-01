@@ -41,4 +41,4 @@ class ContentToolbar(Static):
         from tui.ContentView import ContentView
         content_view = self.app.query_one(ContentView)
         if event.value:
-            content_view.query_one("#clip-content").langage = event.value
+            content_view.query_one("#clip-content", TextArea).language = event.value
