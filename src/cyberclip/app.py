@@ -2,6 +2,7 @@ import sys
 import pyperclip
 from io import StringIO
 import pandas as pd
+import traceback
 from pathlib import Path
 import yaml
 import asyncio
@@ -80,6 +81,10 @@ class ClipBrowser(App):
     def __init__(self, driver_class: type[Driver] | None = None, css_path: CSSPathType | None = None, watch_css: bool = False):
         super().__init__(driver_class, css_path, watch_css)
         self.actions = []
+
+    async def on_mount(self):
+        await self.parser.load_all()
+        await self.recipe_parser.load_all()
 
     def compose(self) -> ComposeResult:
         """Compose the main UI. Generate three tabs corresponding to the three modes of the application :
@@ -164,19 +169,28 @@ class ClipBrowser(App):
     def watch_text(self, new_text: str) -> None:
         self.query_one(ContentView).update_text(new_text)
 
-    async def handle_param(self, action : actionInterface , complex_param : dict | None):
-        if complex_param == None:
-            return
+    @work(exclusive=True)
+    async def handle_param(self, action : actionInterface ,  complex_param : dict | None = None, recipe_parser : bool = False,):
         if complex_param :
             action.complex_param = complex_param
         if self.query_one("#maintabs", TabbedContent).active == "clipview":
+            self.notify(self.text)
             self.text = str(action)
+            self.notify(self.text)
         elif self.query_one("#maintabs", TabbedContent).active == "tableview":
             dataframe = self.query_one(FiltrableDataFrame)
             column_name = dataframe.datatable.df.columns[dataframe.datatable.cursor_column]
-            new_column_name = f"{action.__class__.__name__}_{column_name}"
-            dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.app.parser.apply_actionable(action, str(text)) for text in dataframe.datatable.df[column_name]))
-            dataframe.datatable.update_displayed_df(dataframe.datatable.df)
+            new_column_name = dataframe.datatable.get_column_name(f"{action.__class__.__name__}_{column_name}")
+            try:
+                async with asyncio.timeout(10):
+                    if recipe_parser:
+                        dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.recipe_parser.apply_actionable(action, str(text)) for text in dataframe.datatable.df[column_name]))
+                        dataframe.datatable.update_displayed_df(dataframe.datatable.df)
+                    else:
+                        dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.parser.apply_actionable(action, str(text)) for text in dataframe.datatable.df[column_name]))
+                        dataframe.datatable.update_displayed_df(dataframe.datatable.df)    
+            except Exception as e:
+                self.app.notify("Action took too long to execute..." + str(e) + traceback.format_exc(), severity="error")
 
     
 

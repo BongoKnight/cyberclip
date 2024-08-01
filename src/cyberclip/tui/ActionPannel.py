@@ -1,6 +1,7 @@
 import re
 import time
 import asyncio
+import traceback
 
 from textual import on
 from textual.reactive import var
@@ -37,7 +38,7 @@ class ActionButton(Static):
         self.query_one(Button).tooltip = self.action.__doc__.splitlines()[0]
 
     @on(Button.Pressed, "#action-button")
-    def execute_option_action(self, event: Button.Pressed) -> None:
+    async def execute_option_action(self, event: Button.Pressed) -> None:
         """Event handler called when a  button is pressed."""
         from .ModalParamScreen import ParamScreen
         from .ContentView import ContentView
@@ -47,7 +48,10 @@ class ActionButton(Static):
             param_screen = ParamScreen()
             param_screen.border_title = f"Parameters for '{self.action.description}' action."
             param_screen.action = self.action
-            self.app.push_screen(param_screen, partial(self.app.handle_param, self.action))
+            try:
+                self.app.push_screen(param_screen, partial(self.app.handle_param, self.action))
+            except:
+                self.app.notify(f"Error while executing action : {traceback.format_exc()}", severity="error")
 
     def update_text(self):
         from .ContentView import ContentView
@@ -79,38 +83,59 @@ class ActionCommands(Provider):
             if self.app.query(ContentView):
                 if  "Action" in actionable.__module__ :
                     if not actionable.complex_param :
-                        self.app.text = str(actionable)
-                    else :
+                        self.app.text = await self.app.handle_param(actionable)
+                    else:
                         param_screen = ParamScreen()
                         param_screen.border_title = f"Parameters for '{actionable.description}' action."
                         param_screen.action = actionable
-                        self.app.push_screen(param_screen, partial(self.app.handle_param, actionable))
+                        await self.app.push_screen(param_screen, partial(self.app.handle_param, actionable))
                 elif "Parser" in actionable.__module__:
                     self.app.text = "\r\n".join(actionable.extract())
                 elif isinstance(actionable, Recipe):
-                    await asyncio.gather(actionable.execute_recipe(self.app))
+                    try:
+                        self.app.text = await actionable.execute_recipe(self.app)
+                    except Exception as e:
+                        self.app.notify("Error while applying recipe..." + str(e) + traceback.format_exc(), severity="error")
+
 
     
         elif self.app.query_one(TabbedContent).active == "tableview":
             dataframe = self.app.query_one(FiltrableDataFrame)
             if dataframe.visible:
                 column_name = dataframe.datatable.df.columns[dataframe.datatable.cursor_column]
+                
                 if  "Action" in actionable.__module__ :
-                    new_column_name = f"{actionable.__class__.__name__}_{column_name}"
+                    new_column_name = dataframe.datatable.get_column_name(f"{actionable.__class__.__name__}_{column_name}")
                     if not actionable.complex_param :
-                        dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.app.parser.apply_actionable(actionable, str(text)) for text in dataframe.datatable.df[column_name]))
-                        dataframe.datatable.update_displayed_df(dataframe.datatable.df)
+                        try:
+                            async with asyncio.timeout(10):
+                                dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.app.parser.apply_actionable(actionable, str(text)) for text in dataframe.datatable.df[column_name]))
+                                dataframe.datatable.update_displayed_df(dataframe.datatable.df)
+                        except Exception as e:
+                            self.app.notify("Action took too long to execute (2)..." + str(e), severity="error")
                     else:
                         param_screen = ParamScreen()
                         param_screen.border_title = f"Parameters for '{actionable.description}' action."
                         param_screen.action = actionable
-                        self.app.push_screen(param_screen, partial(self.app.handle_param, actionable))
+                        await self.app.push_screen(param_screen, partial(self.app.handle_param, actionable))
                 elif "Parser" in actionable.__module__:
-                    new_column_name = f"{actionable.parsertype}_{column_name}"
-                    dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.app.parser.apply_actionable(actionable, str(text)) for text in dataframe.datatable.df[column_name]))
-                    #dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: asyncio.get_running_loop().create_task(self.app.parser.apply_actionable(actionable, str(text))).result(), na_action="ignore")
-                    dataframe.datatable.update_displayed_df(dataframe.datatable.df, replace_df=True)
-
+                    new_column_name = dataframe.datatable.get_column_name(f"{actionable.parsertype}_{column_name}")
+                    try:
+                        async with asyncio.timeout(10):
+                            dataframe.datatable.df[new_column_name] = await asyncio.gather(*[self.app.parser.apply_actionable(actionable, str(text)) for text in dataframe.datatable.df[column_name]])
+                            #dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: asyncio.get_running_loop().create_task(self.app.parser.apply_actionable(actionable, str(text))).result(), na_action="ignore")
+                            dataframe.datatable.update_displayed_df(dataframe.datatable.df, replace_df=True)
+                    except Exception as e:
+                        self.app.notify("Parser took too long to execute..." + str(e), severity="error")
+                elif isinstance(actionable, Recipe):
+                    new_column_name = dataframe.datatable.get_column_name(f"{actionable.name}_{column_name}")
+                    try:
+                        self.app.notify("Applying recipe to a dataframe could take some times...")
+                        async with asyncio.timeout(30):
+                            dataframe.datatable.df[new_column_name] = await asyncio.gather(*[actionable.execute_recipe(self.app, text=text) for text in dataframe.datatable.df[column_name]])
+                            dataframe.datatable.update_displayed_df(dataframe.datatable.df, replace_df=True)
+                    except Exception as e:
+                        self.app.notify("Recipe took too long to execute..." + str(e), severity="error")
 
     async def startup(self) -> None:  
         """Called once when the command palette is opened, prior to searching."""
