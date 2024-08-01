@@ -168,6 +168,24 @@ class DataFrameTable(DataTable):
                     df = df[df.apply(lambda row: match_value(str(row[column_name]), filter.value), axis=1) == True]
         self.update_displayed_df(df)
 
+    def get_column_name(self, base_column_name):
+        """
+        Add a column to the DataFrame with a suffix if the base column name already exists.
+        
+        Parameters:
+        base_column_name (str): The base name for the column.
+        """
+        if base_column_name not in self.df.columns:
+            return base_column_name
+        else:
+            i = 1
+            new_column_name = f"{base_column_name}_{i}"
+            while new_column_name in self.df.columns:
+                i += 1
+                new_column_name = f"{base_column_name}_{i}"
+            return new_column_name
+        
+        
 class FiltrableDataFrame(Static):
     DEFAULT_CSS = """
     FiltrableDataFrame {
