@@ -168,15 +168,17 @@ class ClipBrowser(App):
 
     def watch_text(self, new_text: str) -> None:
         self.query_one(ContentView).update_text(new_text)
+        self.query_one(ContentView).filter_action()
 
     @work(exclusive=True)
     async def handle_param(self, action : actionInterface ,  complex_param : dict | None = None, recipe_parser : bool = False,):
         if complex_param :
             action.complex_param = complex_param
         if self.query_one("#maintabs", TabbedContent).active == "clipview":
-            self.notify(self.text)
-            self.text = str(action)
-            self.notify(self.text)
+            try:
+                self.text = await self.parser.apply_actionable(action, text=self.text)
+            except Exception as e:
+                self.app.notify("Error applying action..." + str(e) + traceback.format_exc(), severity="error")  
         elif self.query_one("#maintabs", TabbedContent).active == "tableview":
             dataframe = self.query_one(FiltrableDataFrame)
             column_name = dataframe.datatable.df.columns[dataframe.datatable.cursor_column]

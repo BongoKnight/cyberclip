@@ -21,8 +21,6 @@ class clipParser():
         self.include = include
         self.exclude = exclude
         self.data = ""
-        self.parsers = dict()
-        self.actions = dict()
         self.results = {}
         self.matches = {}
         self.detectedType = set()
@@ -119,7 +117,6 @@ class clipParser():
         """
         self.data = data
         self.parsers = dict()
-        self.actions = dict()
         self.matches = {}
         self.detectedType = set()
 
@@ -164,19 +161,21 @@ class clipParser():
         self.results = {"matches" : self.matches, "detectedType" : self.detectedType, "actions": self.actions, "parsers":self.parsers}
         return self.results
     
-    async def apply_actionable(self, actionable, text, complex_param = {}):
+    async def apply_actionable(self, actionable, text, complex_param = {}) -> str:
         self.parseData(text)
         if  "Action" in actionable.__module__ :
             if action := self.actions.get(actionable.description):
                 if complex_param:
                     action.complex_param = complex_param
-                result = action.execute()
+                if actionable.complex_param:
+                    action.complex_param = actionable.complex_param
+                result = str(action)
                 if isinstance(result, str):
                     return result
                 elif isinstance(result, dict) and (mergedresult := result.get(text)):
-                    return mergedresult
+                    return str(mergedresult)
                 else:
-                    return result
+                    return str(result)
         elif "Parser" in actionable.__module__:
             if parser := self.parsers.get(actionable.parsertype):
                 return ", ".join(parser.extract())

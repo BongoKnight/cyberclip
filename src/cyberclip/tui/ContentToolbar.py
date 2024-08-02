@@ -6,7 +6,7 @@ from rich.markdown import Markdown
 import pyperclip
 
 
-MARKUP_TYPES = ["actionscript3","apache","applescript","asp","bash","brainfuck","c","c++","cfm","clojure","cmake","coffee","coffee-script","coffeescript","cpp","cs","csharp","css","csv","diff","elixir","erb","go","haml","html","http","java","javascript","jruby","json","jsx","less","lolcode","make","markdown","matlab","nginx","objectivec","pascal","perl","php","profile","python","rb","ruby","rust","salt","saltstate","scss","sh","shell","smalltalk","sql","svg","swift","vhdl","vim","viml","volt","vue","xml","yaml","zsh"]
+MARKUP_TYPES = ["bash","c","c++","csharp","css","go","html","java","javascript","json","markdown","matlab","perl","php","python","ruby","rust","sql","xml","yaml"]
 
 class ContentToolbar(Static):
 
