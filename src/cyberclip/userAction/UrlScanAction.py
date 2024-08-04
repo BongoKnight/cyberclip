@@ -2,7 +2,10 @@ try:
     from userAction.actionInterface import actionInterface
 except:
     from actionInterface import actionInterface
+import urllib.parse
 import requests
+import json
+import urllib
 
 BASE_SEARCH_URL = "https://urlscan.io/api/v1/search/"
 
@@ -33,6 +36,42 @@ class SearchInUrlScanAction(actionInterface):
     def __str__(self):
         self.execute()
         return "\n".join([f"{observable}\t{value}" for observable, value in self.results.items()])
+
+
+DEFAULT_QUERY_PARAMETERS = {"Query":{"type":"text","value":"page.url:"}}
+
+class QueryUrlScanAction(actionInterface):
+    """A action module to query URLScan through its API.
+
+    Some querries might require an API Key.
+
+    UrlScan:
+    - api_key: <VT API Key> 
+    """
+
+    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param=DEFAULT_QUERY_PARAMETERS):
+        super().__init__(parsers=parsers, supportedType=supportedType, complex_param=complex_param)
+        self.description = "Query UrlScan"
+        self.load_conf("UrlScan")
+        API_KEY = self.conf.get("api-key","")
+        self.headers = {"accept": "application/json", "API-Key": API_KEY}
+
+        
+    def execute(self) -> object:
+        self.results = {}
+        try:
+            query = self.get_param_value("Query")
+            query_url = BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}" 
+            response = requests.get(query_url, headers=self.headers)
+            self.results = response.json()
+        except Exception as e:
+            self.results = {"error":str(e)}
+        return self.results
+
+
+    def __str__(self):
+        return json.dumps(self.execute())
+
 
 if __name__=='__main__':
     from userTypeParser.domainParser import domainParser
