@@ -20,8 +20,8 @@ You may want to see some screens records, documentation or even a features tour,
 	- [x] Handle Parser in recipes
 	- [x] Add remove recipe
 	- [x] Recipes persistance
-	- [ ] HAndle recipe in Table tab
-	- [ ] Improve the recipe discoverability in command palette
+	- [x] Handle recipe in Table tab
+	- [x] Improve the recipe discoverability in command palette
 	- [ ] Write example recipes :
 		- [ ] Opened port in Shodan
 		- [ ] Certificate + NS info for a domain
@@ -34,7 +34,7 @@ You may want to see some screens records, documentation or even a features tour,
 	- [x] Button to (un)select all types at once
 - [ ] Write docs :
 	- [ ] For users
-	- [ ] For devs (how to write custom parsers/actions)
+	- [x] For devs (how to write custom parsers/actions)
 - [x] Add an help field to make a long description of action possible. (ie sort) 
 	- [x] Use of  instance.execute/__str__.__doc__
 - [x] Wrap custom actions and UserTypeParser in a `private` dir
@@ -47,6 +47,7 @@ You may want to see some screens records, documentation or even a features tour,
 	- [x] TSV to Markdown Table
 	- [x] Domain and Url to base URL
 	- [x] Domain to IP
+	- [x] Certificate for a domain (crt.sh)
 	- [x] IP to ASN
 	- [x] Extract elements from HTML
 	- [ ] Markdown Table to TSV
@@ -55,7 +56,7 @@ You may want to see some screens records, documentation or even a features tour,
 	- [x] Append per line
 	- [x] Regex select or unselect
 	- [ ] Regex Highlighter
-	- [ ] Regex substitution
+	- [x] Regex substitution
 	- [x] Remove empty lines (Filter with [^.])
 	- [x] Stats/Counts per lines
 	- [x] Reverse sort 
@@ -64,6 +65,8 @@ You may want to see some screens records, documentation or even a features tour,
 	- [x] Search in Yeti
  	- [x] Add in Yeti 	
 	- [x] Select top N lines
+	- [x] Search in URLScan
+	- [x] Serach in VT
 	- [x] URL open
 	- [ ] Url redirect chain
 	- [x] Url to Html
@@ -73,6 +76,7 @@ You may want to see some screens records, documentation or even a features tour,
 	- [x] For HTML
 	- [x] For JSON
 	- [x] For Yaml
+	- [x] For analytics Identifiers (ie Google Analytics)
 	- [x] For CVE Number
 	- [ ] For RFC Number
 	- [ ] For uuid
@@ -99,6 +103,15 @@ You may want to see some screens records, documentation or even a features tour,
 - [x] Requirement.txt
 - [ ] Save action with file input (need to implement modal, have to check textual discord).
 - [ ] Write python script/template to generate custom Parser/Action
+
+
+# Generate documentation
+
+```python
+pip install mkdocs mkdocs-gen-files mkdocs-material mkdocs-autorefs mkdocstrings-python
+mkdocs gh-deploy
+```
+
 
 # Thanks to and similar project:
 
