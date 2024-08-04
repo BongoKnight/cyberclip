@@ -6,7 +6,7 @@ from rich.markdown import Markdown
 import pyperclip
 
 
-MARKUP_TYPES = ["bash","c","c++","csharp","css","go","html","java","javascript","json","markdown","matlab","perl","php","python","ruby","rust","sql","xml","yaml"]
+MARKUP_TYPES = ["bash","c","c++","csharp","css","go","html","java","javascript","json","markdown","perl","php","python","ruby","rust","sql","xml","yaml"]
 
 class ContentToolbar(Static):
 
@@ -41,4 +41,7 @@ class ContentToolbar(Static):
         from tui.ContentView import ContentView
         content_view = self.app.query_one(ContentView)
         if event.value:
-            content_view.query_one("#clip-content", TextArea).language = event.value
+            try:
+                content_view.query_one("#clip-content", TextArea).language = event.value
+            except:
+                content_view.query_one("#clip-content", TextArea).language = None

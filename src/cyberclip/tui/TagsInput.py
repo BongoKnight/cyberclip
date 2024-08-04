@@ -12,13 +12,17 @@ class TagsInput(Static):
         max-width: 100%;
         width: auto;
         layout: horizontal;
+        padding: 1;
     }
-    TagsInput Label {
+    Input {
         width: 25;
+    }
+    Label{
         margin-top: 1;
+        width: 25;
     }
     .tag-storage{
-        height:4;
+        height:5;
         align-horizontal: left;
     }
 
@@ -30,7 +34,7 @@ class TagsInput(Static):
     
     def compose(self) -> ComposeResult:
         yield Label(renderable=self.label)
-        yield Input(placeholder=f"Enter {self.label}...",classes="inputag")
+        yield Input(placeholder=f"Enter {self.label.lower()}...",classes="inputag")
         yield HorizontalScroll(*[Tag(value=value, parent_input = self) for value in self._value] ,classes="tag-storage")
     
     @on(Input.Submitted, ".inputag")
