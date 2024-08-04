@@ -21,10 +21,11 @@ class SelectionInput(Static):
         margin: 0;
     }
     """
-    def __init__(self, label : str ="", choices : list[str] ="", **kwargs):
+    def __init__(self, label : str ="", value :  list[str] = [""], choices : list[str] = [""], **kwargs):
         super().__init__(**kwargs)
         self.label = label
         self.choices = choices
+        self.default = value
     
     def _on_mount(self) -> None:
         self.query_one(SelectionList).border_title = self.label
@@ -32,7 +33,7 @@ class SelectionInput(Static):
     def compose(self) -> ComposeResult:
         yield Horizontal(
             Label(self.label, markup=False),
-            SelectionList[str](*[(str(choice), choice, False) for choice in self.choices])
+            SelectionList[str](*[(str(choice), choice, str(choice) in self.default) for choice in self.choices])
             )
 
     @property

@@ -9,14 +9,14 @@ from textual.reactive import var
 try:
     from cyberclip.tui.ActionPannel import ActionButton
     from cyberclip.tui.TagsInput import TagsInput
-    from cyberclip.tui.SimpleInput import SimpleInput
+    from cyberclip.tui.SimpleInput import SimpleInput, SimpleSelect
     from cyberclip.tui.SelectionInput import SelectionInput
     from cyberclip.tui.MultiSelect import MultiSelect
     from cyberclip.userAction import actionInterface
 except:
     from tui.ActionPannel import ActionButton
     from tui.TagsInput import TagsInput
-    from tui.SimpleInput import SimpleInput
+    from tui.SimpleInput import SimpleInput, SimpleSelect
     from tui.SelectionInput import SelectionInput
     from tui.MultiSelect import MultiSelect
     from userAction import actionInterface
@@ -40,14 +40,6 @@ class ParamScreen(Screen):
     #submit {
         height: 3;
         align-horizontal: right;
-    }
-
-    SimpleInput > Label{
-        width: 25;
-    }
-    SimpleInput, TagsInput {
-        margin: 1 1;
-        height: 5;
     }
     """
 
@@ -81,6 +73,8 @@ class ParamScreen(Screen):
             value = widget.value
             if isinstance(widget, SimpleInput):
                 params.update({key: {"value":value, "type":"text"}})
+            if isinstance(widget, SimpleSelect):
+                params.update({key: {"value":value, "type":"list", "choices":widget.choices}})
             if isinstance(widget, TagsInput):
                 params.update({key: {"value":value, "type":"tags"}})
             if isinstance(widget, SelectionInput):
@@ -107,8 +101,10 @@ class ParamScreen(Screen):
                         widgets.append(SimpleInput(label=key, value=stored_values, classes="complex-input"))
                     elif input_type.lower() == "tags":
                         widgets.append(TagsInput(label=key, value=stored_values, classes="complex-input"))
+                    elif input_type.lower() == "list":
+                        widgets.append(SimpleSelect(label=key, value=stored_values, choices=options, classes="complex-input"))
                     elif input_type.lower() == "fixedlist":
-                        widgets.append(SelectionInput(label=key, choices=options, classes="complex-input"))
+                        widgets.append(SelectionInput(label=key, value=stored_values, choices=options, classes="complex-input"))
                     elif input_type.lower() == "compactlist":
                         widgets.append(MultiSelect(label=key, options=options, classes="complex-input"))
                     elif input_type.lower() == "bool" or input_type.lower() == "boolean":

@@ -13,10 +13,8 @@ class TagsInput(Static):
         width: auto;
         layout: horizontal;
     }
-    TagsInput > Input, Label {
+    TagsInput Label {
         width: 25;
-    }
-    TagsInput > Label {
         margin-top: 1;
     }
     .tag-storage{
