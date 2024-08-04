@@ -10,7 +10,7 @@ class SearchInUrlScanAction(actionInterface):
     """A action module to search IP and domains on URLScan.  
     """
 
-    def __init__(self, parsers = {}, supportedType = {"ip","domain"}):
+    def __init__(self, parsers = {}, supportedType = {"ip","domain","analytics"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Search on UrlScan"
 
