@@ -332,9 +332,23 @@ class SelectActionnableScreen(ModalScreen):
     BINDINGS = [("escape", "app.pop_screen", "Escape selection screen.")]
 
     def compose(self) -> ComposeResult:
-        self.app.recipe_parser.load_all()
+        yield Vertical(
+            Select([], allow_blank=True),
+            Horizontal(
+                Button("Save params", variant="primary", id="save"),
+                Button("Cancel", variant="error", id="cancel"), id="submit"
+            ),
+            id="dialog"
+        )
+
+
+
+    async def on_mount(self) -> None:
+        self.query_one("#dialog").border_title = "Select an action"
+        await self.app.recipe_parser.load_all()
         actions = list(self.app.recipe_parser.actions.values())
         parsers = list(self.app.recipe_parser.parsers.values())
+        self.notify("\n".join([str(action.__class__) for action in actions]))
         actionnables = actions + parsers
         actionnable_tupples = []
         for actionnable in actionnables:
@@ -346,19 +360,9 @@ class SelectActionnableScreen(ModalScreen):
                 actionnable_tupples.append((actionnable_desc.description, actionnable_desc))
         if actionnable_tupples:
             actionnable_tupples.sort(key=lambda x : x[0])
-        yield Vertical(
-            Select(actionnable_tupples, allow_blank=False),
-            Horizontal(
-                Button("Save params", variant="primary", id="save"),
-                Button("Cancel", variant="error", id="cancel"), id="submit"
-            ),
-            id="dialog"
-        )
-
-
-
-    def on_mount(self) -> None:
-        self.query_one("#dialog").border_title = "Select an action"
+        select = self.query_one(Select)
+        select.set_options(actionnable_tupples)
+        select._allow_blank = False
 
 
     def on_button_pressed(self, event: Button.Pressed) -> None:

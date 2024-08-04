@@ -94,6 +94,7 @@ class actionInterface():
             return config
         else:
             return ""
+        
 
     def execute(self) -> dict:
         """Execute the action
