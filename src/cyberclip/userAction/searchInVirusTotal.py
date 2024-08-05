@@ -13,7 +13,7 @@ import requests
 DEFAULT_PARAMS = {
                 "Analysis fields":{
                     "type":"tags",
-                    "value":["$.data.attributes.last_analysis_stats.malicious","$.data.attributes.tags","$.data.attributes.meaningful_name","$.data.attributes.magic","$.data.attributes.size","$.data.attributes.jarm","$.data.attributes.asn"]
+                    "value":["$.data.attributes.last_analysis_stats.malicious","$.data.attributes.tags","$.data.attributes.first_submission_date","$.data.attributes.creation_date","$.data.attributes.reputation","$.data.attributes.meaningful_name","$.data.attributes.magic","$.data.attributes.size","$.data.attributes.jarm","$.data.attributes.asn"]
                     }
                 }
 
