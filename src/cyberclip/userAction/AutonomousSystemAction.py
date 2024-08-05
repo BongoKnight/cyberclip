@@ -12,14 +12,15 @@ try:
 except:
     from actionInterface import actionInterface
 
-AS_DB = pd.DataFrame()
-AS_IPv6_DB = pd.DataFrame()
-AS_RANGE = pd.DataFrame()
+AS_DB = None
+AS_IPv6_DB = None
+AS_RANGE = None
 
 def get_AS_data():
     global AS_DB, AS_RANGE
     file_name = os.path.join("as.gz")
     if not os.path.exists(file_name) or (time.time() - os.path.getmtime(file_name) ) / 3600 > 24*7:
+        print("Getting data...")
         try:
             url = "https://iptoasn.com/data/ip2asn-v4-u32.tsv.gz"
             response = requests.get(url, stream=True)
@@ -29,11 +30,12 @@ def get_AS_data():
         except Exception as e:
             print("Error while retriving database from IpToASN")
     try: 
-        AS_DB = pd.read_csv(file_name, header=None, sep="\t", compression="gzip")
-        AS_DB.rename(columns={0:"min_ip",1:"max_ip",2:"as_num",3:"as_loc",4:"as_info"}, inplace=True)
-        AS_DB["CIDRS"] = AS_DB.apply(lambda row: [i for i in ipaddress.summarize_address_range(
-            ipaddress.ip_address(row["min_ip"]),
-            ipaddress.ip_address(row["max_ip"]))], axis=1)
+        if not AS_DB:
+            AS_DB = pd.read_csv(file_name, header=None, sep="\t", compression="gzip")
+            AS_DB.rename(columns={0:"min_ip",1:"max_ip",2:"as_num",3:"as_loc",4:"as_info"}, inplace=True)
+            AS_DB["CIDRS"] = AS_DB.apply(lambda row: [i for i in ipaddress.summarize_address_range(
+                ipaddress.ip_address(row["min_ip"]),
+                ipaddress.ip_address(row["max_ip"]))], axis=1)
     except Exception as e:
         print("Error while loading AS database")
     return AS_DB
@@ -51,19 +53,18 @@ def get_IPv6_AS_data():
         except Exception as e:
             print("Error while retriving database from IpToASN")
     try: 
-        AS_IPv6_DB = pd.read_csv(file_name, header=None, sep="\t", compression="gzip")
-        AS_IPv6_DB.rename(columns={0:"min_ip",1:"max_ip",2:"as_num",3:"as_loc",4:"as_info"}, inplace=True)
-        AS_IPv6_DB["min_ip"] =  AS_IPv6_DB["min_ip"].apply(ipaddress.ip_address)
-        AS_IPv6_DB["max_ip"] =  AS_IPv6_DB["max_ip"].apply(ipaddress.ip_address)
-        AS_IPv6_DB["CIDRS"] = AS_IPv6_DB.apply(lambda row: [i for i in ipaddress.summarize_address_range(
-            row["min_ip"],
-            row["max_ip"])], axis=1)
+        if not AS_IPv6_DB:
+            AS_IPv6_DB = pd.read_csv(file_name, header=None, sep="\t", compression="gzip")
+            AS_IPv6_DB.rename(columns={0:"min_ip",1:"max_ip",2:"as_num",3:"as_loc",4:"as_info"}, inplace=True)
+            AS_IPv6_DB["min_ip"] =  AS_IPv6_DB["min_ip"].apply(ipaddress.ip_address)
+            AS_IPv6_DB["max_ip"] =  AS_IPv6_DB["max_ip"].apply(ipaddress.ip_address)
+            AS_IPv6_DB["CIDRS"] = AS_IPv6_DB.apply(lambda row: [i for i in ipaddress.summarize_address_range(
+                row["min_ip"],
+                row["max_ip"])], axis=1)
     except Exception as e:
         print("Error while loading AS database")
     return AS_IPv6_DB
 
-get_AS_data()
-get_IPv6_AS_data()
 
 class AsToCidrAction(actionInterface):
     """Return a list of CIDR depending of an Autonomous System.
@@ -74,6 +75,8 @@ class AsToCidrAction(actionInterface):
         self.description = "AS Number to CIDR"
 
     def execute(self) -> object:
+        get_AS_data()
+        get_IPv6_AS_data()
         self.observables = self.get_observables()
         if self.observables.get("asnum", []):
             if len(AS_DB.columns):
@@ -112,6 +115,8 @@ class AsInformationAction(actionInterface):
         self.description = "AS Number information"
 
     def execute(self) -> object:
+        get_AS_data()
+        get_IPv6_AS_data()
         self.observables = self.get_observables()
         if self.observables.get("asnum", []):
             if len(AS_DB.columns):
@@ -154,6 +159,8 @@ class IpToAsAction(actionInterface):
         self.description = "IP to AS Number"
 
     def execute(self) -> object:
+        get_AS_data()
+        get_IPv6_AS_data()
         self.observables = self.get_observables()
         if self.observables.get("ip", []):
             if len(AS_DB.columns):
