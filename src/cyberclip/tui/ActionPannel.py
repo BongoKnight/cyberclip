@@ -3,7 +3,7 @@ import time
 import asyncio
 import traceback
 
-from textual import on
+from textual import on, work
 from textual.reactive import var
 from textual.containers import  VerticalScroll
 from textual.widgets import Static, Button, Input, TabbedContent
@@ -43,7 +43,7 @@ class ActionButton(Static):
         from .ModalParamScreen import ParamScreen
         from .ContentView import ContentView
         if not self.action.complex_param :
-            self.update_text()
+            self.app.text = await self.app.parser.apply_actionable(self.action, self.app.text)
         else :
             param_screen = ParamScreen()
             param_screen.border_title = f"Parameters for '{self.action.description}' action."
@@ -52,15 +52,6 @@ class ActionButton(Static):
                 self.app.push_screen(param_screen, partial(self.app.handle_param, self.action))
             except:
                 self.app.notify(f"Error while executing action : {traceback.format_exc()}", severity="error")
-
-    def update_text(self):
-        from .ContentView import ContentView
-        contentView = self.app.query_one(ContentView)
-        if contentView:
-            try:
-                self.app.text = str(self.action)
-            except Exception as e:
-                self.app.notify(f"Error : {e}", severity="error",timeout=5)
 
 
 class ActionCommands(Provider):
@@ -81,21 +72,28 @@ class ActionCommands(Provider):
         
         if self.app.query_one(TabbedContent).active == "clipview":
             if contentview := self.app.query_one(ContentView):
+                self.app.parser.parseData(self.app.text)
                 if  "Action" in actionable.__module__ :
-                    if not actionable.complex_param :
-                        try:
-                            self.app.handle_param(actionable)
-                        except Exception as e:
-                            self.app.notify("Error while applying recipe..." + str(e) + traceback.format_exc(), severity="error")
-                    else:
-                        param_screen = ParamScreen()
-                        param_screen.border_title = f"Parameters for '{actionable.description}' action."
-                        param_screen.action = actionable
-                        await self.app.push_screen(param_screen, partial(self.app.handle_param, actionable))
+                    for desc, action in self.app.parser.actions.items():
+                        if desc == actionable.description:
+                            if not action.complex_param :
+                                try:
+                                    self.app.handle_param(action)
+                                except Exception as e:
+                                    self.app.notify("Error while applying recipe..." + str(e) + traceback.format_exc(), severity="error")
+                            else:
+                                param_screen = ParamScreen()
+                                param_screen.border_title = f"Parameters for '{action.description}' action."
+                                param_screen.action = action
+                                await self.app.push_screen(param_screen, partial(self.app.handle_param, action))
                 elif "Parser" in actionable.__module__:
-                    self.app.text = "\r\n".join(actionable.extract())
+                    for parsertype, parser in self.app.parser.parsers.items():
+                        if parsertype == actionable.parsertype:
+                            self.app.text = "\r\n".join(parser.extract())
+                            break
                 elif isinstance(actionable, Recipe):
                     try:
+                        self.app.recipe_parser.load_all()
                         self.app.text = await actionable.execute_recipe(self.app)
                     except Exception as e:
                         self.app.notify("Error while applying recipe: " + str(e) + traceback.format_exc(), severity="error")
@@ -115,7 +113,7 @@ class ActionCommands(Provider):
                                 dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.app.parser.apply_actionable(actionable, str(text)) for text in dataframe.datatable.df[column_name]))
                                 dataframe.datatable.update_displayed_df(dataframe.datatable.df)
                         except Exception as e:
-                            self.app.notify("Action took too long to execute (2)..." + str(e), severity="error")
+                            self.app.notify("Error executing action: " + str(e), severity="error")
                     else:
                         param_screen = ParamScreen()
                         param_screen.border_title = f"Parameters for '{actionable.description}' action."
@@ -132,16 +130,17 @@ class ActionCommands(Provider):
                             #dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: asyncio.get_running_loop().create_task(self.app.parser.apply_actionable(actionable, str(text))).result(), na_action="ignore")
                             dataframe.datatable.update_displayed_df(dataframe.datatable.df, replace_df=True)
                     except Exception as e:
-                        self.app.notify("Parser took too long to execute: " + str(e), severity="error")
+                        self.app.notify("Error while applying parser: " + str(e), severity="error")
                 elif isinstance(actionable, Recipe):
                     new_column_name = dataframe.datatable.get_column_name(f"{actionable.name}_{column_name}")
                     try:
                         self.app.notify("Applying recipe to a dataframe could take some times.")
-                        async with asyncio.timeout(30):
+                        async with asyncio.timeout(120):
+                            self.app.recipe_parser.load_all()
                             dataframe.datatable.df[new_column_name] = await asyncio.gather(*[actionable.execute_recipe(self.app, text=text) for text in dataframe.datatable.df[column_name]])
                             dataframe.datatable.update_displayed_df(dataframe.datatable.df, replace_df=True)
                     except Exception as e:
-                        self.app.notify("Recipe took too long to execute: " + str(e), severity="error")
+                        self.app.notify("Error while applying recipe: " + str(e), severity="error")
 
     async def startup(self) -> None:  
         """Called once when the command palette is opened, prior to searching."""
@@ -233,14 +232,8 @@ class ActionPannel(Static):
 
     def on_input_changed(self, event: Input.Changed) -> None:
         from .ContentView import ContentView
-        actions = self.query(ActionButton)
-        self.app.actions = self.app.query_one(ContentView).filter_action()
-        for action in actions:
-            for word in event.value.split():
-                if not re.search(f"(?i){word}", action.action.description, re.IGNORECASE):
-                    if not word in action.action.supportedType:
-                        action.visible = False
-                        action.add_class("no-height")
+        self.app.query_one(ContentView).filter_action(text=event.value)
+
 
     def clean_filter(self):
         self.query_one(Input).value = ""

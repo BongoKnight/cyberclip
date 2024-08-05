@@ -59,11 +59,11 @@ class DataLoader(Static):
         from tui.ContentView import ContentView
         if event.button.id == "update-button":
             self.data = get_clipboard_text()
-            mainApp = self.ancestors[-1].query_one(ContentView)
+            mainApp = self.app.query_one(ContentView)
             if mainApp:
                 self.app.text = self.data
         if event.button.id == "text-update-button":
-            mainApp = self.ancestors[-1].query_one(ContentView)
+            mainApp = self.app.query_one(ContentView)
             self.data = mainApp.query_one(TextArea).text
             if mainApp: 
                 self.app.text = self.data

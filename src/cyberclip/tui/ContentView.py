@@ -1,4 +1,5 @@
-import pyperclip
+import re
+
 from textual import events, work, on
 from textual.reactive import var, reactive
 from textual.containers import  Vertical, ScrollableContainer
@@ -51,7 +52,7 @@ class ContentView(Static):
                         if datatype_button.parser_type in action_button.action_supported_type:
                             action_button.action.supportedType.discard(datatype_button.parser_type)
             
-            self.app.actions = []
+            filter_text = self.app.query_one(ActionPannel).query_one(Input).value
             for action_button in actions:
                 if  (len(action_button.action.supportedType.intersection(actual_detected_type)) >=1
                     and len(action_button.action.supportedType.intersection(action_button.action_supported_type)) >= 1
@@ -59,6 +60,12 @@ class ContentView(Static):
                     action_button.visible = True
                     action_button.remove_class("no-height")
                     self.app.actions.append(action_button)
+                    if filter_text:
+                        for word in filter_text.split():
+                            if not re.search(f"(?i){word}", action_button.action.description, re.IGNORECASE):
+                                if not word in action_button.action.supportedType:
+                                    action_button.visible = False
+                                    action_button.add_class("no-height")
                 else:
                     action_button.visible = False
                     action_button.add_class("no-height")
@@ -68,9 +75,8 @@ class ContentView(Static):
         from tui.DataTypePannel import DataTypeButton, DataLoader
         from tui.ActionPannel import ActionPannel, ActionButton
         textArea = self.query_one(TextArea)
-        textArea.replace(str(new_text), (0,0), (textArea.document.line_count, len(textArea.document.get_line(textArea.document.line_count-1))))
-        
         self.app.parser.parseData(new_text)
+        textArea.replace(str(new_text), (0,0), (textArea.document.line_count, len(textArea.document.get_line(textArea.document.line_count-1))))
         parser_types = self.app.parser.detectedType
         # Update detected type buttons
         buttons = self.parent.query(DataTypeButton)
@@ -78,10 +84,7 @@ class ContentView(Static):
             for button in buttons:
                 button.remove()
         for type_of_data in parser_types:
-            if type_of_data == "text":
-                self.parent.query_one(DataLoader).add_dataType(type_of_data, active=False)
-            else:
-                self.parent.query_one(DataLoader).add_dataType(type_of_data, active=True)
+            self.parent.query_one(DataLoader).add_dataType(type_of_data, active=True)
         existing_action = set()
         for action_name, action in self.app.parser.actions.items():
             for action_button in self.parent.query(ActionButton):
@@ -89,7 +92,9 @@ class ContentView(Static):
                     existing_action.add(action_name)            
 
         # Add inexisting action buttons
-        for action_name, action in self.app.parser.actions.items():
+        actions = list(self.app.parser.actions.items())
+        actions.sort(key=lambda tup: tup[0])
+        for action_name, action in actions:
             if  action_name not in existing_action:
                 self.parent.query_one(ActionPannel).add_action(action)
 
@@ -97,7 +102,6 @@ class ContentView(Static):
             action.action.supportedType = set(action.action_supported_type)
             action.action.parsers = self.app.parser.parsers
            
-
         # Filter action on existing active datatype
         self.app.call_after_refresh(self.filter_action)
         
