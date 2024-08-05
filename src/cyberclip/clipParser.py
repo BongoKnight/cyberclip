@@ -12,7 +12,15 @@ import os
 import logging
 from pathlib import Path
 
-        
+from rich.logging import RichHandler
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    datefmt='[%X]',
+    handlers=[],
+    )
+
 class clipParser():
     
     def __init__(self, include="", exclude=""):
@@ -24,23 +32,9 @@ class clipParser():
         self.results = {}
         self.matches = {}
         self.detectedType = set()
-
-        logging.basicConfig(filename="log.log")
-        self.log = logging.Logger("DataParser")
-        self.ch = logging.StreamHandler()
-        self.ch.setLevel(logging.INFO)
-        # create formatter
-        self.formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %I:%M:%S')
-        
-        # add formatter to ch
-        self.ch.setFormatter(self.formatter)
-        self.log.addHandler(self.ch)
-
-        self.parserModuleImport = self.moduleLoader(userTypeParser, 'userTypeParser')
-        self.privateParserModuleImport = self.moduleLoader(userTypeParser.private, 'userTypeParser.private')
-        self.ActionModuleImport = self.moduleLoader(userAction, 'userAction')
-        self.privateActionModuleImport = self.moduleLoader(userAction.private, 'userAction.private') 
-
+        self.log = logging.getLogger(__name__)
+        self.log.addHandler(RichHandler(rich_tracebacks=True, markup=True, level=logging.INFO))
+        self.log.info("ClipParser created.")
     def moduleLoader(self, module_instance, module_name, include=".", exclude=""):
         """
         Load all class defined in `module_name` directory.
@@ -72,6 +66,10 @@ class clipParser():
         self.parsers = dict()
         self.actions = dict()
         data = ""
+        self.parserModuleImport = self.moduleLoader(userTypeParser, 'userTypeParser')
+        self.privateParserModuleImport = self.moduleLoader(userTypeParser.private, 'userTypeParser.private')
+        self.ActionModuleImport = self.moduleLoader(userAction, 'userAction')
+        self.privateActionModuleImport = self.moduleLoader(userAction.private, 'userAction.private') 
 
         # Load all parsers
         parserModules = dict((name, m) for name, m
@@ -106,57 +104,28 @@ class clipParser():
                         self.actions.update({instance.description : instance})
                         self.log.debug("Text might trigger an action : {}".format(instance.description))
 
+
     def parseData(self, data):
         """
         Handle textual datas and return a dict containing matches and type of data detected.
     
         Returns
         -------
-         {"matches" : matches, "detectedType" : detectedType}
+         {"matches" : matches, "detectedType" : detectedType, "actions": actions, "parsers": parsers}
     
         """
         self.data = data
-        self.parsers = dict()
         self.matches = {}
         self.detectedType = set()
 
-        # Load all parsers
-        parserModules = dict((name, m) for name, m
-                           in getmembers(self.parserModuleImport, ismodule))
-        privateParserModules = dict((name, m) for name, m
-                           in getmembers(self.privateParserModuleImport, ismodule))
-        parserModules.update(privateParserModules)
+        for parser in self.parsers.values():
+            parser.text = data
+            if parser.contains():
+                self.detectedType.add(parser.parsertype)
+                self.matches.update({parser.parsertype: parser.extract()})
 
-        for parserModule in parserModules.keys():
-            classes = dict((name, c) for name, c 
-                           in getmembers(parserModules[parserModule], isclass))
-            for className in classes.keys():
-                if "Parser" in className:
-                    instance = classes[className](data)
-                    if instance.contains():
-                        self.matches.update({instance.parsertype: instance.extract()})
-                        # Adding parser in a dict of all parsers relative to the input
-                        self.parsers.update({instance.parsertype:instance})
-                        self.log.debug("Text contains {}".format(instance.parsertype))
-                        self.detectedType.add(instance.parsertype)
-
-        # Load all actions
-        actionModules = dict((name, m) for name, m
-                    in getmembers(self.ActionModuleImport, ismodule))
-        privateActionModules = dict((name, m) for name, m
-                    in getmembers(self.privateActionModuleImport, ismodule))
-        actionModules.update(privateActionModules)
-
-        for actionModule in actionModules.keys():
-            classes = dict((name, c) for name, c 
-                           in getmembers(actionModules[actionModule], isclass))
-            for className in classes.keys():
-                if "Action" in className:
-                    instance = classes[className](self.parsers)
-                    if hasattr(instance, "description"):
-                        # Adding action in a dict of all parsers relative to the input
-                        self.actions.update({instance.description : instance})
-                        self.log.debug("Text might trigger an action : {}".format(instance.description))
+        for action in self.actions.values():
+            action.parsers.update({parsertype:parser for parser, parsertype in self.parsers.items() if parsertype in action.supportedType})
 
         self.results = {"matches" : self.matches, "detectedType" : self.detectedType, "actions": self.actions, "parsers":self.parsers}
         return self.results
@@ -198,7 +167,6 @@ class clipParser():
 
 if __name__=='__main__':
     a = clipParser()
-    a.log.level = logging.debug
     data = "127.0.0.1, 124.0.12.23  user@domain.com aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     print(a.parseData(data))
 

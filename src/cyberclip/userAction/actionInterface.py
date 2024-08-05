@@ -83,7 +83,7 @@ class actionInterface():
         self.results = {}
         for parser_name, parser in self.parsers.items():
             if parser.parsertype in self.supportedType:
-                self.observables[parser.parsertype]=parser.extract()
+                self.observables[parser.parsertype] = parser.extract()
         return self.observables
     
     def get_param_value(self, config_name):
