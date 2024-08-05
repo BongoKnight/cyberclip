@@ -67,9 +67,8 @@ class ClipBrowser(App):
     ]
     CLOSE_TIMEOUT = None
 
-    parser = var(clipParser(exclude="."))
-    recipe_parser = var(clipParser(exclude="."))
-    #parser = var(clipParser())
+    parser = var(clipParser())
+    recipe_parser = var(clipParser())
     text = reactive("Waiting for Update...")
     try:
         with open(Path(__file__).parent / 'data/recipes.yml', "r", encoding="utf8") as f:
@@ -85,6 +84,7 @@ class ClipBrowser(App):
     async def on_mount(self):
         await self.parser.load_all()
         await self.recipe_parser.load_all()
+        self.app.notify(f"Parsers chargés: {len(self.parser.parsers.keys())}\nActions chargées: {len(self.parser.actions.keys())}")
 
     def compose(self) -> ComposeResult:
         """Compose the main UI. Generate three tabs corresponding to the three modes of the application :
@@ -131,13 +131,6 @@ class ClipBrowser(App):
         filter = self.app.query_one("#action-filter").focus()
         filter.value = ""
 
-    async def on_mount(self):
-        asyncio.create_task(self.update_parsers())
-
-    async def update_parsers(self):
-        self.parser = clipParser()
-        self.recipe_parser = clipParser()
-
     @property
     def contentview(self):
         return self.query_one(ContentView)
@@ -171,12 +164,12 @@ class ClipBrowser(App):
         self.query_one(ContentView).filter_action()
 
     @work(exclusive=True)
-    async def handle_param(self, action : actionInterface ,  complex_param : dict | None = None, recipe_parser : bool = False,):
+    async def handle_param(self, action : actionInterface ,  complex_param : dict | None = None, recipe_parser : bool = False):
         if complex_param :
             action.complex_param = complex_param
         if self.query_one("#maintabs", TabbedContent).active == "clipview":
             try:
-                self.text = await self.parser.apply_actionable(action, text=self.text)
+                self.text = await self.parser.apply_actionable(action, self.text)
             except Exception as e:
                 self.app.notify("Error applying action..." + str(e) + traceback.format_exc(), severity="error")  
         elif self.query_one("#maintabs", TabbedContent).active == "tableview":

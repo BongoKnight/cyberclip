@@ -114,7 +114,6 @@ class Recipe:
         else:
             new_text = text
         app.recipe_parser.parseData(new_text)
-        await app.recipe_parser.load_all()
         if step_index < nb_step:
             step = self.steps[step_index]
             if step.find_actionnable(app, step.actionnableName):
@@ -345,10 +344,8 @@ class SelectActionnableScreen(ModalScreen):
 
     async def on_mount(self) -> None:
         self.query_one("#dialog").border_title = "Select an action"
-        await self.app.recipe_parser.load_all()
         actions = list(self.app.recipe_parser.actions.values())
         parsers = list(self.app.recipe_parser.parsers.values())
-        self.notify("\n".join([str(action.__class__) for action in actions]))
         actionnables = actions + parsers
         actionnable_tupples = []
         for actionnable in actionnables:

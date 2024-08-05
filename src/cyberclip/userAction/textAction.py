@@ -252,6 +252,7 @@ class toplLinesAction(actionInterface):
         if self.observables.get("text"):
             lines = self.observables.get("text")[0].splitlines()
             return "\n".join([i for i in lines[:min(int(nb), len(lines))]])
+        return ""
 
     
     def __str__(self):

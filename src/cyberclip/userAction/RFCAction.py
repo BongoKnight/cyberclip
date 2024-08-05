@@ -39,3 +39,7 @@ class RFCExplainerAction(actionInterface):
             results.append(text)
         return  "\r\n\r\n".join(results)
 
+if __name__=='__main__':
+    from userTypeParser.RFCParser import RFCParser
+    parser = RFCParser("RFC 2646")
+    print(RFCExplainerAction(parsers={"rfc":parser}))

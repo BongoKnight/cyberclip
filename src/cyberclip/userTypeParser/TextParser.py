@@ -31,6 +31,6 @@ class TextParser(ParserInterface):
         
 if __name__=="__main__":
     a = TextParser("1.3.4.5")
-    b = TextParser("toto")
+    b = TextParser("")
     print(a.extract(), a.contains())
     print(b.extract(), b.contains())

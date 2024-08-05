@@ -44,7 +44,7 @@ class ParamScreen(Screen):
     """
 
     action : actionInterface = var(None)
-    BINDINGS = [("escape", "app.pop_screen", "Escape config screen.")]
+    BINDINGS = [("escape", "app.pop_screen", "Escape config screen."),("ctrl+s", "submit", "Submit")]
 
     def compose(self) -> ComposeResult:
         yield Vertical(
@@ -59,6 +59,8 @@ class ParamScreen(Screen):
     def on_mount(self) -> None:
         self.query_one("#dialog").border_title = self.action.description
 
+    def action_submit(self) -> None:
+        self.dismiss(result=self.return_parameters())
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "cancel":
