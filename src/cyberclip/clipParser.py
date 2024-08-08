@@ -18,18 +18,16 @@ from pathlib import Path
 
 from rich.logging import RichHandler
 
-
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s %(levelname)s %(funcName)s %(message)s",
-    datefmt='[%X]',
-    handlers=[],
-    )
-
 class clipParser():
     
     def __init__(self, include="", exclude=""):
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format="%(asctime)s %(levelname)s %(funcName)s %(message)s",
+            datefmt='[%X]',
+            handlers=[],
+            )
+
         self.actions = dict()
         self.parsers = dict()
         self.include = include
@@ -39,7 +37,7 @@ class clipParser():
         self.matches = {}
         self.detectedType = set()
         self.log = logging.getLogger(__name__)
-        self.log.addHandler(RotatingFileHandler(filename="C://Users/KTLT9976/Documents/cyberclip/log.log", maxBytes=10*1024*1024))
+        self.log.handlers = [RotatingFileHandler(filename="C://Users/KTLT9976/Documents/cyberclip/log.log", maxBytes=5*1024*1024, backupCount=1)]
         # self.log.addHandler(RichHandler(rich_tracebacks=True, markup=True, level=logging.INFO))
         self.log.info("ClipParser created.")
 

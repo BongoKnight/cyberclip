@@ -142,7 +142,7 @@ class ClipBrowser(App):
             parser = TSVParser.tsvParser(self.text)
             if parser.extract():            
                 try:
-                    df = pd.read_csv(StringIO(self.text), sep="\t",header=None)
+                    df = pd.read_csv(StringIO(self.text), sep="\t", header=None, skip_blank_lines=False)
                     df.columns = [str(i) for i in df.columns]
                     self.app.call_after_refresh(self.update_dataframe, df)
                 except Exception as e:

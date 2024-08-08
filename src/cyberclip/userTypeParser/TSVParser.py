@@ -22,9 +22,9 @@ class tsvParser(ParserInterface):
     def contains(self):
         """Return true if text contains TSV data in at least two columns."""
         try:
-            df = pd.read_csv(StringIO(self.text),sep="\t")
+            df = pd.read_csv(StringIO(self.text),sep="\t", skip_blank_lines=False)
             self.objects = df
-            if len(df.columns) > 1:
+            if len(df.columns) >= 1:
                 return True
             else:
                 return False
