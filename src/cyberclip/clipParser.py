@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from inspect import getmembers, isfunction, isclass, ismodule, iscode
+import traceback
+
+
 import userTypeParser
 import userTypeParser.private
 
@@ -10,13 +13,16 @@ import userAction.private
 import re
 import os
 import logging
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from rich.logging import RichHandler
 
+
+
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(message)s",
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(funcName)s %(message)s",
     datefmt='[%X]',
     handlers=[],
     )
@@ -33,8 +39,11 @@ class clipParser():
         self.matches = {}
         self.detectedType = set()
         self.log = logging.getLogger(__name__)
-        self.log.addHandler(RichHandler(rich_tracebacks=True, markup=True, level=logging.INFO))
+        self.log.addHandler(RotatingFileHandler(filename="C://Users/KTLT9976/Documents/cyberclip/log.log", maxBytes=10*1024*1024))
+        # self.log.addHandler(RichHandler(rich_tracebacks=True, markup=True, level=logging.INFO))
         self.log.info("ClipParser created.")
+
+
     def moduleLoader(self, module_instance, module_name, include=".", exclude=""):
         """
         Load all class defined in `module_name` directory.
@@ -51,7 +60,7 @@ class clipParser():
             if self.verify_filename(file):
                 module_mainname = file.split(".")[0]
                 modules.append(module_mainname)
-                self.log.info(f"Importing {module_mainname} from {module_name}")
+                # self.log.info(f"Importing {module_mainname} from {module_name}")
                 # import all parser parserModule from file
                 try:
                     modules_imports = __import__(f'{module_name}',fromlist=modules)
@@ -63,6 +72,7 @@ class clipParser():
         return classes[class_name](arg)
 
     async def load_all(self):
+        self.log.debug("Initiate parser and action loading." )
         self.parsers = dict()
         self.actions = dict()
         data = ""
@@ -82,7 +92,7 @@ class clipParser():
             classes = dict((name, c) for name, c 
                            in getmembers(parserModules[parserModule], isclass))
             for className in classes.keys():
-                if "Parser" in className:
+                if "Parser" in className and "ParserInterface" not in className:
                     instance = await self.create_instance(classes, className, data)
                     self.parsers.update({instance.parsertype:instance})
 
@@ -97,12 +107,11 @@ class clipParser():
             classes = dict((name, c) for name, c 
                            in getmembers(actionModules[actionModule], isclass))
             for className in classes.keys():
-                if "Action" in className:
+                if "Action" in className and not "ActionInterface" in className:
                     instance = await self.create_instance(classes, className, self.parsers)
                     if hasattr(instance, "description"):
                         # Adding action in a dict of all parsers relative to the input
                         self.actions.update({instance.description : instance})
-                        self.log.debug("Text might trigger an action : {}".format(instance.description))
 
 
     def parseData(self, data):
@@ -114,23 +123,30 @@ class clipParser():
          {"matches" : matches, "detectedType" : detectedType, "actions": actions, "parsers": parsers}
     
         """
+        self.log.debug("Parsing data")
         self.data = data
         self.matches = {}
         self.detectedType = set()
 
-        for parser in self.parsers.values():
-            parser.text = data
-            if parser.contains():
-                self.detectedType.add(parser.parsertype)
-                self.matches.update({parser.parsertype: parser.extract()})
+        if data:
+            for parsertype, parser in self.parsers.items():
+                parser.text = data
+                if parser.contains():
+                    self.detectedType.add(parsertype)
+                    self.matches.update({parsertype: parser.extract()})
 
-        for action in self.actions.values():
-            action.parsers.update({parsertype:parser for parser, parsertype in self.parsers.items() if parsertype in action.supportedType})
-
+            for action in self.actions.values():
+                action.parsers = {}
+                for parsertype, parser in self.parsers.items():
+                    if parsertype in action.supportedType and parsertype in self.detectedType:
+                        # self.log.debug(f"Add parser: {parser.__class__}")
+                        action.parsers.update({parsertype:parser})
+            self.log.debug(f"Parsed data: {data[0:min(100,len(data))]}")        
         self.results = {"matches" : self.matches, "detectedType" : self.detectedType, "actions": self.actions, "parsers":self.parsers}
         return self.results
     
     async def apply_actionable(self, actionable, text, complex_param = {}) -> str:
+        self.log.info(f"Applying {actionable.__class__}")
         self.parseData(text)
         if  "Action" in actionable.__module__ :
             if action := self.actions.get(actionable.description):
@@ -138,7 +154,10 @@ class clipParser():
                     action.complex_param = complex_param
                 if actionable.complex_param:
                     action.complex_param = actionable.complex_param
+                self.log.debug(f"Action params : {actionable.complex_param}")
+                self.log.debug(f"Action parsers : {",".join([str(parser.__class__) for parser in actionable.parsers.values()])}")
                 result = str(action)
+                self.log.debug(f"Action result : {result}")
                 if isinstance(result, str):
                     return result
                 elif isinstance(result, dict) and (mergedresult := result.get(text)):
@@ -148,6 +167,7 @@ class clipParser():
         elif "Parser" in actionable.__module__:
             if parser := self.parsers.get(actionable.parsertype):
                 return ", ".join(parser.extract())
+        return "Action or parser not found"
 
     def verify_filename(self, file):
         is_valid = True
@@ -165,8 +185,4 @@ class clipParser():
                 is_valid = True
         return is_valid
 
-if __name__=='__main__':
-    a = clipParser()
-    data = "127.0.0.1, 124.0.12.23  user@domain.com aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    print(a.parseData(data))
 

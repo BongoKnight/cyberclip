@@ -57,16 +57,13 @@ class DataLoader(Static):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Event handler called when a button is pressed."""
         from tui.ContentView import ContentView
+        textArea = self.app.query_one(ContentView).query_one(TextArea)
         if event.button.id == "update-button":
             self.data = get_clipboard_text()
-            mainApp = self.app.query_one(ContentView)
-            if mainApp:
-                self.app.text = self.data
         if event.button.id == "text-update-button":
-            mainApp = self.app.query_one(ContentView)
-            self.data = mainApp.query_one(TextArea).text
-            if mainApp: 
-                self.app.text = self.data
+            self.data = textArea.text
+        if textArea: 
+            self.app.text = self.data
         if event.button.id == "filter-button":
             self.select_all_datatype = not  self.select_all_datatype 
             for switch in self.query(Switch):

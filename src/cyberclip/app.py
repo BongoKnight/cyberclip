@@ -13,7 +13,7 @@ from textual._path import CSSPathType
 from textual.app import App, CSSPathType, ComposeResult
 from textual.containers import Grid
 from textual.driver import Driver
-from textual.widgets import Footer, TabbedContent, TabPane, Label
+from textual.widgets import Footer, TabbedContent, TabPane, TextArea
 
 try:
     from cyberclip.tui.ConfigScreen import ConfigScreen
@@ -84,7 +84,7 @@ class ClipBrowser(App):
     async def on_mount(self):
         await self.parser.load_all()
         await self.recipe_parser.load_all()
-        self.app.notify(f"Parsers chargés: {len(self.parser.parsers.keys())}\nActions chargées: {len(self.parser.actions.keys())}")
+        # self.app.notify(f"Parsers chargés: {len(self.parser.parsers.keys())}\nActions chargées: {len(self.parser.actions.keys())}")
 
     def compose(self) -> ComposeResult:
         """Compose the main UI. Generate three tabs corresponding to the three modes of the application :
@@ -146,7 +146,7 @@ class ClipBrowser(App):
                     df.columns = [str(i) for i in df.columns]
                     self.app.call_after_refresh(self.update_dataframe, df)
                 except Exception as e:
-                    self.app.notify(f"Error : {str(e)}",title="Error while loading data...",timeout=5, severity="error")
+                    self.app.notify(f"Error : {str(e)}" ,title="Error while loading data...", timeout=5, severity="error")
         if event.tab.label_text == "📝CyberClip👩‍💻":
             self.parser.parseData(self.text)
         if event.tab.label_text == "Recipes":
@@ -160,8 +160,11 @@ class ClipBrowser(App):
         tab.mount(FiltrableDataFrame(pd.DataFrame(df), id="main-table"))
 
     def watch_text(self, new_text: str) -> None:
-        self.query_one(ContentView).update_text(new_text)
-        self.query_one(ContentView).filter_action()
+        if self.text:
+            self.parser.parseData(self.text)
+            self.query_one(ContentView).update_text(new_text)
+            self.query_one(ContentView).filter_action()
+
 
     @work(exclusive=True)
     async def handle_param(self, action : actionInterface ,  complex_param : dict | None = None, recipe_parser : bool = False):

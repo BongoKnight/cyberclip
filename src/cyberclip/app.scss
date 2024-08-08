@@ -23,20 +23,18 @@ Tooltip {
 #action-container{
     column-span: 1;
     row-span: 5;
-    height: 100%;
+    height: 1fr;
 }
 #action-pannel{
     column-span: 1;
     row-span: 5;
-    height: 100%;
+    height: auto;
 }
 
 #left-pannel{
     row-span:5;
     column-span: 1;
-    height:100%;
-    row-span:5;
-
+    height:auto;
 }
 
 #data-type-container{

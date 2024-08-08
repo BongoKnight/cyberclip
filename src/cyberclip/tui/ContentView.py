@@ -75,7 +75,6 @@ class ContentView(Static):
         from tui.DataTypePannel import DataTypeButton, DataLoader
         from tui.ActionPannel import ActionPannel, ActionButton
         textArea = self.query_one(TextArea)
-        self.app.parser.parseData(new_text)
         textArea.replace(str(new_text), (0,0), (textArea.document.line_count, len(textArea.document.get_line(textArea.document.line_count-1))))
         parser_types = self.app.parser.detectedType
         # Update detected type buttons
