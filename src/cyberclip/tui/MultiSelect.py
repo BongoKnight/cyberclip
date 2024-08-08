@@ -45,7 +45,7 @@ class MultiSelect(Static):
     def compose(self) -> ComposeResult:
         yield Horizontal(
             Label(renderable=self.label, id="title"),
-            Select(self.options, prompt=self.prompt ,classes="multiselect")
+            Select(self.options, prompt=self.prompt ,classes="multiselect", allow_blank=True)
         )
     
     class Changed(Message):
@@ -74,7 +74,6 @@ class MultiSelect(Static):
 
     @on(Select.Changed)
     def switch_state(self, event: Select.Changed) -> None:
-        self.app.notify(str(event.value))
         if event.value == None:
             self.select_or_deselect_all()
         else:

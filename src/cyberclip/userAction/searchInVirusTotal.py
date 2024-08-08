@@ -4,6 +4,7 @@ except:
     from actionInterface import actionInterface
 
 from jsonpath import jsonpath
+import json
 from pathlib import Path
 from yaml.loader import SafeLoader
 import requests
@@ -79,7 +80,7 @@ class searchInVirusTotalAction(actionInterface):
         self.execute()
         text = []
         for k,v in self.results.items():
-            text.append(f"{k}\t{v}")
+            text.append(f"{k}\t{json.dumps(v,indent=None)}")
         return "\n".join(text)
 
 if __name__=='__main__':

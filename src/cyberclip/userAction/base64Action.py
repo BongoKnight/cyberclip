@@ -14,7 +14,7 @@ class B64DecodeAction(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"b64"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Base64: Decode"
-        self.decoded_b64 = []
+        self.decoded_b64 = {}
         
     def execute(self) -> object:
         self.observables = self.get_observables()

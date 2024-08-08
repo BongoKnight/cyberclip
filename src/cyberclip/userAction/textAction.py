@@ -5,6 +5,7 @@ except:
 from collections import Counter
 import re
 from datetime import datetime
+from urllib.parse import unquote, quote
 
 
 
@@ -279,6 +280,54 @@ class fromHexAction(actionInterface):
                 return bytes.fromhex(text).decode('utf-8')
             except Exception as e:
                 return "Invalid hexadecimal: " + str(e)
+        return "No text found."
+    
+    def __str__(self):
+        return  self.execute()
+    
+class UrlUnquoteAction(actionInterface):
+    """Unquote a URL encoded text."""
+    
+    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
+        self.description = "URL decode"
+        
+    def execute(self) -> object:
+        """Unquote a URL encoded text.
+        
+        Returns:
+            urllib.parse.unquote(text)
+        """
+        if self.get_observables().get("text"):
+            text = self.observables.get("text")[0]
+            try: 
+                return unquote(text)
+            except Exception as e:
+                return "Invalid URL encoding: " + str(e)
+        return "No text found."
+    
+    def __str__(self):
+        return  self.execute()
+    
+class UrlQuoteAction(actionInterface):
+    """Encode a text in an URL safe way."""
+    
+    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
+        self.description = "URL encode"
+        
+    def execute(self) -> object:
+        """Encode a text in an URL safe way.
+        
+        Returns:
+            urllib.parse.quote(text)
+        """
+        if self.get_observables().get("text"):
+            text = self.observables.get("text")[0]
+            try: 
+                return quote(text)
+            except Exception as e:
+                return "Invalid URL encoding: " + str(e)
         return "No text found."
     
     def __str__(self):

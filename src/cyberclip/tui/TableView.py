@@ -201,7 +201,7 @@ class FiltrableDataFrame(Static):
         overflow-x: scroll;
         overflow-y: hidden;
         width: auto;
-        height: 99%;
+        height: 1fr;
         row-span: 1;
     }
 
