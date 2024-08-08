@@ -4,6 +4,7 @@ except:
     from actionInterface import actionInterface
 from collections import Counter
 import re
+from datetime import datetime
 
 
 
@@ -25,7 +26,7 @@ class appendEachLineAction(actionInterface):
         if self.observables.get("text"):
             text = self.observables.get("text")[0].splitlines()
             return "\r\n".join([line + self.get_param_value("Text to add").replace("\\t","\t") for line in text])
-
+        return ""
     
     def __str__(self):
         """Add a line of text at the beginning of a text."""
@@ -139,6 +140,7 @@ class countAction(actionInterface):
             lines = self.observables.get("text")[0].splitlines()
             counts = Counter(lines)
             return counts
+        return {}
 
     
     def __str__(self):
@@ -152,7 +154,7 @@ class findReplaceAction(actionInterface):
 
     def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={"Search":"","Replace":""}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
-        self.description = "Find and replace"
+        self.description = "Regex: Find and replace"
         
     def execute(self) -> object:
         """Find a regex pattern and replace it.
@@ -163,6 +165,7 @@ class findReplaceAction(actionInterface):
             search_regex = self.get_param_value('Search')
             replace_regex = self.get_param_value('Replace')
             return re.sub(search_regex, replace_regex, text, flags= re.MULTILINE)
+        return ""
 
     
     def __str__(self):
@@ -175,7 +178,7 @@ class regexFilterAction(actionInterface):
 
     def __init__(self, parsers = {}, supportedType = {"text"}, complex_param= {"Regex":{"type":"text","value":""}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param = complex_param)
-        self.description = "Filter with Regex"
+        self.description = "Regex: Filter"
         
     def execute(self) -> object:
         lines = []
@@ -195,7 +198,7 @@ class reverseRegexFilterAction(actionInterface):
 
     def __init__(self, parsers = {}, supportedType = {"text"}, complex_param= {"Regex":{"type":"text","value":""}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param = complex_param)
-        self.description = "Reverse filter with Regex"
+        self.description = "Regex: Reverse filter"
         
     def execute(self) -> object:
         lines = []
@@ -214,7 +217,7 @@ class extractRegexGroupAction(actionInterface):
 
     def __init__(self, parsers = {}, supportedType = {"text"}, complex_param= {"Regex":{"type":"text","value":""}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param = complex_param)
-        self.description = "Extract group with Regex"
+        self.description = "Regex: Extract group"
         
     def execute(self) -> object:
         text = ""
@@ -232,6 +235,78 @@ class extractRegexGroupAction(actionInterface):
     def __str__(self):
         return  self.execute()
 
+class timestampToDateAction(actionInterface):
+    """Convert a Unix timestamp to a readable date"""
+    
+    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
+        self.description = "Timestamp: To date"
+        
+    def execute(self) -> object:
+        """Convert a text which is a timestamp to a date.
+        
+        Returns:
+            datetime.datetime(timestamp)
+        """
+        if self.get_observables().get("text"):
+            text = self.observables.get("text")[0]
+            if re.search(r"\d+", text):
+                try: 
+                    return str(datetime.fromtimestamp(int(text)))
+                except Exception as e:
+                    return str(e)
+        return "Invalid timestamp."
+    
+    def __str__(self):
+        return  self.execute()
+
+class fromHexAction(actionInterface):
+    """Convert a hexadecimal string to the corresponding UTF-8 string. String should not be prefixed by 0x"""
+    
+    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
+        self.description = "Hex: To UTF-8"
+        
+    def execute(self) -> object:
+        """Convert a hexadecimal string to the corresponding UTF-8 string. String should not be prefixed by 0x.
+        
+        Returns:
+            bytes.fromhex(text).decode('utf-8')
+        """
+        if self.get_observables().get("text"):
+            text = self.observables.get("text")[0]
+            try: 
+                return bytes.fromhex(text).decode('utf-8')
+            except Exception as e:
+                return "Invalid hexadecimal: " + str(e)
+        return "No text found."
+    
+    def __str__(self):
+        return  self.execute()
+
+class toHexAction(actionInterface):
+    """Convert a UTF-8 string to the coressponding one in hexadecimal. """
+    
+    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
+        self.description = "Hex: From UTF-8"
+        
+    def execute(self) -> object:
+        """Convert a UTF-8 string to the coressponding one in hexadecimal.
+        
+        Returns:
+            text.encode().hex()
+        """
+        if self.get_observables().get("text"):
+            text = self.observables.get("text")[0]
+            try: 
+                return text.encode().hex()
+            except Exception as e:
+                return str(e)
+        return "No text found."
+    
+    def __str__(self):
+        return  self.execute()
 
 class toplLinesAction(actionInterface):
     """A action module to crop data to only the N first lines. Default 10 lines."""

@@ -15,7 +15,7 @@ class SearchInUrlScanAction(actionInterface):
 
     def __init__(self, parsers = {}, supportedType = {"ip","domain","analytics"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
-        self.description = "Search on UrlScan"
+        self.description = "UrlScan: Search"
 
         
     def execute(self) -> object:
@@ -38,7 +38,7 @@ class SearchInUrlScanAction(actionInterface):
         return "\n".join([f"{observable}\t{value}" for observable, value in self.results.items()])
 
 
-DEFAULT_QUERY_PARAMETERS = {"Query":{"type":"text","value":"page.url:"}}
+DEFAULT_QUERY_PARAMETERS = {"Query":{"type":"text","value":"*"}}
 
 class QueryUrlScanAction(actionInterface):
     """A action module to query URLScan through its API.
@@ -51,7 +51,7 @@ class QueryUrlScanAction(actionInterface):
 
     def __init__(self, parsers = {}, supportedType = {"text"}, complex_param=DEFAULT_QUERY_PARAMETERS):
         super().__init__(parsers=parsers, supportedType=supportedType, complex_param=complex_param)
-        self.description = "Query UrlScan"
+        self.description = "UrlScan: Query"
         self.load_conf("UrlScan")
         API_KEY = self.conf.get("api-key","")
         self.headers = {"accept": "application/json", "API-Key": API_KEY}

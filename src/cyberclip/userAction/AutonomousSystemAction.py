@@ -75,6 +75,7 @@ class AsToCidrAction(actionInterface):
         self.description = "AS Number to CIDR"
 
     def execute(self) -> object:
+        self.results = {}
         get_AS_data()
         get_IPv6_AS_data()
         self.observables = self.get_observables()
@@ -115,6 +116,7 @@ class AsInformationAction(actionInterface):
         self.description = "AS Number information"
 
     def execute(self) -> object:
+        self.results = {}
         get_AS_data()
         get_IPv6_AS_data()
         self.observables = self.get_observables()
@@ -159,6 +161,7 @@ class IpToAsAction(actionInterface):
         self.description = "IP to AS Number"
 
     def execute(self) -> object:
+        self.results = {}
         get_AS_data()
         get_IPv6_AS_data()
         self.observables = self.get_observables()
@@ -166,6 +169,7 @@ class IpToAsAction(actionInterface):
             if len(AS_DB.columns):
                 ips = self.observables.get("ip", [])
                 for ip in ips:
+                    infos = {}
                     int_ip = int(ipaddress.ip_address(ip))
                     response = AS_DB.loc[(AS_DB["min_ip"]<int_ip) & (AS_DB["max_ip"]>=int_ip)].to_dict(orient="records")
                     if len(response)>0:
@@ -178,6 +182,7 @@ class IpToAsAction(actionInterface):
             if len(AS_IPv6_DB.columns):
                 ips = self.observables.get("ipv6", [])
                 for ip in ips:
+                    infos = {}
                     ip_object = ipaddress.ip_address(ip)
                     response = AS_IPv6_DB.loc[(AS_IPv6_DB["min_ip"]<ip_object) & (AS_IPv6_DB["max_ip"]>=ip_object)].to_dict(orient="records")
                     if len(response)>0:

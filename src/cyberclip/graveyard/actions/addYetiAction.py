@@ -64,7 +64,6 @@ class searchYetiAction(actionInterface):
                                 self.lines.append(f'{item.get("value")} is already known. \r\n{set([i.get("name","") for i in item.get("tags")])}')
                 except ConnectionError:
                     self.lines.append("Error while connecting Yeti.")
-        return
     
     def __str__(self):
         self.execute()

@@ -8,7 +8,7 @@ from json import dumps, loads
 import yaml
 import pandas as pd
 
-# Thanks too https://github.com/ScriptSmith/socialreaper/blob/master/socialreaper/tools.py#L8
+# Thanks to https://github.com/ScriptSmith/socialreaper/blob/master/socialreaper/tools.py#L8
 from collections.abc import MutableMapping
 def flatten(dictionary, parent_key=False, separator='.'):
     """

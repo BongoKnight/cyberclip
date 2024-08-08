@@ -47,6 +47,7 @@ class searchInOpenCTIAction(actionInterface):
             results = self.api.stix_cyber_observable.list(filters=[{"values":observables, "key":"value"}])
             indexed_result = {result.get("value"):result for result in results}
             return indexed_result
+        return {}
     
     def __str__(self):
         out = self.execute()

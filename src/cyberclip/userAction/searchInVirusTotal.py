@@ -27,7 +27,7 @@ class searchInVirusTotalAction(actionInterface):
     """    
     def __init__(self, parsers ={}, supportedType = {"ip","domain","md5","sha1","sha256"}, complex_param=DEFAULT_PARAMS):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
-        self.description = "Search all obsevables in Virus Total."
+        self.description = "Virus Total: Search all obsevables."
         self.lines = []
         self.load_conf("VirusTotal")
         API_KEY = self.conf.get("api-key","")

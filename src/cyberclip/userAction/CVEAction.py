@@ -12,7 +12,7 @@ class CVEExplainerAction(actionInterface):
     """
     def __init__(self, parsers = {}, supportedType = {"cve"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
-        self.description = "Explain CVE number"
+        self.description = "CVE: Explain number"
         self.decoded_b64 = []
         
     def execute(self) -> object:

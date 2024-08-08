@@ -42,7 +42,7 @@ class searchYetiAction(actionInterface):
                     if resp.json():
                         self.lines.append(f"Found in Yeti: {value}")
 
-        return
+        return ""
     
     def __str__(self):
         self.execute()

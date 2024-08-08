@@ -10,7 +10,7 @@ class defangAction(actionInterface):
 
     def __init__(self, parsers = {}, supportedType = {"ip","url","domain"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
-        self.description = "Defang IoC"
+        self.description = "IoC: Defang"
         
     def execute(self) -> list:
         observables = []
@@ -21,6 +21,29 @@ class defangAction(actionInterface):
             defanged = observable.replace(".","[.]")
             defanged = re.sub("^http","hxxp", defanged)
             results.append(defanged)
+        return results
+    
+    def __str__(self):
+        return  "\r\n".join(self.execute())
+
+class fangAction(actionInterface):    
+    """A action module, to fang URLs, domains and IP addresses. Replace '[.]' by '.' and 'hxxp' by 'http'.  
+    """
+
+    def __init__(self, parsers = {}, supportedType = {"ip","url","domain"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
+        self.description = "IoC: Fang"
+        
+    def execute(self) -> list:
+        observables = []
+        results = []
+        for parsertype in self.supportedType:
+            observables += self.get_observables().get(parsertype, [])
+        for observable in set(observables):
+            fanged = observable.replace("[.]",".")
+            fanged = re.sub("(\[:/?/?\])","://", fanged)
+            fanged = re.sub("^hxxp","http", fanged)
+            results.append(fanged)
         return results
     
     def __str__(self):

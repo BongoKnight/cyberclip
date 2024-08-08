@@ -9,7 +9,7 @@ class URLOpenAction(actionInterface):
     
     def __init__(self, parsers ={}, supportedType = {"url"}):
         super().__init__(parsers = parsers, supportedType = supportedType)       
-        self.description = "Open URL in browser."
+        self.description = "URL: Open in browser."
         
     def execute(self) -> object:
         lines = []

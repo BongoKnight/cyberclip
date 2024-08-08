@@ -20,6 +20,7 @@ class toSqlSearchAction(actionInterface):
             lines = list(set(self.observables.get("text")[0].splitlines()))
             lines.sort()
             return '"' + '","'.join(lines) +'"'
+        return ""
 
     
     def __str__(self):

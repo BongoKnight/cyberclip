@@ -11,6 +11,13 @@ class extractAction(actionInterface):
         self.description="Extract all elements."
         self.exception = exception
 
+
+    def execute(self) -> object:
+        for parser_name, parser in self.parsers.items():
+            if parser_name not in self.exception:
+                self.observables.update({parser_name:parser.extract()})
+        return self.observables
+
     def __str__(self):
         self.execute()
         extracted_items = []
@@ -25,12 +32,6 @@ class extractAction(actionInterface):
                     for i in value:
                         extracted_items.append(i)
         return "\n".join(extracted_items)
-        
-    def execute(self) -> object:
-        for parser_name, parser in self.parsers.items():
-            if parser_name not in self.exception:
-                self.observables.update({parser_name:parser.extract()})
-        return self.observables
     
 
 

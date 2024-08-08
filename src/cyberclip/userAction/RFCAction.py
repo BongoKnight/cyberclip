@@ -12,7 +12,7 @@ class RFCExplainerAction(actionInterface):
     """
     def __init__(self, parsers = {}, supportedType = {"rfc"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
-        self.description = "Get RFC"
+        self.description = "RFC: Get text version"
         self.decoded_b64 = []
         
     def execute(self) -> object:

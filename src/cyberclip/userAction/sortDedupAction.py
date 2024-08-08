@@ -17,7 +17,7 @@ class sortDedupAction(actionInterface):
             lines = list(set(self.observables.get("text")[0].splitlines()))
             lines.sort()
             return "\n".join([i for i in lines if i!=""])
-
+        return ""
     
     def __str__(self):
         return  self.execute()
@@ -48,6 +48,7 @@ class sortAction(actionInterface):
             if self.get_param_value("Reverse sort"):
                 lines.sort(reverse=True)
             return "\n".join([i for i in lines])
+        return ""
         
     def __str__(self):
         return self.execute()

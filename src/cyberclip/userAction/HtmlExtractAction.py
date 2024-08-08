@@ -15,7 +15,7 @@ class HtmlExtractAction(actionInterface):
 
     def __init__(self, parsers = {}, supportedType = {"html"}, complex_param={"CSS selectors":{"value":["p"], "type":"tags"}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
-        self.description = "Extract tags from HTML with CSS selector"
+        self.description = "HTML: Extract tags with CSS selector"
 
     def execute(self) -> object:
         html_texts = self.get_observables().get("html")
@@ -52,7 +52,7 @@ class HtmlExtractTextAction(actionInterface):
 
     def __init__(self, parsers = {}, supportedType = {"html"}, complex_param = {"CSS selectors":{"value":["p"], "type":"tags"}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param = complex_param)
-        self.description = "Extract text from HTML with CSS selector"
+        self.description = "HTML: Extract text with CSS selector"
 
     def execute(self) -> object:
         self.results = {}

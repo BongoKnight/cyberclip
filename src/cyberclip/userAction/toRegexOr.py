@@ -20,6 +20,7 @@ class regexOrAction(actionInterface):
             lines.sort()
             lines = [i.replace(".","\\.") for i in lines]
             return '|'.join(lines)
+        return ""
 
     
     def __str__(self):

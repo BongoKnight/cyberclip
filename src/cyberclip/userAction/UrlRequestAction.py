@@ -15,7 +15,7 @@ class UrlToHtmlAction(actionInterface):
 
     def __init__(self, parsers = {}, supportedType = {"url"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
-        self.description = "URL to HTML"
+        self.description = "URL: Get HTML content"
 
         
     def execute(self) -> object:

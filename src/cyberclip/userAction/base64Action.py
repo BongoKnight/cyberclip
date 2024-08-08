@@ -13,7 +13,7 @@ class B64DecodeAction(actionInterface):
     """
     def __init__(self, parsers = {}, supportedType = {"b64"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
-        self.description = "Decode Base 64"
+        self.description = "Base64: Decode"
         self.decoded_b64 = []
         
     def execute(self) -> object:
@@ -42,10 +42,11 @@ class B64EncodeAction(actionInterface):
     """
     def __init__(self, parsers = {}, supportedType = {"text"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
-        self.description = "Encode in Base 64"
-        self.encoded_b64 = []
+        self.description = "Base64: Encode"
+        self.encoded_b64 = {}
         
     def execute(self) -> object:
+        self.encoded_b64 = {}
         self.observables = self.get_observables()
         if self.observables.get("text"):
             try:
@@ -71,7 +72,7 @@ class Base64PermutateAction(actionInterface):
     """
     def __init__(self, parsers = {}, supportedType = {"text"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
-        self.description = "Calculate Base64 permutation"
+        self.description = "Base64: Calculate permutation"
         self.encoded_b64 = []
         
     def execute(self) -> object:
