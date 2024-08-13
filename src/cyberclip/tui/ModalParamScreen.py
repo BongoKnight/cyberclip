@@ -6,16 +6,19 @@ from textual.widgets import Label, Button, Input, Checkbox
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.reactive import var
 
+
 try:
     from cyberclip.tui.ActionPannel import ActionButton
     from cyberclip.tui.TagsInput import TagsInput
     from cyberclip.tui.SimpleInput import SimpleInput, SimpleSelect
+    from cyberclip.tui.FileInput import FileInput
     from cyberclip.tui.SelectionInput import SelectionInput
     from cyberclip.tui.MultiSelect import MultiSelect
     from cyberclip.userAction import actionInterface
 except:
     from tui.ActionPannel import ActionButton
     from tui.TagsInput import TagsInput
+    from tui.FileInput import FileInput
     from tui.SimpleInput import SimpleInput, SimpleSelect
     from tui.SelectionInput import SelectionInput
     from tui.MultiSelect import MultiSelect
@@ -65,7 +68,7 @@ class ParamScreen(Screen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "cancel":
             self.app.pop_screen()
-        else:
+        elif event.button.id == "save":
             self.dismiss(result=self.return_parameters())
             
     def return_parameters(self):
@@ -77,6 +80,8 @@ class ParamScreen(Screen):
                 params.update({key: {"value":value, "type":"text"}})
             if isinstance(widget, SimpleSelect):
                 params.update({key: {"value":value, "type":"list", "choices":widget.choices}})
+            if isinstance(widget, FileInput):
+                params.update({key: {"value":value, "type":"filename"}})
             if isinstance(widget, TagsInput):
                 params.update({key: {"value":value, "type":"tags"}})
             if isinstance(widget, SelectionInput):
@@ -103,6 +108,8 @@ class ParamScreen(Screen):
                         widgets.append(SimpleInput(label=key, value=stored_values, classes="complex-input"))
                     elif input_type.lower() == "tags":
                         widgets.append(TagsInput(label=key, value=stored_values, classes="complex-input"))
+                    elif input_type.lower() in ["filename","dir","filesave","save","fileopen"]:
+                        widgets.append(FileInput(label=key, value=stored_values, type=input_type.lower(), classes="complex-input"))
                     elif input_type.lower() == "list":
                         widgets.append(SimpleSelect(label=key, value=stored_values, choices=options, classes="complex-input"))
                     elif input_type.lower() == "fixedlist":
