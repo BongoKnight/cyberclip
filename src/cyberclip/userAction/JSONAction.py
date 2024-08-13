@@ -41,22 +41,28 @@ class JSONExtractAction(actionInterface):
     """A action module to extract data from a JSON object.  
     Use jsonpath module.
     """
-    CONF = {"Selectors":{"type":"tags", "value":""}, "Extract as TSV":{"type":"bool","value":"True"}}
+    CONF = {"Selectors":{"type":"tags", "value":[]}}
     def __init__(self, parsers = {}, supportedType = {"json","yaml"}, complex_param=CONF):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
         self.description = "Extract from JSON/YAML with Path Selector"
         self.results = {}
 
-    def filter_json(self, json_objects: str):
-        if json_objects:
-            for json_str in json_objects:
-                extract = {}
-                for selector in self.get_param_value("Selectors"):
-                    try:
-                        extract[selector] = jsonpath(loads(json_str), selector)
-                    except Exception as e:
-                        extract[selector] = [f"Error : {e}"]
-            self.results.update({str(json_str):extract})
+    def filter_json(self, json_str: str):
+        if json_str:
+            extract = {}
+            data = loads(json_str)
+            for selector in self.get_param_value("Selectors"):
+                try:
+                    extract[selector] = jsonpath(data, selector)
+                except Exception as e:
+                    extract[selector] = [f"Error : {e}"]
+            if len(set([len(extracted) for selector, extracted in extract.items()])) == 1:
+                atomic_dict = [{k: v[i] for k, v in extract.items()} for i in range(len(next(iter(extract.values()))))]
+                #atomic_dict = {i: [v[i] for k, v in extract.items()] for i in range(len(next(iter(extract.values()))))}
+                #atomic_dict = [[v[i] for k, v in extract.items()] for i in range(len(next(iter(extract.values()))))]
+                self.results.update({json_str:atomic_dict})
+            else:
+                self.results.update({json_str:[extract]})
         return self.results
         
     def execute(self) -> object:
@@ -73,8 +79,11 @@ class JSONExtractAction(actionInterface):
     
     def __str__(self):
         filtered_jsons = self.execute()
-        df = pd.DataFrame(filtered_jsons)
-        return df.to_csv(sep="\t")
+        dfs = []
+        for filtered_json_object in filtered_jsons.values():
+            df = pd.DataFrame([*filtered_json_object])
+            dfs.append(df)
+        return pd.concat(dfs).to_csv(sep="\t", index=False, header=True)
 
 
 class JSONFlattenAction(actionInterface):
@@ -107,8 +116,9 @@ class JSONFlattenAction(actionInterface):
 
 if __name__=='__main__':
     from userTypeParser.JsonParser import JSONParser
-    data = '[{"a":"toto"},{"a":"titi"}]'
+    data = '[{"a":"toto","b":"tutu","c":"unique"},{"a":"titi","b":"tutu"},{"a":"toti","b":"tati"}]'
     #data =  '{"a":"1"}'
     text_parser = JSONParser(data)
-    a = str(JSONExtractAction({"json":text_parser},["json"], complex_param={"Selectors":["[*].a"]}))
-    print(f"JSON: {text_parser.extract()}", f"Extract : {a}")
+    a = str(JSONExtractAction({"json":text_parser},["json"], complex_param={"Selectors":{"type":"tags", "value":["$.[*].a","$.[*].b"]}}))
+    b = str(JSONExtractAction({"json":text_parser},["json"], complex_param={"Selectors":{"type":"tags", "value":["$.[*].b","$.[*].c"]}}))
+    print(f"JSON: {text_parser.extract()}\nExtract : {a}\nExtract : {b}")

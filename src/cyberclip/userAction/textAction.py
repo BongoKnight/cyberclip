@@ -381,6 +381,32 @@ class toplLinesAction(actionInterface):
     
     def __str__(self):
         return  self.execute()
+    
+class saveInFileAction(actionInterface):
+    """Save the actual data in a file"""
+    
+    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={"Save as":{"type":"save","value":"./tmp.txt"}}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
+        self.description = "Save as"
+        
+    def execute(self) -> object:
+        """Save text in a file.
+        
+        Returns:
+            lines[0:n] (list(str)): The n first lines
+        """
+        filename = self.get_param_value("Save as")
+        self.observables = self.get_observables()
+        if self.observables.get("text"):
+            text = self.observables.get("text")[0]
+            with open(filename,"w") as file:
+                file.write(text)
+            return text
+        return ""
+
+    
+    def __str__(self):
+        return  self.execute()
 
 if __name__=='__main__':
     from userTypeParser.TextParser import TextParser
