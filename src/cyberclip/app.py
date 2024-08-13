@@ -160,7 +160,7 @@ class ClipBrowser(App):
         tab.mount(FiltrableDataFrame(pd.DataFrame(df), id="main-table"))
 
     def watch_text(self, new_text: str) -> None:
-        if self.text:
+        if self.text or self.text == "":
             self.parser.parseData(self.text)
             self.query_one(ContentView).update_text(new_text)
             self.query_one(ContentView).filter_action()
