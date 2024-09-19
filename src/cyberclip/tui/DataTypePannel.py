@@ -59,11 +59,9 @@ class DataLoader(Static):
         from tui.ContentView import ContentView
         textArea = self.app.query_one(ContentView).query_one(TextArea)
         if event.button.id == "update-button":
-            self.data = get_clipboard_text()
+            self.app.text = get_clipboard_text()
         if event.button.id == "text-update-button":
-            self.data = textArea.text
-        if textArea: 
-            self.app.text = self.data
+            self.app.text = textArea.text
         if event.button.id == "filter-button":
             self.select_all_datatype = not  self.select_all_datatype 
             for switch in self.query(Switch):
