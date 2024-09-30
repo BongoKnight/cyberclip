@@ -154,9 +154,9 @@ class ClipBrowser(App):
             if querybuttons:= self.query(RecipeButton):
                 querybuttons[0].press()
 
-    def update_dataframe(self, df):
+    async def update_dataframe(self, df):
         tab = self.query_one("#tableview")
-        tab.remove_children()
+        await tab.remove_children()
         tab.mount(FiltrableDataFrame(pd.DataFrame(df), id="main-table"))
 
     def watch_text(self, new_text: str) -> None:
