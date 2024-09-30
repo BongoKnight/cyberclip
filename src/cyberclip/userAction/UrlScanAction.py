@@ -34,8 +34,7 @@ class SearchInUrlScanAction(actionInterface):
 
 
     def __str__(self):
-        self.execute()
-        return "\n".join([f"{observable}\t{value}" for observable, value in self.results.items()])
+        return json.dumps(self.execute())
 
 
 DEFAULT_QUERY_PARAMETERS = {"Query":{"type":"text","value":"*"}}
@@ -78,4 +77,5 @@ if __name__=='__main__':
     data = "urlscan.io"
     parser = domainParser(data)
     a = str(SearchInUrlScanAction({"domain":parser},["domain"]))
-    print(a, parser.objects)
+    b = str(QueryUrlScanAction())
+    print(b, parser.objects)

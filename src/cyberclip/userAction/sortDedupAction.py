@@ -36,22 +36,22 @@ class sortAction(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"text"}, complex_param = params):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param = complex_param)
         self.description = "Sort lines."
+        self.lines = []
         
     def execute(self) -> object:
-        lines = []
+        self.lines = []
         self.observables = self.get_observables()
         if self.observables.get("text"):
-            lines = self.observables.get("text")[0].splitlines()
-            lines.sort()
+            self.lines = self.observables.get("text")[0].splitlines()
+            self.lines.sort()
             if self.get_param_value("Numeric sort"):
-                lines.sort(key=lambda s: int(re.search(r'^(\s*\d+)', s).group()) if re.search(r'^(\s*\d+)', s) else 0)       
+                self.lines.sort(key=lambda s: int(re.search(r'^(\s*\d+)', s).group()) if re.search(r'^(\s*\d+)', s) else 0)       
             if self.get_param_value("Reverse sort"):
-                lines.sort(reverse=True)
-            return "\n".join([i for i in lines])
-        return ""
+                self.lines.sort(reverse=True)
         
     def __str__(self):
-        return self.execute()
+        self.execute()
+        return "\r\n".join(self.lines)
     
 if __name__=='__main__':
     from userTypeParser.TextParser import TextParser

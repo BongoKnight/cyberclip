@@ -86,6 +86,53 @@ class JSONExtractAction(actionInterface):
         return pd.concat(dfs).to_csv(sep="\t", index=False, header=True)
 
 
+class JSONSchemeAction(actionInterface):
+    """A action module to display the scheme of a JSON object.  
+    """
+    def __init__(self, parsers = {}, supportedType = {"json","yaml"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
+        self.description = "Show JSON/YAML scheme"
+        self.json_paths = set()
+
+    def get_json_paths(self, data, current_path=""):
+        if isinstance(data, dict):
+            for key, value in data.items():
+                new_path = f"{current_path}.{key}" if current_path else key
+                self.json_paths.add(new_path)
+                self.get_json_paths(value, new_path)
+
+        elif isinstance(data, list):
+            for index, item in enumerate(data):
+                new_path = f"{current_path}[*]"
+                self.json_paths.add(new_path)
+                self.get_json_paths(item, new_path)
+        else:
+            # For primitive values, print the current path
+            self.json_paths.add(current_path)
+
+
+        
+    def execute(self) -> set:
+        self.json_paths = set()
+        self.observables = self.get_observables()
+        if json_objects:=self.observables.get("json"):
+            for json in json_objects:
+                self.get_json_paths(loads(json))          
+        if self.observables.get("yaml") and not self.observables.get("json"):
+            json_objects = [dumps(yaml.safe_load(yaml_str)) for yaml_str in self.observables.get("yaml")]
+            for json in json_objects:
+                self.get_json_paths(json)    
+        return self.json_paths
+    
+    def __str__(self):
+        return "\r\n".join(list(self.execute()))
+
+
+
+
+
+
+
 class JSONFlattenAction(actionInterface):
     """A action module to flatten data from a JSON object.  
     Use jsonpath module.
@@ -116,9 +163,8 @@ class JSONFlattenAction(actionInterface):
 
 if __name__=='__main__':
     from userTypeParser.JsonParser import JSONParser
-    data = '[{"a":"toto","b":"tutu","c":"unique"},{"a":"titi","b":"tutu"},{"a":"toti","b":"tati"}]'
+    data = '{"a":"toto","b":"tutu","c":"unique", "d":[{"a":"titi","b":"tutu"},{"a":"toti","b":"tati"}]}'
     #data =  '{"a":"1"}'
     text_parser = JSONParser(data)
-    a = str(JSONExtractAction({"json":text_parser},["json"], complex_param={"Selectors":{"type":"tags", "value":["$.[*].a","$.[*].b"]}}))
-    b = str(JSONExtractAction({"json":text_parser},["json"], complex_param={"Selectors":{"type":"tags", "value":["$.[*].b","$.[*].c"]}}))
-    print(f"JSON: {text_parser.extract()}\nExtract : {a}\nExtract : {b}")
+    c = str(JSONSchemeAction({"json":text_parser},["json"]))
+    print(f"Scheme:{c}")
