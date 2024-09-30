@@ -37,7 +37,7 @@ class clipParser():
         self.matches = {}
         self.detectedType = set()
         self.log = logging.getLogger(__name__)
-        self.log.handlers = [RotatingFileHandler(filename="C://Users/KTLT9976/Documents/cyberclip/log.log", maxBytes=5*1024*1024, backupCount=1)]
+        self.log.handlers = [RotatingFileHandler(filename=Path(__file__).parent / "log.log", maxBytes=5*1024*1024, backupCount=1)]
         # self.log.addHandler(RichHandler(rich_tracebacks=True, markup=True, level=logging.INFO))
         self.log.info("ClipParser created.")
 
