@@ -28,6 +28,7 @@ dependencies = [
   "jsonpath",
   "pandas",
   "pycti",
+  "pywin32",
   "pyperclip",
   "requests",
   "shodan",
