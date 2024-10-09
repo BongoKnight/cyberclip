@@ -60,11 +60,17 @@ class CVEItem:
 
     @property
     def score(self):
-        return str(self.data.get("containers",{}).get("cna",{}).get("metrics",{})[0].get("cvssV3_1", {}).get("baseScore",""))
-
+        try:
+            return str(self.data.get("containers",{}).get("cna",{}).get("metrics",{})[0].get("cvssV3_1", {}).get("baseScore",""))
+        except:
+            return "N/A"
+        
     @property
     def severity(self):
-        return self.data.get("containers",{}).get("cna",{}).get("metrics",{})[0].get("cvssV3_1", {}).get("baseSeverity","")
+        try:
+            return self.data.get("containers",{}).get("cna",{}).get("metrics",{})[0].get("cvssV3_1", {}).get("baseSeverity","")
+        except:
+            return "N/A"
 
     @property
     def description(self):
