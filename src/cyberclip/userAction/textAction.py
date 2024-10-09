@@ -253,7 +253,11 @@ class timestampToDateAction(actionInterface):
             text = self.observables.get("text")[0]
             if re.search(r"\d+", text):
                 try: 
-                    return str(datetime.fromtimestamp(int(text)))
+                    timestamps_regex = re.findall(r"(^|\b)(\d{10})(\b|$)", text)
+                    dates = []
+                    for timestamp in timestamps_regex:
+                        dates.append(str(datetime.fromtimestamp(int(timestamp[1]))))
+                    return "\r\n".join(dates)
                 except Exception as e:
                     return str(e)
         return "Invalid timestamp."
