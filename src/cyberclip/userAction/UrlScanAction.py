@@ -15,7 +15,7 @@ class SearchInUrlScanAction(actionInterface):
 
     def __init__(self, parsers = {}, supportedType = {"ip","domain","analytics"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
-        self.description = "UrlScan: Search"
+        self.description = "UrlScan: Search IoC"
 
         
     def execute(self) -> object:
