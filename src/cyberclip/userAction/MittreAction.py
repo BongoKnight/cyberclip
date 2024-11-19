@@ -10,7 +10,7 @@ except:
     from actionInterface import actionInterface
 
 Mitre_DB = pd.DataFrame()
-file_name = os.path.join(Path(__file__).parent / "../data/mittre.json")
+file_name = Path(__file__).parent / "../data/mittre.json"
 if not os.path.exists(file_name) or (time.time() - os.path.getmtime(file_name) ) / 3600 > 24*7:
     try:
         url = "https://github.com/mitre-attack/attack-stix-data/raw/master/enterprise-attack/enterprise-attack.json"

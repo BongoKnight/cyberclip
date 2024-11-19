@@ -7,6 +7,7 @@ import sys
 import re
 import ipaddress
 import time
+from pathlib import Path
 try:
     from userAction.actionInterface import actionInterface
 except:
@@ -18,7 +19,7 @@ AS_RANGE = None
 
 def get_AS_data():
     global AS_DB, AS_RANGE
-    file_name = os.path.join("as.gz")
+    file_name = Path(__file__).parent / "../data/as.gz"
     if not os.path.exists(file_name) or (time.time() - os.path.getmtime(file_name) ) / 3600 > 24*7:
         print("Getting data...")
         try:
@@ -42,7 +43,7 @@ def get_AS_data():
 
 def get_IPv6_AS_data():
     global AS_IPv6_DB
-    file_name = os.path.join("as_ipv6.gz")
+    file_name = Path(__file__).parent / "../data/as_ipv6.gz"
     if not os.path.exists(file_name) or (time.time() - os.path.getmtime(file_name) ) / 3600 > 24*7:
         try:
             url = "https://iptoasn.com/data/ip2asn-v6.tsv.gz"
