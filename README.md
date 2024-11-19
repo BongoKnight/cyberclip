@@ -47,6 +47,8 @@ You may want to see some screens records, documentation or even a features tour,
 	- [x] TSV to Markdown Table
 	- [x] Domain and Url to base URL
 	- [x] Domain to IP
+ 	- [ ] Domain in top 1M (Cloudflare list)
+  	- [ ] Get base domain (i.e subdomain.domain.com should return domain.com)   
 	- [x] Certificate for a domain (crt.sh)
 	- [x] IP to ASN
 	- [x] Extract elements from HTML
@@ -66,7 +68,7 @@ You may want to see some screens records, documentation or even a features tour,
  	- [x] Add in Yeti 	
 	- [x] Select top N lines
 	- [x] Search in URLScan
-	- [x] Serach in VT
+	- [x] Search in VT
 	- [x] URL open
 	- [ ] Url redirect chain
 	- [x] Url to Html
@@ -78,7 +80,7 @@ You may want to see some screens records, documentation or even a features tour,
 	- [x] For Yaml
 	- [x] For analytics Identifiers (ie Google Analytics)
 	- [x] For CVE Number
-	- [ ] For RFC Number
+	- [x] For RFC Number
 	- [ ] For uuid
 	- [ ] For JWT
 	- [ ] For lat long coordinates (maybe as a tutorial)
