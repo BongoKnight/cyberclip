@@ -66,10 +66,10 @@ class clipParser():
                     self.log.error(f"Error while loading {modules} from {file} : {e}")
         return modules_imports
         
-    async def create_instance(self, classes, class_name, arg):
+    def create_instance(self, classes, class_name, arg):
         return classes[class_name](arg)
 
-    async def load_all(self):
+    def load_all(self):
         self.log.debug("Initiate parser and action loading." )
         self.parsers = dict()
         self.actions = dict()
@@ -91,7 +91,7 @@ class clipParser():
                            in getmembers(parserModules[parserModule], isclass))
             for className in classes.keys():
                 if "Parser" in className and "ParserInterface" not in className:
-                    instance = await self.create_instance(classes, className, data)
+                    instance = self.create_instance(classes, className, data)
                     self.parsers.update({instance.parsertype:instance})
 
         # Load all actions
@@ -106,11 +106,10 @@ class clipParser():
                            in getmembers(actionModules[actionModule], isclass))
             for className in classes.keys():
                 if "Action" in className and not "ActionInterface" in className:
-                    instance = await self.create_instance(classes, className, self.parsers)
+                    instance = self.create_instance(classes, className, self.parsers)
                     if hasattr(instance, "description"):
                         # Adding action in a dict of all parsers relative to the input
                         self.actions.update({instance.description : instance})
-
 
     def parseData(self, data):
         """
@@ -132,6 +131,10 @@ class clipParser():
                 if parser.contains():
                     self.detectedType.add(parsertype)
                     self.matches.update({parsertype: parser.extract()})
+                else:
+                    # Reset parser to avoid keeping old data in memory
+                    parser.text = ""
+                    parser.objects = {}
 
             for action in self.actions.values():
                 action.parsers = {}
@@ -142,6 +145,7 @@ class clipParser():
             self.log.debug(f"Parsed data: {data[0:min(100,len(data))]}")        
         self.results = {"matches" : self.matches, "detectedType" : self.detectedType, "actions": self.actions, "parsers":self.parsers}
         return self.results
+    
     
     async def apply_actionable(self, actionable, text, complex_param = {}) -> str:
         self.log.info(f"Applying {actionable.__class__}")

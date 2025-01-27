@@ -18,7 +18,7 @@ class FileInput(Static):
         margin-top: 1;
     }
     FileInput .selected {
-        border: cornflowerblue;
+        border: $primary;
         width: 1fr;
         margin-left: 2;
         margin-bottom: 2;

@@ -37,7 +37,7 @@ class ParamScreen(Screen):
         padding: 3 3;
         width: 80%;
         height: 80%;
-        border: $accent;
+        border: $primary;
         }
     
     #submit {

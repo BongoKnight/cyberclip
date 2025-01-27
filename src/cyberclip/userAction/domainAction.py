@@ -6,6 +6,8 @@ except:
 import os
 import time
 import requests
+import tldextract
+import shutil
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -26,9 +28,9 @@ class baseDomainAction(actionInterface):
         self.results = {}
         self.observables = self.get_observables()
         if self.observables.get("url"):
-            self.results.update({url:f"{'.'.join(urlparse(url).netloc.split('.')[-2:])}" for url in self.observables.get("url")})
+            self.results.update({url:f"{tldextract.extract(url).registered_domain}" for url in self.observables.get("url")})
         if self.observables.get("domain"):
-            self.results.update({domain:f"{'.'.join(domain.split('.')[-2:])}" for domain in self.observables.get("domain")})
+            self.results.update({domain:f"{tldextract.extract(domain).registered_domain}" for domain in self.observables.get("domain")})
         return self.results
 
     
@@ -51,7 +53,9 @@ class inTop1MAction(actionInterface):
         file_name = Path(__file__).parent / "../data/top1m.csv"
         if not os.path.exists(file_name) or (time.time() - os.path.getmtime(file_name) ) / 3600 > 24*7:
             try:
-                url = "https://radar.cloudflare.com/charts/LargerTopDomainsTable/attachment?id=1545&top=1000000&startDate=2024-11-11&endDate=2024-11-18"
+                last_week_start = datetime.today() - timedelta(days=datetime.today().weekday() % 7 + 7)
+                last_week_end = last_week_start + timedelta(days=7)
+                url = f"https://radar.cloudflare.com/charts/LargerTopDomainsTable/attachment?id=1545&top=1000000&startDate={last_week_start.date()}&endDate={last_week_end.date()}"
                 response = requests.get(url, stream=True)
                 with open(file_name, 'wb') as f:
                     shutil.copyfileobj(response.raw,f)
@@ -59,7 +63,7 @@ class inTop1MAction(actionInterface):
             except Exception as e:
                 print("Error while retriving database from CloudFlare", e)
         TOP1M = []
-        with open(file_name, "r") as f:
+        with open(file_name, "r", encoding="utf-8") as f:
             TOP1M = set(f.read().splitlines()[1:])
         if self.get_param_value("Get domain NOT IN top 1M"):
             self.results = list(set(self.observables.get("domain")).difference(TOP1M))

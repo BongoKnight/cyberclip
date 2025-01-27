@@ -16,7 +16,7 @@ class SelectionInput(Static):
     }
     SelectionList {
         padding: 1;
-        border: solid $accent;
+        border: solid $primary;
         max-height: 10;
         margin: 0;
     }

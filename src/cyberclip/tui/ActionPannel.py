@@ -6,7 +6,7 @@ import traceback
 from textual import on, work
 from textual.reactive import var
 from textual.containers import  VerticalScroll
-from textual.widgets import Static, Button, Input, TabbedContent
+from textual.widgets import Static, Button, Input, TabbedContent, TextArea
 from textual.app import ComposeResult
 from textual.command import Hit, Hits, Provider
 from functools import partial
@@ -25,9 +25,7 @@ except:
 class ActionButton(Static):
     """A action widget for action specific to certain types of data."""
     DEFAULT_CSS="""
-"""
-
-
+    """
     action : actionInterface = var(None)
     action_name = var("")
     action_supported_type = var({})
@@ -43,13 +41,13 @@ class ActionButton(Static):
         from .ModalParamScreen import ParamScreen
         from .ContentView import ContentView
         if not self.action.complex_param :
-            self.app.text = await self.app.parser.apply_actionable(self.action, self.app.text)
+            self.app.text = await self.app.parser.apply_actionable(self.action, self.app.query_one(TextArea).text)
         else:
             param_screen = ParamScreen()
             param_screen.border_title = f"Parameters for '{self.action.description}' action."
             param_screen.action = self.action
             try:
-                await self.app.push_screen(param_screen, partial(self.app.handle_param, self.action))
+                self.app.push_screen(param_screen, partial(self.app.handle_param, self.action))
             except:
                 self.app.notify(f"Error while executing action : {traceback.format_exc()}", severity="error")
 
@@ -70,9 +68,9 @@ class ActionCommands(Provider):
         from .ContentView import ContentView
         from .TableView import FiltrableDataFrame
         
-        if self.app.query_one(TabbedContent).active == "clipview":
-            try:
-                if contentview := self.app.query_one(ContentView):
+        try:
+            if self.app.query_one(TabbedContent).active == "clipview":
+                if self.app.query_one(ContentView):
                     self.app.parser.parseData(self.app.text)
                     if  "Action" in actionable.__module__ :
                         for desc, action in self.app.parser.actions.items():
@@ -84,7 +82,7 @@ class ActionCommands(Provider):
                                         param_screen = ParamScreen()
                                         param_screen.border_title = f"Parameters for '{action.description}' action."
                                         param_screen.action = action
-                                        await self.app.push_screen(param_screen, partial(self.app.handle_param, action))
+                                        self.app.push_screen(param_screen, partial(self.app.handle_param, action))
                                 except Exception as e:
                                     self.app.notify("Error while applying action:" + str(e) + traceback.format_exc(), severity="error")
 
@@ -98,51 +96,52 @@ class ActionCommands(Provider):
                             self.app.text = await actionable.execute_recipe(self.app)
                         except Exception as e:
                             self.app.notify("Error while applying recipe: " + str(e) + traceback.format_exc(), severity="error")
-            except Exception as e:
-                self.app.notify("Error while applying: " + str(actionable.__class__) + traceback.format_exc(), severity="error")
-
-
-    
-        elif self.app.query_one(TabbedContent).active == "tableview":
-            dataframe = self.app.query_one(FiltrableDataFrame)
-            if dataframe.visible:
-                column_name = dataframe.datatable.df.columns[dataframe.datatable.cursor_column]
-                
-                if  "Action" in actionable.__module__ :
-                    new_column_name = dataframe.datatable.get_column_name(f"{actionable.__class__.__name__}_{column_name}")
-                    if not actionable.complex_param :
+            
+            
+            elif self.app.query_one(TabbedContent).active == "tableview":    
+                dataframe = self.app.query_one(FiltrableDataFrame)
+                if dataframe.visible:
+                    column_name = dataframe.datatable.df.columns[dataframe.datatable.cursor_column]
+                    
+                    if  "Action" in actionable.__module__ :
+                        for desc, action in self.app.parser.actions.items():
+                            if desc == actionable.description:
+                                new_column_name = dataframe.datatable.get_column_name(f"{actionable.__class__.__name__}_{column_name}")
+                                if not actionable.complex_param :
+                                    try:
+                                        async with asyncio.timeout(10):
+                                            dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.app.parser.apply_actionable(action, str(text)) for text in dataframe.datatable.df[column_name]))
+                                            dataframe.datatable.update_displayed_df(dataframe.datatable.df)
+                                    except Exception as e:
+                                        self.app.notify("Error executing action: " + str(e), severity="error")
+                                else:
+                                    param_screen = ParamScreen()
+                                    param_screen.border_title = f"Parameters for '{actionable.description}' action."
+                                    param_screen.action = action
+                                    try:
+                                        self.app.push_screen(param_screen, partial(self.app.handle_param, action))
+                                    except Exception as e:
+                                        self.app.notify("Error applying action: " + str(e), severity="error")
+                    elif "Parser" in actionable.__module__:
+                        new_column_name = dataframe.datatable.get_column_name(f"{actionable.parsertype}_{column_name}")
                         try:
                             async with asyncio.timeout(10):
-                                dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.app.parser.apply_actionable(actionable, str(text)) for text in dataframe.datatable.df[column_name]))
-                                dataframe.datatable.update_displayed_df(dataframe.datatable.df)
+                                dataframe.datatable.df[new_column_name] = await asyncio.gather(*[self.app.parser.apply_actionable(actionable, str(text)) for text in dataframe.datatable.df[column_name]])
+                                #dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: asyncio.get_running_loop().create_task(self.app.parser.apply_actionable(actionable, str(text))).result(), na_action="ignore")
+                                dataframe.datatable.update_displayed_df(dataframe.datatable.df, replace_df=True)
                         except Exception as e:
-                            self.app.notify("Error executing action: " + str(e), severity="error")
-                    else:
-                        param_screen = ParamScreen()
-                        param_screen.border_title = f"Parameters for '{actionable.description}' action."
-                        param_screen.action = actionable
+                            self.app.notify("Error while applying parser: " + str(e), severity="error")
+                    elif isinstance(actionable, Recipe):
+                        new_column_name = dataframe.datatable.get_column_name(f"{actionable.name}_{column_name}")
                         try:
-                            await self.app.push_screen(param_screen, partial(self.app.handle_param, actionable))
+                            self.app.notify("Applying recipe to a dataframe could take some times.")
+                            async with asyncio.timeout(120):
+                                dataframe.datatable.df[new_column_name] = await asyncio.gather(*[actionable.execute_recipe(self.app, text=text) for text in dataframe.datatable.df[column_name]])
+                                dataframe.datatable.update_displayed_df(dataframe.datatable.df, replace_df=True)
                         except Exception as e:
-                            self.app.notify("Error applying action: " + str(e), severity="error")
-                elif "Parser" in actionable.__module__:
-                    new_column_name = dataframe.datatable.get_column_name(f"{actionable.parsertype}_{column_name}")
-                    try:
-                        async with asyncio.timeout(10):
-                            dataframe.datatable.df[new_column_name] = await asyncio.gather(*[self.app.parser.apply_actionable(actionable, str(text)) for text in dataframe.datatable.df[column_name]])
-                            #dataframe.datatable.df[new_column_name] = dataframe.datatable.df[column_name].map(lambda text: asyncio.get_running_loop().create_task(self.app.parser.apply_actionable(actionable, str(text))).result(), na_action="ignore")
-                            dataframe.datatable.update_displayed_df(dataframe.datatable.df, replace_df=True)
-                    except Exception as e:
-                        self.app.notify("Error while applying parser: " + str(e), severity="error")
-                elif isinstance(actionable, Recipe):
-                    new_column_name = dataframe.datatable.get_column_name(f"{actionable.name}_{column_name}")
-                    try:
-                        self.app.notify("Applying recipe to a dataframe could take some times.")
-                        async with asyncio.timeout(120):
-                            dataframe.datatable.df[new_column_name] = await asyncio.gather(*[actionable.execute_recipe(self.app, text=text) for text in dataframe.datatable.df[column_name]])
-                            dataframe.datatable.update_displayed_df(dataframe.datatable.df, replace_df=True)
-                    except Exception as e:
-                        self.app.notify("Error while applying recipe: " + str(e), severity="error")
+                            self.app.notify("Error while applying recipe: " + str(e), severity="error")
+        except Exception as e:
+            self.app.notify("Error while applying: " + str(actionable.__class__) + traceback.format_exc(), severity="error")
 
     async def startup(self) -> None:  
         """Called once when the command palette is opened, prior to searching."""

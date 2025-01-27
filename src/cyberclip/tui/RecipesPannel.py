@@ -229,7 +229,7 @@ class RecipeButton(Button):
 class StepWidget(Static):
     DEFAULT_CSS = """    
     .step{
-        border: $accent;
+        border: $primary;
         height: 20;
     }
     .title {
@@ -318,7 +318,7 @@ class SelectActionnableScreen(ModalScreen):
         padding: 3 3;
         width: 80%;
         height: 20;
-        border: $accent;
+        border: $primary;
         }
     
     #submit {
@@ -406,8 +406,8 @@ class RecipeWidget(Static):
             stepslist.mount(step_widget)
 
     @on(Button.Pressed, "#delete_recipe")
-    def delete_recipe(self, event: Button.Pressed):
-        self.button.remove()
+    async def delete_recipe(self, event: Button.Pressed):
+        await self.button.remove()
         self.app.query_one(RecipesPannel).save_recipes()
         self.app.query_one(RecipesPannel).refresh_recipes()
 

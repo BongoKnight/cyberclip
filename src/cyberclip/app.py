@@ -6,13 +6,16 @@ import traceback
 from pathlib import Path
 import yaml
 import asyncio
+from functools import partial
 
 from textual import on, work
 from textual.reactive import var, reactive
 from textual._path import CSSPathType
 from textual.app import App, CSSPathType, ComposeResult
+from textual.system_commands import SystemCommandsProvider
 from textual.containers import Grid
 from textual.driver import Driver
+from textual.screen import Screen   
 from textual.widgets import Footer, TabbedContent, TabPane, TextArea
 
 try:
@@ -54,10 +57,9 @@ class ClipBrowser(App):
     
     """
     CSS_PATH = "app.scss"
-    COMMANDS = {ActionCommands}
+    COMMANDS = {ActionCommands, SystemCommandsProvider}
     SCREENS = {"conf": ConfigScreen}
     BINDINGS = [
-        ("ctrl+p", "command_palette","Command palette"),
         ("ctrl+s", "save", "Save actual view."),
         ("ctrl+q", "quit", "Quit"),
         ("ctrl+f", "select_action_filter", "Filter"),
@@ -69,7 +71,7 @@ class ClipBrowser(App):
 
     parser = var(clipParser())
     recipe_parser = var(clipParser())
-    text = reactive("Waiting for Update...")
+    text = reactive("Waiting for Update...", init=False)
     try:
         with open(Path(__file__).parent / 'data/recipes.yml', "r", encoding="utf8") as f:
             recipes = var([Recipe(recipe_dict=i) for i in yaml.safe_load(f.read())])
@@ -82,8 +84,9 @@ class ClipBrowser(App):
         self.actions = []
 
     async def on_mount(self):
-        await self.parser.load_all()
-        await self.recipe_parser.load_all()
+        self.parser.load_all()
+        self.recipe_parser.load_all()
+        self.theme = "flexoki"
         # self.app.notify(f"Parsers chargés: {len(self.parser.parsers.keys())}\nActions chargées: {len(self.parser.actions.keys())}")
 
     def compose(self) -> ComposeResult:
@@ -162,17 +165,16 @@ class ClipBrowser(App):
     def watch_text(self, new_text: str) -> None:
         if self.text or self.text == "":
             self.parser.parseData(self.text)
-            self.query_one(ContentView).update_text(new_text)
+            self.query_one(ContentView).update_text(new_text, force=True)
             self.query_one(ContentView).filter_action()
 
-
-    @work(exclusive=True)
+    @work()
     async def handle_param(self, action : actionInterface ,  complex_param : dict | None = None, recipe_parser : bool = False):
         if complex_param :
             action.complex_param = complex_param
         if self.query_one("#maintabs", TabbedContent).active == "clipview":
             try:
-                self.text = await self.parser.apply_actionable(action, self.text)
+                self.text = await self.parser.apply_actionable(action, self.app.query_one(TextArea).text)
             except Exception as e:
                 self.app.notify("Error applying action..." + str(e) + traceback.format_exc(), severity="error")  
         elif self.query_one("#maintabs", TabbedContent).active == "tableview":

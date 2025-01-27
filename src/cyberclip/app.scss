@@ -1,6 +1,3 @@
-$accent: cornflowerblue;
-
-
 #maingrid {
     width: 100%;
     grid-size: 5 5;
@@ -16,7 +13,7 @@ $accent: cornflowerblue;
 
 Tooltip {
     background: antiquewhite;
-    border: $accent;
+    border: $primary;
     color: black
 }
 

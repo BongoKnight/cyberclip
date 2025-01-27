@@ -18,7 +18,7 @@ class actionInterface():
     - `__str__` : Visual representation of the action after being executed.
 
     Attributes:
-        parsers (list of ParserInterface): A list of parsers interface, these are used to 
+        parsers (dict of str:ParserInterface): A dict of parsers interface, these are used to 
             extract observales from text
         observables (list of str): A list of observables extracted by the parsers
         conf (dict): A configuration extracted from `conf.yaml`, this store data needed 
@@ -34,7 +34,7 @@ class actionInterface():
 
     """
     
-    def __init__(self, parsers: list[ParserInterface] = {}, supportedType: list[str] = {}, complex_param: dict = {}):
+    def __init__(self, parsers: dict = {}, supportedType: list[str] = {}, complex_param: dict = {}):
         """
         Args: 
             complex_param (dict): A dictionnary of value needed for executing the action properly typically a filename, config options, users choices, etc... This parameter is parsed by  

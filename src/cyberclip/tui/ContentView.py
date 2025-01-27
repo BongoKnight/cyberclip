@@ -1,4 +1,5 @@
 import re
+from functools import partial
 
 from textual import events, work, on
 from textual.reactive import var, reactive
@@ -20,17 +21,15 @@ class ContentView(Static):
     }
     #clip-content{
         width: 100%;
-        border: $accent;
+        border: $primary;
     }
     """
-
-    initial_text = "Waiting for Update..."
 
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader.""" 
         yield Vertical(
             ContentToolbar(),
-            ScrollableContainer(TextArea(self.initial_text, name="Content", id="clip-content", show_line_numbers=True))
+            ScrollableContainer(TextArea(self.app.text, name="Content", id="clip-content", show_line_numbers=True))
             )
 
     def filter_action(self):
@@ -69,21 +68,34 @@ class ContentView(Static):
                 else:
                     action_button.visible = False
                     action_button.add_class("no-height")
-    
-    def update_text(self, new_text: str) -> None:
+
+    def on_mount(self):
+        self.set_interval(2, self.auto_update)
+
+    def auto_update(self):
+        text = self.query_one(TextArea).text
+        if len(text) < 3000:
+            self.app.text = text 
+
+
+    def update_text(self, new_text: str, force=False) -> None:
         """Called when the text attribute changes."""
         from tui.DataTypePannel import DataTypeButton, DataLoader
         from tui.ActionPannel import ActionPannel, ActionButton
         textArea = self.query_one(TextArea)
         textArea.replace(str(new_text), (0,0), (textArea.document.line_count, len(textArea.document.get_line(textArea.document.line_count-1))))
-        parser_types = self.app.parser.detectedType
+        parser_types = list(self.app.parser.detectedType)
+        parser_types.sort()
         # Update detected type buttons
         buttons = self.parent.query(DataTypeButton)
         if buttons:             
             for button in buttons:
                 button.remove()
         for type_of_data in parser_types:
-            self.parent.query_one(DataLoader).add_dataType(type_of_data, active=True)
+            if type_of_data != "text":
+                self.parent.query_one(DataLoader).add_dataType(type_of_data, active=True)
+            else:
+                self.parent.query_one(DataLoader).add_dataType(type_of_data, active=False)
         existing_action = set()
         for action_name, action in self.app.parser.actions.items():
             for action_button in self.parent.query(ActionButton):
@@ -92,6 +104,7 @@ class ContentView(Static):
 
         # Add inexisting action buttons
         actions = list(self.app.parser.actions.items())
+        # Sort action by name
         actions.sort(key=lambda tup: tup[0])
         for action_name, action in actions:
             if  action_name not in existing_action:
@@ -100,7 +113,8 @@ class ContentView(Static):
         for action in self.parent.query(ActionButton):
             action.action.supportedType = set(action.action_supported_type)
             action.action.parsers = self.app.parser.parsers
-           
+        # for action in self.app.parser.actions.values():
+        #     action.parsers = self.app.parser.parsers
         # Filter action on existing active datatype
         self.app.call_after_refresh(self.filter_action)
         

@@ -403,7 +403,7 @@ class saveInFileAction(actionInterface):
         self.observables = self.get_observables()
         if self.observables.get("text"):
             text = self.observables.get("text")[0]
-            with open(filename,"w") as file:
+            with open(filename,"w", encoding="utf-8") as file:
                 file.write(text)
             return text
         return ""
