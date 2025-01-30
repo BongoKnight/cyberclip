@@ -36,6 +36,7 @@ class crtshCertificatesAction(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"domain"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Crt.sh: Get certificates"
+        self.indicators= "🐌"
 
         
     def execute(self) -> object:

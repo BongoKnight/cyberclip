@@ -23,6 +23,7 @@ class searchYetiAction(actionInterface):
     def __init__(self, parsers ={}, supportedType = {"ip","ipv6","domain","mail","url"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Search observables in YETI."
+        self.indicators = "🔑"
         self.config = self.load_conf("Yeti")
 
 

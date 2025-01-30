@@ -45,6 +45,7 @@ class inTop1MAction(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"domain"}, complex_param={"Get domain NOT IN top 1M":{"type":"bool","value":True}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
         self.description = "Top 1M domain"
+        self.indicators = "📑"
         self.results = []
 
     def execute(self) -> object:

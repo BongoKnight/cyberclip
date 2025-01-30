@@ -11,7 +11,7 @@ import json
 from dns import resolver
 
 class DNSAction(actionInterface):
-    """A action module, to return reverse DNS for an IP, and DNS for a domain.  
+    """Return reverse DNS for an IP, and DNS for a domain.  
     For a domain the a list of DNS reccord can be specified (default A) : ie. AAA,SPF,TXT.
     """
     CONF = {"Reccords":{"type":"tags","value":["A","TXT","SOA","NS","MX"]}}

@@ -59,6 +59,7 @@ class JA4Action(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"ja4"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "JA4: Search"
+        self.indicators = "📑"
         
     def execute(self) -> object:
         """
@@ -89,6 +90,7 @@ class JA3Action(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"md5"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "JA3: Search"
+        self.indicators = "📑"
         
     def execute(self) -> object:
         """

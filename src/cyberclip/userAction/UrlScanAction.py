@@ -16,6 +16,7 @@ class SearchInUrlScanAction(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"ip","domain","analytics"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "UrlScan: Search IoC"
+        self.indicators = "🔑"
 
         
     def execute(self) -> object:
@@ -51,6 +52,7 @@ class QueryUrlScanAction(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"text"}, complex_param=DEFAULT_QUERY_PARAMETERS):
         super().__init__(parsers=parsers, supportedType=supportedType, complex_param=complex_param)
         self.description = "UrlScan: Query"
+        self.indicators = "🔑"
         self.load_conf("UrlScan")
         API_KEY = self.conf.get("api-key","")
         self.headers = {"accept": "application/json", "API-Key": API_KEY}

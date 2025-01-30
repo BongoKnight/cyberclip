@@ -35,6 +35,7 @@ class translateWithDeeplAction(actionInterface):
     def __init__(self, parsers ={}, supportedType = {"text"}, complex_param=DEFAULT_PARAMS):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
         self.description = "Deepl: Tanslate text"
+        self.indicators = "🔑"
         self.lines = []
         self.load_conf("Deepl")
         API_KEY = self.conf.get("api-key","")

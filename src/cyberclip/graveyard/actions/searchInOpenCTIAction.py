@@ -25,6 +25,7 @@ class searchInOpenCTIAction(actionInterface):
     def __init__(self, parsers ={}, supportedType = {"ip","ipv6","domain","mail","url","md5"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Search all obsevables in OpenCTI."
+        self.indicators = "🔑"
         self.lines = []
         self.load_conf("OpenCTI")
         if (key:=self.conf.get("api_key","")) and (url:=self.conf.get("api_url","")):

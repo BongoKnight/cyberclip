@@ -46,6 +46,8 @@ class actionInterface():
         self.observables = {}
         self.results = {}
         self.conf = {}
+        self.indicators = ""
+
     
     def load_conf(self, conf_name, path='../data/conf.yml'):
         conf = {}

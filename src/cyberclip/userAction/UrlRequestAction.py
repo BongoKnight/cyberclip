@@ -16,6 +16,7 @@ class UrlToHtmlAction(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"url"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "URL: Get HTML content"
+        self.indicators = "🚩"
 
         
     def execute(self) -> object:
@@ -41,7 +42,8 @@ class GetCertificatesAction(actionInterface):
     CONF = {"Port":{"type":"text", "value":"443"}}
     def __init__(self, parsers = {}, supportedType = {"domain","ip"}, complex_param = CONF):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
-        self.description = "Get certificate."
+        self.description = "Get certificate"
+        self.indicators = "🚩"
 
     def verify_ssl_certificate(self, hostname, port=443):
         context = ssl.create_default_context()
@@ -74,6 +76,7 @@ class UrlToFaviconHashAction(actionInterface):
     def __init__(self, parsers = {}, supportedType = {"url","domain"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Favicon hash (mmh3)"
+        self.indicators = "🚩"
         
     def execute(self) -> object:
         results = {}

@@ -34,6 +34,7 @@ class searchYetiAction(actionInterface):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param = complex_param)
         self.description = "Add observables in YETI."
         self.config = self.load_conf("Yeti")
+        self.indicators = "🔑"
 
 
     def execute(self) -> object:
