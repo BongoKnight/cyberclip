@@ -57,7 +57,7 @@ class DataLoader(Static):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Event handler called when a button is pressed."""
         from tui.ContentView import ContentView
-        textArea = self.app.query_one(ContentView).query_one(TextArea)
+        textArea = self.app.contentview.query_one(TextArea)
         if event.button.id == "update-button":
             self.app.text = get_clipboard_text()
         if event.button.id == "text-update-button":
@@ -77,9 +77,8 @@ class DataLoader(Static):
 
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataLoader."""
-        yield Vertical(
-            Button("Parse clip", id="update-button", variant="success"),
-            Button("Parse text", id="text-update-button", variant="primary"), classes='update'
-        )
+        if not self.app.is_web:
+            yield Button("Parse clip", id="update-button", variant="success") 
+        yield Button("Parse text", id="text-update-button", variant="primary")
         yield VerticalScroll(id="data-type-container")
         yield Button("(Un)select all", id="filter-button", variant="primary")

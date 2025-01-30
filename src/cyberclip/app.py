@@ -10,6 +10,7 @@ import asyncio
 from functools import partial
 
 from textual import on, work
+from textual.binding import Binding
 from textual.reactive import var, reactive
 from textual._path import CSSPathType
 from textual.app import App, CSSPathType, ComposeResult
@@ -57,15 +58,16 @@ class ClipBrowser(App):
         
     
     """
+    APP_TITLE = "📝CyberClip👩‍💻"
     CSS_PATH = "app.scss"
-    COMMANDS = {ActionCommands, SystemCommandsProvider}
+    COMMANDS = App.COMMANDS | {ActionCommands}
     SCREENS = {"conf": ConfigScreen}
     BINDINGS = [
         ("ctrl+s", "save", "Save actual view."),
         ("ctrl+q", "quit", "Quit"),
         ("ctrl+f", "select_action_filter", "Filter"),
         ("ctrl+b", "copy", "Copy actual content to clipboard."),
-        ("ctrl+r", "reset", "Reset content view to clipboard content."),
+        Binding("ctrl+r", "reset", "Reset content view to clipboard content.", False),
         ("ctrl+e", "push_screen('conf')", "Edit config")
     ]
     CLOSE_TIMEOUT = None
@@ -88,7 +90,7 @@ class ClipBrowser(App):
         self.parser.load_all()
         self.recipe_parser.load_all()
         self.theme = "flexoki"
-        # self.app.notify(f"Parsers chargés: {len(self.parser.parsers.keys())}\nActions chargées: {len(self.parser.actions.keys())}")
+        self.app.notify(f"Loaded parsers: {len(self.parser.parsers.keys())}\nLoaded actions: {len(self.parser.actions.keys())}")
 
     def compose(self) -> ComposeResult:
         """Compose the main UI. Generate three tabs corresponding to the three modes of the application :
@@ -102,9 +104,9 @@ class ClipBrowser(App):
             Table and rule views are a WIP.
 
         """
-        self.console.set_window_title("📝CyberClip👩‍💻")
+        self.console.set_window_title(ClipBrowser.APP_TITLE)
         with TabbedContent(id="maintabs"):
-            with TabPane("📝CyberClip👩‍💻", id="clipview"):
+            with TabPane(ClipBrowser.APP_TITLE, id="clipview"):
                 yield Grid(
                     DataLoader(id="left-pannel"),
                     ContentView(id="content-view"),
@@ -172,8 +174,8 @@ class ClipBrowser(App):
     @work()
     async def handle_param(self, action : actionInterface ,  complex_param : dict | None = None, recipe_parser : bool = False):
         if complex_param :
-            action.complex_param = complex_param
-        if self.query_one("#maintabs", TabbedContent).active == "clipview":
+            actionnable.complex_param = complex_param
+        if self.active_tab == ClipBrowser.APP_TITLE:
             try:
                 self.text = await self.parser.apply_actionable(action, self.app.query_one(TextArea).text)
             except Exception as e:

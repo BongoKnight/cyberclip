@@ -39,7 +39,7 @@ class ContentView(Static):
         if actionView:
             actions = actionView.query(ActionButton)
             actual_detected_type = set(self.app.parser.detectedType)
-            for datatype_button in self.parent.ancestors[-1].query(DataTypeButton):
+            for datatype_button in self.app.query(DataTypeButton):
                 # Update actions supported_type and hide action buttons where no type are supported
                 if datatype_button.switch and datatype_button.switch.value:
                     for action_button in actions:
