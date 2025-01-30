@@ -22,21 +22,26 @@ except:
 
 
 
-class ActionButton(Static):
+class ActionButton(Button):
     """A action widget for action specific to certain types of data."""
     DEFAULT_CSS="""
     """
-    action : actionInterface = var(None)
-    action_name = var("")
+    actionnable : actionInterface = var(None)
     action_supported_type = var({})
-    def compose(self) -> ComposeResult:
-        yield Button(self.action_name, id="action-button", classes="")
     
     def on_mount(self) -> None:
-        self.query_one(Button).tooltip = self.action.__doc__.splitlines()[0]
+        self.label = self.action_name
+        self.tooltip = self.actionnable.__doc__.splitlines()[0]
+        if self.actionnable.indicators:
+            self.styles.border_subtitle_color = "blue"
+            self.border_subtitle = self.actionnable.indicators
 
-    @on(Button.Pressed, "#action-button")
-    async def execute_option_action(self, event: Button.Pressed) -> None:
+    @property
+    def action_name(self):
+        return self.actionnable.description
+
+    @on(Button.Pressed)
+    def execute_option_action(self, event: Button.Pressed) -> None:
         """Event handler called when a  button is pressed."""
         from .ModalParamScreen import ParamScreen
         from .ContentView import ContentView
