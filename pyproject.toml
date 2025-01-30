@@ -32,9 +32,9 @@ dependencies = [
   "pyperclip",
   "requests",
   "shodan",
-  "textual==0.81.0",
+  "textual",
   "textual[syntax]",
-  "textual-fspicker==0.0.11",
+  "textual-fspicker",
   "urllib3"
 ]
 

@@ -1,4 +1,5 @@
 import sys
+import argparse
 import pyperclip
 from io import StringIO
 import pandas as pd
@@ -196,8 +197,16 @@ class ClipBrowser(App):
 
 
 def main():
-    cyberClip = ClipBrowser()
-    cyberClip.run()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-w","--web", help="Serve as a web app", action="store_true")
+    args = parser.parse_args()
+    if args.web:
+        from textual_serve.server import Server
+        server = Server(f"python {Path(__file__).parent / "app.py"}")
+        server.serve()
+    else:
+        cyberClip = ClipBrowser()
+        cyberClip.run()
 
 if __name__ == "__main__":
     main()
