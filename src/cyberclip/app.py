@@ -21,7 +21,6 @@ from textual.screen import Screen
 from textual.widgets import Footer, TabbedContent, TabPane, TextArea
 
 try:
-    from cyberclip.tui.ConfigScreen import ConfigScreen
     from cyberclip.tui.DataTypePannel import DataLoader
     from cyberclip.tui.ContentView import ContentView
     from cyberclip.tui.ActionPannel import ActionPannel, ActionCommands
@@ -32,7 +31,6 @@ try:
     from cyberclip.userAction import actionInterface
     from cyberclip.clipboardHandler import get_clipboard_text
 except:
-    from tui.ConfigScreen import ConfigScreen
     from tui.DataTypePannel import DataLoader
     from tui.ContentView import ContentView
     from tui.ActionPannel import ActionPannel, ActionCommands
@@ -61,14 +59,12 @@ class ClipBrowser(App):
     APP_TITLE = "📝CyberClip👩‍💻"
     CSS_PATH = "app.scss"
     COMMANDS = App.COMMANDS | {ActionCommands}
-    SCREENS = {"conf": ConfigScreen}
     BINDINGS = [
         ("ctrl+s", "save", "Save actual view."),
         ("ctrl+q", "quit", "Quit"),
         ("ctrl+f", "select_action_filter", "Filter"),
         ("ctrl+b", "copy", "Copy actual content to clipboard."),
         Binding("ctrl+r", "reset", "Reset content view to clipboard content.", False),
-        ("ctrl+e", "push_screen('conf')", "Edit config")
     ]
     CLOSE_TIMEOUT = None
 
