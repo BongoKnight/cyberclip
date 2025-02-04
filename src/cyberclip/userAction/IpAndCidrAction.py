@@ -37,6 +37,37 @@ class ToCIDR24Action(actionInterface):
     def __str__(self):
         self.execute()
         return  "\n".join([f'{key}\t{value}' for key, value in self.exploded_cidr.items() if value!=""])
+    
+class ReservedIPAction(actionInterface):
+    """Parse IP to sort reserved/local IP. By default returns only IP that are NOT reserved or local. 
+
+You can set the `Reserved` parameter to `True` to return only  the reserved IP addresses.
+    """
+    def __init__(self, parsers = {}, supportedType = {"ip","ipv6"}, complex_param={"Reserved":{"type":"bool","value":False}}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
+        self.description = "IP: Reserved/Local"
+        self.results = {}
+        
+    def execute(self) -> object:
+        self.results = {}
+        self.observables = self.get_observables()
+        if ips := self.observables.get("ip",[]) + self.observables.get("ipv6",[]):
+            for ip in ips:
+                try:
+                    if reserved := self.get_param_value("Reserved"):
+                        if ipaddress.ip_address(ip).is_private:
+                            self.results.update({ip:ip})
+                    else:
+                        if ipaddress.ip_address(ip).is_global:
+                            self.results.update({ip:ip})
+                except:
+                    pass
+        return self.results
+
+    
+    def __str__(self):
+        self.execute()
+        return  "\n".join([key for key in self.results.keys()])
 
 if __name__=='__main__':
     from userTypeParser.IPParser import CIDRParser
