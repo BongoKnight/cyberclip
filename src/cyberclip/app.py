@@ -14,10 +14,8 @@ from textual.binding import Binding
 from textual.reactive import var, reactive
 from textual._path import CSSPathType
 from textual.app import App, CSSPathType, ComposeResult
-from textual.system_commands import SystemCommandsProvider
 from textual.containers import Grid
 from textual.driver import Driver
-from textual.screen import Screen   
 from textual.widgets import Footer, TabbedContent, TabPane, TextArea
 
 try:
@@ -26,9 +24,11 @@ try:
     from cyberclip.tui.ActionPannel import ActionPannel, ActionCommands
     from cyberclip.tui.TableView import FiltrableDataFrame
     from cyberclip.tui.RecipesPannel import RecipesPannel, RecipeButton, Recipe
+    from cyberclip.tui.ModalParamScreen import ParamScreen
     from cyberclip.userTypeParser import TSVParser
     from cyberclip.clipParser import clipParser
-    from cyberclip.userAction import actionInterface
+    from cyberclip.userAction.actionInterface import actionInterface
+    from cyberclip.userTypeParser.ParserInterface import ParserInterface
     from cyberclip.clipboardHandler import get_clipboard_text
 except:
     from tui.DataTypePannel import DataLoader
@@ -36,9 +36,11 @@ except:
     from tui.ActionPannel import ActionPannel, ActionCommands
     from tui.TableView import FiltrableDataFrame
     from tui.RecipesPannel import RecipesPannel, RecipeButton, Recipe
+    from tui.ModalParamScreen import ParamScreen
     from userTypeParser import TSVParser
     from clipParser import clipParser
-    from userAction import actionInterface
+    from userAction.actionInterface import actionInterface
+    from userTypeParser.ParserInterface import ParserInterface
     from clipboardHandler import get_clipboard_text
 
 
@@ -71,6 +73,7 @@ class ClipBrowser(App):
     parser = var(clipParser())
     recipe_parser = var(clipParser())
     text = reactive("Waiting for Update...", init=False)
+    active_tab : str = ""
     try:
         with open(Path(__file__).parent / 'data/recipes.yml', "r", encoding="utf8") as f:
             recipes = var([Recipe(recipe_dict=i) for i in yaml.safe_load(f.read())])
@@ -140,7 +143,8 @@ class ClipBrowser(App):
 
     @on(TabbedContent.TabActivated)
     def check_TSV(self, event: TabbedContent.TabActivated):
-        if event.tab.label_text == "TableView":
+        self.active_tab = event.tab.label_text
+        if self.active_tab == "TableView":
             df = pd.DataFrame()
             parser = TSVParser.tsvParser(self.text)
             if parser.extract():            
@@ -150,9 +154,9 @@ class ClipBrowser(App):
                     self.app.call_after_refresh(self.update_dataframe, df)
                 except Exception as e:
                     self.app.notify(f"Error : {str(e)}" ,title="Error while loading data...", timeout=5, severity="error")
-        if event.tab.label_text == "📝CyberClip👩‍💻":
+        if self.active_tab == ClipBrowser.APP_TITLE:
             self.parser.parseData(self.text)
-        if event.tab.label_text == "Recipes":
+        if self.active_tab == "Recipes":
             self.query_one(RecipesPannel).refresh_recipes()
             if querybuttons:= self.query(RecipeButton):
                 querybuttons[0].press()
@@ -165,34 +169,46 @@ class ClipBrowser(App):
     def watch_text(self, new_text: str) -> None:
         if self.text or self.text == "":
             self.parser.parseData(self.text)
-            self.query_one(ContentView).update_text(new_text, force=True)
-            self.query_one(ContentView).filter_action()
+            self.contentview.update_text(new_text, force=True)
+            self.contentview.filter_action()
 
     @work()
-    async def handle_param(self, action : actionInterface ,  complex_param : dict | None = None, recipe_parser : bool = False):
+    async def get_param(self, actionnable: actionInterface | ParserInterface):
+        if isinstance(actionnable, ParserInterface) or not actionnable.complex_param :
+            await self.handle_param(actionnable)
+        else:
+            param_screen = ParamScreen()
+            param_screen.border_title = f"Parameters for '{actionnable.description}' action."
+            param_screen.actionnable = actionnable
+            try:
+                self.push_screen(param_screen, callback=partial(self.handle_param, actionnable))
+            except:
+                self.notify(f"Error while executing action : {traceback.format_exc()}", severity="error")
+
+    async def handle_param(self, actionnable : actionInterface | ParserInterface ,  complex_param : dict | None = None, recipe_parser : bool = False):
         if complex_param :
             actionnable.complex_param = complex_param
         if self.active_tab == ClipBrowser.APP_TITLE:
             try:
-                self.text = await self.parser.apply_actionable(action, self.app.query_one(TextArea).text)
+                self.notify("I'm there")
+                self.text = await self.parser.apply_actionable(actionnable, self.app.query_one(TextArea).text)
             except Exception as e:
                 self.app.notify("Error applying action..." + str(e) + traceback.format_exc(), severity="error")  
-        elif self.query_one("#maintabs", TabbedContent).active == "tableview":
+        elif self.active_tab == "TableView":
             dataframe = self.query_one(FiltrableDataFrame)
             column_name = dataframe.datatable.df.columns[dataframe.datatable.cursor_column]
-            new_column_name = dataframe.datatable.get_column_name(f"{action.__class__.__name__}_{column_name}")
+            new_column_name = dataframe.datatable.get_column_name(f"{actionnable.__class__.__name__}_{column_name}")
             try:
-                async with asyncio.timeout(10):
-                    if recipe_parser:
-                        dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.recipe_parser.apply_actionable(action, str(text)) for text in dataframe.datatable.df[column_name]))
-                        dataframe.datatable.update_displayed_df(dataframe.datatable.df)
-                    else:
-                        dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.parser.apply_actionable(action, str(text)) for text in dataframe.datatable.df[column_name]))
-                        dataframe.datatable.update_displayed_df(dataframe.datatable.df)    
+                if recipe_parser:
+                    dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.recipe_parser.apply_actionable(actionnable, str(text)) for text in dataframe.datatable.df[column_name]))
+                    dataframe.datatable.update_displayed_df(dataframe.datatable.df)
+                else:
+                    dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.parser.apply_actionable(actionnable, str(text)) for text in dataframe.datatable.df[column_name]))
+                    dataframe.datatable.update_displayed_df(dataframe.datatable.df)
             except Exception as e:
-                self.app.notify("Action took too long to execute..." + str(e) + traceback.format_exc(), severity="error")
+                self.app.notify("Error executing an action..." + str(e) + traceback.format_exc(), severity="error")
 
-    
+
 
 
 def main():

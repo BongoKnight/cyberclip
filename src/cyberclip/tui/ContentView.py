@@ -45,24 +45,24 @@ class ContentView(Static):
                     for action_button in actions:
                         # Add the supported type if the default action support it.
                         if datatype_button.parser_type in action_button.action_supported_type:
-                            action_button.action.supportedType.add(datatype_button.parser_type)
+                            action_button.actionnable.supportedType.add(datatype_button.parser_type)
                 else:
                     for action_button in actions:
                         if datatype_button.parser_type in action_button.action_supported_type:
-                            action_button.action.supportedType.discard(datatype_button.parser_type)
+                            action_button.actionnable.supportedType.discard(datatype_button.parser_type)
             
             filter_text = self.app.query_one(ActionPannel).query_one(Input).value
             for action_button in actions:
-                if  (len(action_button.action.supportedType.intersection(actual_detected_type)) >=1
-                    and len(action_button.action.supportedType.intersection(action_button.action_supported_type)) >= 1
+                if  (len(action_button.actionnable.supportedType.intersection(actual_detected_type)) >=1
+                    and len(action_button.actionnable.supportedType.intersection(action_button.action_supported_type)) >= 1
                     ) :
                     action_button.visible = True
                     action_button.remove_class("no-height")
                     self.app.actions.append(action_button)
                     if filter_text:
                         for word in filter_text.split():
-                            if not re.search(f"(?i){word}", action_button.action.description, re.IGNORECASE):
-                                if not word in action_button.action.supportedType:
+                            if not re.search(f"(?i){word}", action_button.actionnable.description, re.IGNORECASE):
+                                if not word in action_button.actionnable.supportedType:
                                     action_button.visible = False
                                     action_button.add_class("no-height")
                 else:
@@ -111,8 +111,8 @@ class ContentView(Static):
                 self.parent.query_one(ActionPannel).add_action(action)
 
         for action in self.parent.query(ActionButton):
-            action.action.supportedType = set(action.action_supported_type)
-            action.action.parsers = self.app.parser.parsers
+            action.actionnable.supportedType = set(action.action_supported_type)
+            action.actionnable.parsers = self.app.parser.parsers
         # for action in self.app.parser.actions.values():
         #     action.parsers = self.app.parser.parsers
         # Filter action on existing active datatype

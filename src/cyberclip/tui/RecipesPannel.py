@@ -124,10 +124,7 @@ class Recipe:
                         new_text = await app.recipe_parser.apply_actionable(step.actionnable.actionnable, new_text)
                         return await self.execute_recipe(app, text=new_text, step_index=step_index+1)         
                     else:
-                        param_screen = ParamScreen()
-                        param_screen.border_title = f"Parameters for {step.actionnable.description}."
-                        param_screen.action = step.actionnable.actionnable
-                        await app.push_screen(param_screen, partial(app.handle_param, step.actionnable.actionnable))
+                        await app.get_param(step.actionnable.actionnable)
                         return await self.execute_recipe(app, text=app.text, step_index=step_index+1)
                 elif step.actionnable.type == "parser":
                     new_text = "\r\n".join(step.actionnable.actionnable.extract())
