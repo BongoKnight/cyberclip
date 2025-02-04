@@ -249,7 +249,6 @@ class FiltrableDataFrame(Static):
                     radioset.border_title = "Select :"
             yield Button("Copy selected", id="copy", variant="primary")
             yield Button("Copy table", id="copy-table", variant="primary")
-            yield Button("Open in visidata", id="visidata", variant="success")
             yield Button("Reset", id="clean-filter", variant="error")
             with Vertical() :
                 yield Select([], prompt="Group by...", id="groupby")
@@ -285,27 +284,17 @@ class FiltrableDataFrame(Static):
     def copy_selected_to_clipboard(self):
         if self.datatable.cursor_type == "cell":
             cell = self.datatable.get_cell_at(self.datatable.cursor_coordinate)
-            pyperclip.copy(str(cell))
+            self.app.copy_to_clipboard(str(cell))
         elif self.datatable.cursor_type == "row":
             row = self.datatable.get_row_at(self.datatable.cursor_coordinate.row)
-            pyperclip.copy("\t".join([str(i) for i in row]))
+            self.app.copy_to_clipboard("\t".join([str(i) for i in row]))
         elif self.datatable.cursor_type == "column":
             column = self.datatable.get_column_at(self.datatable.cursor_coordinate.column)
-            pyperclip.copy("\n".join([str(i) for i in column]))
+            self.app.copy_to_clipboard("\n".join([str(i) for i in column]))
 
     @on(Button.Pressed, "#copy-table")
     def copy_table_to_clipboard(self):
-        pyperclip.copy(self.datatable.displayed_df.to_csv(sep="\t",index=False))
-
-    @on(Button.Pressed, "#visidata")
-    def open_in_visidata(self):
-        file = Path(__file__).parent / "../data/tmp.csv"
-        self.datatable.displayed_df.to_csv(file, index=False)
-        with self.app.suspend():
-            file = str(file.absolute()).replace("C://","/mnt/c/")
-            system(f"wsl.exe -e ~/.venv/bin/python3 -m visidata {file}")
-        with open(file, "r") as f:
-            self.app.text = f.read()
+        self.app.copy_to_clipboard(self.datatable.displayed_df.to_csv(sep="\t",index=False))
 
     @on(Button.Pressed, "#clean-filter")
     def clean_filters(self, reset_df = True):

@@ -125,9 +125,10 @@ class ClipBrowser(App):
     def action_save(self):      
         with open("clipboard.txt", "w") as f:
             f.write(self.text)
+            self.deliver_text(f, encoding="utf-8")
 
     def action_copy(self):
-        pyperclip.copy(self.text)
+        self.app.copy_to_clipboard(self.text)
         self.notify("Copied in clipboard!")
 
     def action_reset(self):
