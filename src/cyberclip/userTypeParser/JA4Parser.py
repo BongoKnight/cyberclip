@@ -21,16 +21,16 @@ class ja4Parser(ParserInterface):
         self.objects = []
         
     def contains(self):
-        """Return true if text contains at least one md5."""
+        """Return true if text contains at least one JA4."""
         if re.search(r"\b(JA4(H|X|SSH|S|T|TScan)?=?)?([a-z0-9]{4,20}_[a-z0-9]{4,20}(_[a-z0-9]{4,20})?|(\d+)_\d+-[\d\-_]+)\b",self.text) :
             return True
         else :
             return False
     
     def extract(self):
-        """Return all md5 contained in text."""
+        """Return all JA4 contained in text."""
         ja4sIter = re.finditer(r"\b(JA4(H|X|SSH|S|T|TScan)?=?)?([a-z0-9]{4,20}_[a-z0-9]{4,20}(_[a-z0-9]{4,20})?|(\d+)_\d+-[\d\-_]+)\b", self.text)
-        ja4s = [ja4.group(3) for ja4 in ja4sIter]
+        ja4s = [ja4.group(3) for ja4 in ja4sIter if re.search("\d{2}", ja4.group(3))]
         self.objects = ja4s
         return ja4s
         
