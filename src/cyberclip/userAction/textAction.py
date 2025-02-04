@@ -6,6 +6,7 @@ from collections import Counter
 import re
 from datetime import datetime
 from urllib.parse import unquote, quote
+import html
 
 
 
@@ -308,6 +309,54 @@ class UrlUnquoteAction(actionInterface):
                 return unquote(text)
             except Exception as e:
                 return "Invalid URL encoding: " + str(e)
+        return "No text found."
+    
+    def __str__(self):
+        return  self.execute()
+    
+class HtmlUnquoteAction(actionInterface):
+    """Unescape HTML encoded text. `&gt;` is replaced by `>`."""
+    
+    def __init__(self, parsers = {}, supportedType = {"text"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
+        self.description = "HTML entity decode"
+        
+    def execute(self) -> object:
+        """Unescape a HTML encoded text.
+        
+        Returns:
+            html.unescape(text)
+        """
+        if self.get_observables().get("text"):
+            text = self.observables.get("text")[0]
+            try: 
+                return html.unescape(text)
+            except Exception as e:
+                return "Invalid HTML encoding: " + str(e)
+        return "No text found."
+    
+    def __str__(self):
+        return  self.execute()
+    
+class HtmlQuoteAction(actionInterface):
+    """Escape special character in a text with HTML entity. `>` is replaced by `&gt;`."""
+    
+    def __init__(self, parsers = {}, supportedType = {"text"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
+        self.description = "HTML entity encode"
+        
+    def execute(self) -> object:
+        """Escape a text with HTML entity.
+        
+        Returns:
+            html.escape(text)
+        """
+        if self.get_observables().get("text"):
+            text = self.observables.get("text")[0]
+            try: 
+                return html.escape(text)
+            except Exception as e:
+                return "Invalid HTML encoding: " + str(e)
         return "No text found."
     
     def __str__(self):
