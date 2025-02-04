@@ -5,19 +5,19 @@ except:
 
 import os
 import time
+import json
 import requests
 import tldextract
 import shutil
-from urllib.parse import urlparse
 from datetime import datetime, timedelta
 from pathlib import Path
 
 class baseDomainAction(actionInterface):
-    """A action module, to return the base domain of a domain or URL.  
-    For example : 
+    """Return the base domain of a domain or URL.  
+For example : 
 
-    - `https://www.example.com/path/of/page` returns `example.com`
-    - `www.example.com` returns `example.com`
+- `https://www.example.com/path/of/page` returns `example.com`
+- `www.example.com` returns `example.com`
     """
     def __init__(self, parsers = {}, supportedType = {"url","domain"}, complex_param={}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
@@ -36,7 +36,40 @@ class baseDomainAction(actionInterface):
     
     def __str__(self):
         self.execute()
-        return  "\n".join([value for key, value in self.results.items() if value!=""])
+        lines = []
+        for key, value in self.results.items():
+            lines.append(f"{key}\t{value}")
+        return  "\n".join(lines)
+    
+
+class TldDomainAction(actionInterface):
+    """A action module, to return the base domain of a domain or URL.  
+For example : 
+
+- `https://www.example.co.uk/path/of/page` returns `co.uk`
+- `www.example.com` returns `com`
+    """
+    def __init__(self, parsers = {}, supportedType = {"url","domain"}, complex_param={}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
+        self.description = "Extract TLD"
+        self.results = {}
+        
+    def execute(self) -> object:
+        self.results = {}
+        self.observables = self.get_observables()
+        if self.observables.get("url"):
+            self.results.update({url:f"{tldextract.extract(url).suffix}" for url in self.observables.get("url")})
+        if self.observables.get("domain"):
+            self.results.update({domain:f"{tldextract.extract(domain).suffix}" for domain in self.observables.get("domain")})
+        return self.results
+
+    
+    def __str__(self):
+        self.execute()
+        lines = []
+        for key, value in self.results.items():
+            lines.append(f"{key}\t{value}")
+        return  "\n".join(lines)
 
 
 class inTop1MAction(actionInterface):
@@ -44,7 +77,7 @@ class inTop1MAction(actionInterface):
     """
     def __init__(self, parsers = {}, supportedType = {"domain"}, complex_param={"Get domain NOT IN top 1M":{"type":"bool","value":True}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
-        self.description = "Top 1M domain"
+        self.description = "Domain: Top 1M"
         self.indicators = "📑"
         self.results = []
 
