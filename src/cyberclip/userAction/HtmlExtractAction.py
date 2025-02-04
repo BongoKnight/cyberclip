@@ -5,12 +5,12 @@ except:
 from bs4 import BeautifulSoup
 
 class HtmlExtractAction(actionInterface):
-    """A action module to extract tags from an HTML document.  
-    Extract paragraph and title by default  
-    For example :
+    """Extract tags from an HTML document.  
+Extract paragraph and title by default  
+For example :
 
-    - `td > b` : Extract all the bold tags inside a table
-    - `#password` : Extract all the Html tags where the id property value is `password` 
+- `td > b` : Extract all the bold tags inside a table
+- `#password` : Extract all the Html tags where the id property value is `password` 
     """
 
     def __init__(self, parsers = {}, supportedType = {"html"}, complex_param={"CSS selectors":{"value":["p"], "type":"tags"}}):
@@ -42,12 +42,12 @@ class HtmlExtractAction(actionInterface):
         return  "\r\n".join(lines)
 
 class HtmlExtractTextAction(actionInterface):
-    """A action module to extract text from an HTML document.  
-    Extract paragraph and title by default  
-    For example :  
+    """Extract text from an HTML document.  
+Extract paragraph and title by default  
+For example :  
 
-    - `td > b` : Extract all the bold text inside a table
-    - `#password` : Extract text from all the Html tags where the id property value is `password`
+- `td > b` : Extract all the bold text inside a table
+- `#password` : Extract text from all the Html tags where the id property value is `password`
     """
 
     def __init__(self, parsers = {}, supportedType = {"html"}, complex_param = {"CSS selectors":{"value":["p"], "type":"tags"}}):
