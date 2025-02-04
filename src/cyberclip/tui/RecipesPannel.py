@@ -124,8 +124,8 @@ class Recipe:
                         new_text = await app.recipe_parser.apply_actionable(step.actionnable.actionnable, new_text)
                         return await self.execute_recipe(app, text=new_text, step_index=step_index+1)         
                     else:
-                        await app.get_param(step.actionnable.actionnable)
-                        return await self.execute_recipe(app, text=app.text, step_index=step_index+1)
+                        async with app.get_param(step.actionnable.actionnable):
+                           return await self.execute_recipe(app, text=app.text, step_index=step_index+1)
                 elif step.actionnable.type == "parser":
                     new_text = "\r\n".join(step.actionnable.actionnable.extract())
                     return await self.execute_recipe(app, text=new_text, step_index=step_index+1)

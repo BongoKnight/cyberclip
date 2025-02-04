@@ -64,7 +64,7 @@ class ActionCommands(Provider):
                 if self.app.contentview:
                     if isinstance(actionable, Recipe):
                         try:
-                            self.app.text = actionable.execute_recipe(self.app)
+                            self.app.text = await actionable.execute_recipe(self.app)
                         except Exception as e:
                             self.app.notify("Error while applying recipe: " + str(e) + traceback.format_exc(), severity="error")
             

@@ -190,7 +190,6 @@ class ClipBrowser(App):
             actionnable.complex_param = complex_param
         if self.active_tab == ClipBrowser.APP_TITLE:
             try:
-                self.notify("I'm there")
                 self.text = await self.parser.apply_actionable(actionnable, self.app.query_one(TextArea).text)
             except Exception as e:
                 self.app.notify("Error applying action..." + str(e) + traceback.format_exc(), severity="error")  
