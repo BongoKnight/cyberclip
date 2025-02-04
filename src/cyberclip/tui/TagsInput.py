@@ -27,6 +27,7 @@ class TagsInput(Static):
     }
 
     """
+    BINDINGS = [("ctrl+r", "delete_all", "Delete all tags")]
     def __init__(self, label : str ="", value : set = set(), **kwargs):
         super().__init__(**kwargs)
         self._value = set(value)
@@ -48,7 +49,10 @@ class TagsInput(Static):
             input.value = ""
             self.query_one(Input).focus()
         
-    
+    def action_delete_all(self):
+        self._value = set()
+        self.query_one(HorizontalScroll).remove_children()
+
     @property
     def value(self):
         return list(self._value)
