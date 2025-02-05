@@ -37,11 +37,20 @@ def flatten(dictionary, parent_key=False, separator='.'):
     return dict(items)
 
 class JSONExtractAction(actionInterface):
-    """A action module to extract data from a JSON object.  
-Use jq module. You can test your queries here: https://jqplay.org/
+    """Extract data from a JSON or YAML object using jq. You can test your queries here: https://jqplay.org/
 
 Example::
 
+```json
+{"a":"elem1","b":"elem2","c":3, "d":[{"a":"elem3","b":"elem4","c":5},{"a":"elem5","b":"elem6","c":2}]}
+```
+
+With the JSON above: 
+
+- `.a` selector will return `"elem1"`
+- `.c` selector  will return `3`
+- `.d[].a` selector will return `"elem3"\n"elem5"`
+- `.d[] | select(.c>2)` selector will return `{"a": "elem3","b": "elem4","c": 5}`
 
     """
     CONF = {"Selectors":{"type":"tags", "value":[]}, "Get only values":{"type":"bool","value": True}}
