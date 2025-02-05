@@ -17,7 +17,7 @@ from textual.app import App, CSSPathType, ComposeResult
 from textual.containers import Grid
 from textual.driver import Driver
 from textual.widgets import Footer, TabbedContent, TabPane, TextArea
-
+from utilities import clean_tsv
 try:
     from cyberclip.tui.DataTypePannel import DataLoader
     from cyberclip.tui.ContentView import ContentView
@@ -200,9 +200,11 @@ class ClipBrowser(App):
             try:
                 if recipe_parser:
                     dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.recipe_parser.apply_actionable(actionnable, str(text)) for text in dataframe.datatable.df[column_name]))
+                    dataframe.datatable.df[new_column_name] = dataframe.datatable.df.apply(lambda x: clean_tsv(x[new_column_name], x[column_name]), axis=1)
                     dataframe.datatable.update_displayed_df(dataframe.datatable.df)
                 else:
                     dataframe.datatable.df[new_column_name] = await asyncio.gather(*(self.parser.apply_actionable(actionnable, str(text)) for text in dataframe.datatable.df[column_name]))
+                    dataframe.datatable.df[new_column_name] = dataframe.datatable.df.apply(lambda x: clean_tsv(x[new_column_name], x[column_name]), axis=1)
                     dataframe.datatable.update_displayed_df(dataframe.datatable.df)
             except Exception as e:
                 self.app.notify("Error executing an action..." + str(e) + traceback.format_exc(), severity="error")
