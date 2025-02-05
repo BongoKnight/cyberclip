@@ -69,7 +69,6 @@ With the JSON above:
                     actual_value = self.results.get(json_str, {})
                     actual_value.update({selector:extract[selector]})
                     self.results[json_str] = actual_value
-                    print(jq.compile(selector).input_value(data).text())
                 except Exception as e:
                     extract[selector] = [f"Error : {e}"]
                 # if len(set([len(extracted) for selector, extracted in extract.items()])) == 1:

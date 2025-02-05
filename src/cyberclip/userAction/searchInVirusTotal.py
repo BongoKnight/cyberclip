@@ -3,7 +3,7 @@ try:
 except:
     from actionInterface import actionInterface
 
-from jsonpath import jsonpath
+import jq
 import json
 from pathlib import Path
 from yaml.loader import SafeLoader
@@ -18,7 +18,23 @@ DEFAULT_PARAMS = {
                     },
                 "Analysis fields":{
                     "type":"tags",
-                    "value":["$.data.attributes.last_analysis_stats.malicious","$.data.attributes.tags","$.data.attributes.first_submission_date","$.data.attributes.creation_date","$.data.attributes.reputation","$.data.attributes.meaningful_name","$.data.attributes.magic","$.data.attributes.size","$.data.attributes.jarm","$.data.attributes.asn","$.data.relationships.bundled_files.data[*].id","$.data.relationships.contacted_domains.data[*].id","$.data.relationships.contacted_ips.data[*].id","$.data.relationships.contacted_urls.data[*].context_attributes.url","$.data.relationships.dropped_files.data[*].id","$.data.relationships.submissions.data[*].attributes.country","$.data.relationships.submissions.data[*].attributes.date"]
+                    "value":[".data.attributes.last_analysis_stats.malicious",
+                             ".data.attributes.tags",
+                             ".data.attributes.first_submission_date",
+                             ".data.attributes.creation_date",
+                             ".data.attributes.reputation",
+                             ".data.attributes.meaningful_name",
+                             ".data.attributes.magic",
+                             ".data.attributes.size",
+                             ".data.attributes.jarm",
+                             ".data.attributes.asn",
+                             ".data.relationships.bundled_files.data[].id",
+                             ".data.relationships.contacted_domains.data[].id",
+                             ".data.relationships.contacted_ips.data[].id",
+                             ".data.relationships.contacted_urls.data[].context_attributes.url",
+                             ".data.relationships.dropped_files.data[].id",
+                             ".data.relationships.submissions.data.attributes.country",
+                             ".data.relationships.submissions.data.attributes.date"]
                     },
                 }
 
@@ -84,12 +100,12 @@ VirusTotal:
                 data = {}
                 for selector in self.get_param_value("Analysis fields"):
                     cleaned_selector = selector 
-                    if cleaned_selector.startswith("$.data.attributes."):
-                        cleaned_selector = cleaned_selector.replace("$.data.attributes.", "")
-                    if cleaned_selector.startswith("$.data.relationships."):
-                        cleaned_selector = cleaned_selector.replace("$.data.relationships.", "")
-                    if seen := jsonpath(result, selector):
-                        data[cleaned_selector] = seen
+                    if cleaned_selector.startswith(".data.attributes."):
+                        cleaned_selector = cleaned_selector.replace(".data.attributes.", "")
+                    if cleaned_selector.startswith(".data.relationships."):
+                        cleaned_selector = cleaned_selector.replace(".data.relationships.", "")
+                    if seen := jq.compile(selector).input_value(result):
+                        data[cleaned_selector] = seen.text()
                     else:
                         data[cleaned_selector] = ""
             self.results[observable] = data
