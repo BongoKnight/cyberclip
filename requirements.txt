@@ -1,6 +1,7 @@
 beautifulsoup4
 dnspython
 jsonpath
+jq
 pandas
 pycti
 pyperclip

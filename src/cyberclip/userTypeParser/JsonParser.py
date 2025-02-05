@@ -64,7 +64,7 @@ class JSONParser(ParserInterface):
                         self.objects.append(json_obj)
                 except JSONDecodeError as e:
                     pass
-        return [json.dumps(self.objects, indent=4)]
+        return [json.dumps(self.objects)]
         
         
 if __name__=="__main__":

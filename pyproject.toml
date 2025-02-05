@@ -26,6 +26,7 @@ dependencies = [
   "beautifulsoup4",
   "dnspython",
   "jsonpath",
+  "jq",
   "pandas",
   "pycti",
   "pywin32",

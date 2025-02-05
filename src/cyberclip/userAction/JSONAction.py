@@ -2,9 +2,8 @@ try:
     from userAction.actionInterface import actionInterface
 except:
     from actionInterface import actionInterface
-from jsonpath import jsonpath
-import json
-from json import dumps, loads
+import jq
+import json 
 import yaml
 import pandas as pd
 
@@ -39,9 +38,13 @@ def flatten(dictionary, parent_key=False, separator='.'):
 
 class JSONExtractAction(actionInterface):
     """A action module to extract data from a JSON object.  
-    Use jsonpath module.
+Use jq module. You can test your queries here: https://jqplay.org/
+
+Example::
+
+
     """
-    CONF = {"Selectors":{"type":"tags", "value":[]}}
+    CONF = {"Selectors":{"type":"tags", "value":[]}, "Get only values":{"type":"bool","value": True}}
     def __init__(self, parsers = {}, supportedType = {"json","yaml"}, complex_param=CONF):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
         self.description = "Extract from JSON/YAML with Path Selector"
@@ -50,40 +53,49 @@ class JSONExtractAction(actionInterface):
     def filter_json(self, json_str: str):
         if json_str:
             extract = {}
-            data = loads(json_str)
+            data = json.loads(json_str)
             for selector in self.get_param_value("Selectors"):
                 try:
-                    extract[selector] = jsonpath(data, selector)
+                    extract[selector] = jq.compile(selector).input_value(data).text()
+                    actual_value = self.results.get(json_str, {})
+                    actual_value.update({selector:extract[selector]})
+                    self.results[json_str] = actual_value
+                    print(jq.compile(selector).input_value(data).text())
                 except Exception as e:
                     extract[selector] = [f"Error : {e}"]
-            if len(set([len(extracted) for selector, extracted in extract.items()])) == 1:
-                atomic_dict = [{k: v[i] for k, v in extract.items()} for i in range(len(next(iter(extract.values()))))]
-                #atomic_dict = {i: [v[i] for k, v in extract.items()] for i in range(len(next(iter(extract.values()))))}
-                #atomic_dict = [[v[i] for k, v in extract.items()] for i in range(len(next(iter(extract.values()))))]
-                self.results.update({json_str:atomic_dict})
-            else:
-                self.results.update({json_str:[extract]})
+                # if len(set([len(extracted) for selector, extracted in extract.items()])) == 1:
+                #     atomic_dict = [{k: v[i] for k, v in extract.items()} for i in range(len(next(iter(extract.values()))))]
+                #     #atomic_dict = {i: [v[i] for k, v in extract.items()] for i in range(len(next(iter(extract.values()))))}
+                #     #atomic_dict = [[v[i] for k, v in extract.items()] for i in range(len(next(iter(extract.values()))))]
+                #     self.results.update({json_str:atomic_dict})
+                # else:
+                #     self.results.update({json_str:[extract]})
+
         return self.results
         
     def execute(self) -> object:
         self.results = []
         self.observables = self.get_observables()
         if json_objects:=self.observables.get("json"):
-            for json in json_objects:
-                self.filter_json(json)          
+            for _json in json_objects:
+                self.filter_json(_json)          
         if self.observables.get("yaml") and not self.observables.get("json"):
-            json_objects = [dumps(yaml.safe_load(yaml_str)) for yaml_str in self.observables.get("yaml")]
-            for json in json_objects:
-                self.filter_json(json)    
+            json_objects = [json.dumps(yaml.safe_load(yaml_str)) for yaml_str in self.observables.get("yaml")]
+            for _json in json_objects:
+                self.filter_json(_json)    
         return self.results
     
     def __str__(self):
-        filtered_jsons = self.execute()
-        dfs = []
-        for filtered_json_object in filtered_jsons.values():
-            df = pd.DataFrame([*filtered_json_object])
-            dfs.append(df)
-        return pd.concat(dfs).to_csv(sep="\t", index=False, header=True)
+        self.execute()
+        text = []
+        if self.get_param_value("Get only values"):
+            for _json, extract in self.results.items():
+                for value in extract.values():
+                    text.append(str(value))
+        else:
+            for k,v in self.results.items():
+                text.append(f"{k}\t{json.dumps(v,indent=None)}")
+        return "\n".join(text)
 
 
 class JSONSchemeAction(actionInterface):
@@ -116,12 +128,12 @@ class JSONSchemeAction(actionInterface):
         self.json_paths = set()
         self.observables = self.get_observables()
         if json_objects:=self.observables.get("json"):
-            for json in json_objects:
-                self.get_json_paths(loads(json))          
+            for _json in json_objects:
+                self.get_json_paths(json.loads(_json))          
         if self.observables.get("yaml") and not self.observables.get("json"):
-            json_objects = [dumps(yaml.safe_load(yaml_str)) for yaml_str in self.observables.get("yaml")]
-            for json in json_objects:
-                self.get_json_paths(json)    
+            json_objects = [json.dumps(yaml.safe_load(yaml_str)) for yaml_str in self.observables.get("yaml")]
+            for _json in json_objects:
+                self.get_json_paths(_json)    
         return self.json_paths
     
     def __str__(self):
@@ -135,7 +147,6 @@ class JSONSchemeAction(actionInterface):
 
 class JSONFlattenAction(actionInterface):
     """A action module to flatten data from a JSON object.  
-    Use jsonpath module.
     """
 
     def __init__(self, parsers = {}, supportedType = {"json","yaml"}):
@@ -148,7 +159,7 @@ class JSONFlattenAction(actionInterface):
         self.observables = self.get_observables()
         json_objects = {}
         if self.observables.get("json"):
-            json_objects = [loads(json) for json in self.observables.get("json")]
+            json_objects = [json.loads(json) for json in self.observables.get("json")]
         if self.observables.get("yaml") and not self.observables.get("json"):
             json_objects = [yaml.safe_load(yaml_str) for yaml_str in self.observables.get("yaml")]
         for json in json_objects:
@@ -166,5 +177,7 @@ if __name__=='__main__':
     data = '{"a":"toto","b":"tutu","c":"unique", "d":[{"a":"titi","b":"tutu"},{"a":"toti","b":"tati"}]}'
     #data =  '{"a":"1"}'
     text_parser = JSONParser(data)
+    d = str(JSONExtractAction({"json":text_parser},["json"],complex_param={"Selectors":{"type":"tags", "value":[".a"]}}))
     c = str(JSONSchemeAction({"json":text_parser},["json"]))
     print(f"Scheme:{c}")
+    print(f"Extract: {d}")
