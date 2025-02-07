@@ -218,7 +218,7 @@ def main():
     args = parser.parse_args()
     if args.web:
         from textual_serve.server import Server
-        server = Server(f"python {Path(__file__).parent / "app.py"}")
+        server = Server(f"python {Path(__file__).parent / "app.py"}", host="0.0.0.0")
         server.serve()
     else:
         cyberClip = ClipBrowser()
