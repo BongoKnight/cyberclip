@@ -89,7 +89,6 @@ class ClipBrowser(App):
     async def on_mount(self):
         self.parser.load_all()
         self.recipe_parser.load_all()
-        self.theme = "orange"
         self.app.notify(f"Loaded parsers: {len(self.parser.parsers.keys())}\nLoaded actions: {len(self.parser.actions.keys())}")
 
     def compose(self) -> ComposeResult:
