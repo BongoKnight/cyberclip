@@ -30,7 +30,22 @@ class Certificate:
 
 
 class crtshCertificatesAction(actionInterface):
-    """Recover list of certificate for a domain.  
+    """Recover list of certificate for a domain using crt.sh. Should only be used on small domain list.
+
+    Certificates fields that are returned are:
+
+    ```
+    issuer_ca_id: int
+    issuer_name: str
+    common_name: str
+    name_value: str
+    id: int
+    entry_timestamp: str
+    not_before: str
+    not_after: str
+    serial_number: str
+    result_count: int 
+    ```
     """
 
     def __init__(self, parsers = {}, supportedType = {"domain"}):

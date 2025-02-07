@@ -8,7 +8,13 @@ import requests
 from dataclasses import dataclass
 
 class CVEExplainerAction(actionInterface):
-    """A action module, to get info on CVE number.
+    """Get information associated to a CVE number.
+
+Information are retrieved from https://cveawg.mitre.org/api/cve/.
+
+Example:
+
+`cve-2024-3400` returns `cve-2024-3400	10	CRITICAL	PAN-OS,Cloud NGFW,Prisma Access	2024-04-12T07:20:00.707Z	A command injection as a result of arbitrary file creation vulnerability in the GlobalProtect feature of Palo Alto Networks PAN-OS software for specific PAN-OS versions and distinct feature configurations may enable an unauthenticated attacker to execute arbitrary code with root privileges on the firewall.Cloud NGFW, Panorama appliances, and Prisma Access are not impacted by this vulnerability.	https://security.paloaltonetworks.com/CVE-2024-3400,https://unit42.paloaltonetworks.com/cve-2024-3400/,https://www.volexity.com/blog/2024/04/12/zero-day-exploitation-of-unauthenticated-remote-code-execution-vulnerability-in-globalprotect-cve-2024-3400/,https://www.paloaltonetworks.com/blog/2024/04/more-on-the-pan-os-cve/`
     """
     def __init__(self, parsers = {}, supportedType = {"cve"}):
         super().__init__(parsers = parsers, supportedType = supportedType)

@@ -31,7 +31,7 @@ except Exception as e:
 
 
 class MitreAction(actionInterface):
-    """A action module, to explain Mitre Att&ck TTP Code.  
+    """Explain Mitre Att&ck TTP Code.  
     Return the name, and the Mitre URL of a tactic.
     """
 

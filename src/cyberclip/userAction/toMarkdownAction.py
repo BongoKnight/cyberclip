@@ -3,11 +3,8 @@ try:
 except:
     from actionInterface import actionInterface
 
-import os
-import re
-
 class toMarkdownAction(actionInterface):   
-    """A action module, to transform a TSV data to a Markdown table.""" 
+    """Transform a TSV data to a Markdown table.""" 
     def __init__(self, parsers = {}, supportedType = {"tsv"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "TSV to Md."

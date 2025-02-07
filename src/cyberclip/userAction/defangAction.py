@@ -5,7 +5,7 @@ except:
 import re
 
 class defangAction(actionInterface):    
-    """A action module, to defang URLs, domains and IP addresses.  
+    """Defang URLs, domains and IP addresses. Replace '.' by '[.]' and '^http' by 'hxxp'.
     """
 
     def __init__(self, parsers = {}, supportedType = {"ip","url","domain"}):
@@ -27,7 +27,7 @@ class defangAction(actionInterface):
         return  "\r\n".join(self.execute())
 
 class fangAction(actionInterface):    
-    """A action module, to fang URLs, domains and IP addresses. Replace '[.]' by '.' and 'hxxp' by 'http'.  
+    """Fang URLs, domains and IP addresses. Replace '[.]' by '.' and 'hxxp' by 'http'.  
     """
 
     def __init__(self, parsers = {}, supportedType = {"ip","url","domain"}):

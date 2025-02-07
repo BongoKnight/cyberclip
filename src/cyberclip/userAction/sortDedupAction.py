@@ -5,7 +5,7 @@ except:
 import re
 
 class sortDedupAction(actionInterface):
-    """A action module, to sort and deduplicates lines contained in the keyboard."""
+    """Sort and deduplicates lines contained in the keyboard."""
 
     def __init__(self, parsers = {}, supportedType = {"text"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
@@ -25,10 +25,10 @@ class sortDedupAction(actionInterface):
 
 class sortAction(actionInterface):    
     """A action module, to sort lines of a text.  
-    Parameter can be passed over : 
+Parameter can be passed over : 
 
-    - if desc or reverse in param revert the order
-    - if num, int, version in param sort by number
+- if desc or reverse in param revert the order
+- if num, int, version in param sort by number
     """
 
     params = {"Numeric sort":{"type":"boolean","value":False} , "Reverse sort":{"type":"boolean","value":False}}

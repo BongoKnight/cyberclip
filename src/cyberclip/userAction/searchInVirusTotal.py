@@ -9,7 +9,7 @@ from pathlib import Path
 from yaml.loader import SafeLoader
 import requests
 
-"""A action module, to open search observables contained in a text in Virus Total."""
+"""Search observables in Virus Total."""
 
 DEFAULT_PARAMS = {
                 "Relationships":{

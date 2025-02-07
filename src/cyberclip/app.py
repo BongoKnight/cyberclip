@@ -10,6 +10,7 @@ import asyncio
 from functools import partial
 
 from textual import on, work
+from textual.theme import Theme
 from textual.binding import Binding
 from textual.reactive import var, reactive
 from textual._path import CSSPathType
@@ -45,7 +46,6 @@ except:
 
 
 
-
 class ClipBrowser(App):
     """This class implements the `App` class from `textual`. It defines the layout of the Terminal 
     User Interface (TUI).  
@@ -55,6 +55,7 @@ class ClipBrowser(App):
             updated with data contained in the clipboard.
         parser (clipParser): A text parser that parse text to extract valuable data (thanks to `userTypeParser`) 
             and execute action based on the data extracted (thanks to `userAction`).
+        active_tab (str): Name of the currently active tab
         
     
     """
@@ -88,7 +89,7 @@ class ClipBrowser(App):
     async def on_mount(self):
         self.parser.load_all()
         self.recipe_parser.load_all()
-        self.theme = "flexoki"
+        self.theme = "orange"
         self.app.notify(f"Loaded parsers: {len(self.parser.parsers.keys())}\nLoaded actions: {len(self.parser.actions.keys())}")
 
     def compose(self) -> ComposeResult:

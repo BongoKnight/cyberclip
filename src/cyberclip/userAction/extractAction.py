@@ -8,7 +8,7 @@ except:
 
 
 class extractAction(actionInterface):
-    """Extract all the observables."""
+    """Extract all the observables of specified types, by default everything is returned."""
     
     def __init__(self, parsers = {}, supportedType = {"domain","analytics","md5","sha1","sha256","ja3","ja4","url","ip","cve","mittre","ipv6","phone","email","text"}, exception = ["text","html", "json", "yaml"], complex_param={"Extract":{"type":"tags","value":["all"]}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)

@@ -8,7 +8,7 @@ import requests
 from dataclasses import dataclass
 
 class RFCExplainerAction(actionInterface):
-    """A action module, to get info on a RFC (Request For Comments).
+    """Display the full RFC (Request For Comments) content.
     """
     def __init__(self, parsers = {}, supportedType = {"rfc"}):
         super().__init__(parsers = parsers, supportedType = supportedType)

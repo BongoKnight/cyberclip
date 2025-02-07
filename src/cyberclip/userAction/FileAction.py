@@ -45,7 +45,7 @@ class ExtractTextAction(actionInterface):
         return  "\n\n".join(results)
 
 class CalculateHashAction(actionInterface):
-    """A action module to calculate hashes from files contained in the clipboard.  
+    """Calculate hashes from files contained in the clipboard. Relies on Windows clipboard API.  
     Default : MD5 and SHA1
     """
     CONF =  {"Hashes":{"type":"tags","value":["MD5","SHA1"]}}

@@ -69,6 +69,8 @@ def get_IPv6_AS_data():
 
 class AsToCidrAction(actionInterface):
     """Return a list of CIDR depending of an Autonomous System.
+    
+    `AS15169` returns `AS15169	8.8.4.0/24 8.8.8.0/24`
     """
     
     def __init__(self, parsers = {}, supportedType = {"asnum"}):
@@ -110,6 +112,8 @@ class AsToCidrAction(actionInterface):
 
 class AsInformationAction(actionInterface):
     """Return information about an Autonomous System.
+
+    `AS15169` returns `AS15169	15169	GOOGLE	US	8.8.4.0/24 8.8.8.0/24 <list of GOOGLE CIDR>`
     """
     
     def __init__(self, parsers = {}, supportedType = {"asnum"}):
@@ -154,7 +158,9 @@ class AsInformationAction(actionInterface):
 
 
 class IpToAsAction(actionInterface):
-    """Return Autonomous System information refering to an IP.
+    """Return Autonomous System information refering to an IP address.
+
+    `8.8.8.8` will return `8.8.8.8	8.8.8.0	8.8.8.255	AS15169	US	GOOGLE`
     """
     
     def __init__(self, parsers = {}, supportedType = {"ipv6","ip"}):

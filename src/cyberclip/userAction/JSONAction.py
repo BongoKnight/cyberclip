@@ -107,7 +107,26 @@ With the JSON above:
 
 
 class JSONSchemeAction(actionInterface):
-    """A action module to display the scheme of a JSON object.  
+    """Display the scheme of a JSON object.
+
+Example::
+
+```json
+{"a":"elem1","b":"elem2","c":3, "d":[{"a":"elem3","b":"elem4","c":5},{"a":"elem5","b":"elem6","c":2}]}
+```
+
+With the JSON above returns:
+
+```
+a
+b
+c
+d
+d[]
+d[].a
+d[].b
+d[].c
+```
     """
     def __init__(self, parsers = {}, supportedType = {"json","yaml"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
@@ -123,7 +142,7 @@ class JSONSchemeAction(actionInterface):
 
         elif isinstance(data, list):
             for index, item in enumerate(data):
-                new_path = f"{current_path}[*]"
+                new_path = f"{current_path}[]"
                 self.json_paths.add(new_path)
                 self.get_json_paths(item, new_path)
         else:

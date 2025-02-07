@@ -11,8 +11,7 @@ import html
 
 
 class appendEachLineAction(actionInterface):   
-    """A action module, to append data to each line of a given text.  
-    Add the text to add as a param.
+    """Append text to the end of each line of a given text.  
     """ 
     def __init__(self, parsers = {}, supportedType = {"text"}, complex_param: dict = {"Text to add":{"type":"text","value":""}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
@@ -35,9 +34,9 @@ class appendEachLineAction(actionInterface):
         return  self.execute()
 
 class prependAction(actionInterface):   
-    """A action module, to prepend data to a given text.
+    """Prepend text to a given text.
     
-    Usefull for adding header to data.
+    Usefull for adding a header to data.
     """
 
     def __init__(self, parsers = {}, supportedType = {"text"}, complex_param = {"Text to add":{"type":"text","value":""}}):
@@ -63,7 +62,7 @@ class prependAction(actionInterface):
 
 
 class prependEachLineAction(actionInterface):   
-    """A action module, to prepend data to all the lines of a given text.
+    """Add text at the beginning of each line of a given text.
     Enter the text to preprend as a param.
     """ 
 
@@ -86,7 +85,9 @@ class prependEachLineAction(actionInterface):
         return  self.execute()
 
 class toLowerCaseAction(actionInterface):   
-    """A action module, to lower case a text.
+    """Return the given text in lower case.
+
+    `Hello` returns `hello`
     """ 
 
     def __init__(self, parsers = {}, supportedType = {"text"}):
@@ -104,7 +105,9 @@ class toLowerCaseAction(actionInterface):
         return text
 
 class toUperCaseAction(actionInterface):   
-    """A action module, to UPPER case a text.
+    """Return the given text in UPPER case.
+
+    `Hello` returns `HELLO`
     """ 
 
     def __init__(self, parsers = {}, supportedType = {"text"}):
@@ -125,7 +128,7 @@ class toUperCaseAction(actionInterface):
         return  self.execute()
 
 class countAction(actionInterface):    
-    """A action module, to count lines contained in a text.
+    """Count the number of time each unique line is contained in a text.
 
     Return :
         <number_of_occurences>\t<occurence>
@@ -150,7 +153,7 @@ class countAction(actionInterface):
         return  "\n".join([f"{count}\t{line}" for line, count in counts.items()])
 
 class findReplaceAction(actionInterface):    
-    """A action module to search and replace using regex.sub().  
+    """Search and replace using regex.sub().  
     Enter the regex as a param.
     """
 
@@ -174,7 +177,7 @@ class findReplaceAction(actionInterface):
         return  self.execute()
 
 class regexFilterAction(actionInterface):    
-    """A action module to filter lines matching a regex.  
+    """Filter lines matching a regex.  
     Enter the regex as a param.
     """
 
@@ -194,7 +197,7 @@ class regexFilterAction(actionInterface):
         return  self.execute()
 
 class reverseRegexFilterAction(actionInterface):    
-    """A action module to filter lines not matching a regex.  
+    """Filter lines not matching a regex.  
     Enter the regex as a param.
     """
 
@@ -213,7 +216,7 @@ class reverseRegexFilterAction(actionInterface):
         return  self.execute()
 
 class extractRegexGroupAction(actionInterface):    
-    """A action module to extract group matching a regex.  
+    """Extract group matching a regex.  
     Enter the regex as a param.
     """
 
@@ -291,7 +294,8 @@ class fromHexAction(actionInterface):
         return  self.execute()
     
 class UrlUnquoteAction(actionInterface):
-    """Unquote a URL encoded text."""
+    """Unquote a URL encoded text. `%22Hello!%22` returns `"Hello!"`
+    """
     
     def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
@@ -307,6 +311,30 @@ class UrlUnquoteAction(actionInterface):
             text = self.observables.get("text")[0]
             try: 
                 return unquote(text)
+            except Exception as e:
+                return "Invalid URL encoding: " + str(e)
+        return "No text found."
+    
+    def __str__(self):
+        return  self.execute()
+    
+class UrlQuoteAction(actionInterface):
+    """Encode a text in an URL safe way. `Yeah !` returns `Yeah%20%21`"""
+    
+    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
+        self.description = "URL encode"
+        
+    def execute(self) -> object:
+        """Encode a text in an URL safe way.
+        
+        Returns:
+            urllib.parse.quote(text)
+        """
+        if self.get_observables().get("text"):
+            text = self.observables.get("text")[0]
+            try: 
+                return quote(text)
             except Exception as e:
                 return "Invalid URL encoding: " + str(e)
         return "No text found."
@@ -362,29 +390,6 @@ class HtmlQuoteAction(actionInterface):
     def __str__(self):
         return  self.execute()
     
-class UrlQuoteAction(actionInterface):
-    """Encode a text in an URL safe way."""
-    
-    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={}):
-        super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
-        self.description = "URL encode"
-        
-    def execute(self) -> object:
-        """Encode a text in an URL safe way.
-        
-        Returns:
-            urllib.parse.quote(text)
-        """
-        if self.get_observables().get("text"):
-            text = self.observables.get("text")[0]
-            try: 
-                return quote(text)
-            except Exception as e:
-                return "Invalid URL encoding: " + str(e)
-        return "No text found."
-    
-    def __str__(self):
-        return  self.execute()
 
 class toHexAction(actionInterface):
     """Convert a UTF-8 string to the coressponding one in hexadecimal. """

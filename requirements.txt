@@ -5,7 +5,7 @@ jq
 pandas
 pycti
 pyperclip
-pywin32
+pywin32; platform_system=="Windows"
 textual
 textual[syntax]
 textual-fspicker

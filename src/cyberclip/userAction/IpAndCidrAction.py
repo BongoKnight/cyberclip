@@ -17,7 +17,7 @@ def explode_to(network, prefixlen=24):
     return [str(nwk) for sublist in subnets for nwk in sublist]
 
 class ToCIDR24Action(actionInterface):
-    """A action module, to return a list of /24 CIDR from a bigger CIDR.
+    """A action module, to return a list of /24 CIDR from a bigger CIDR. Usefull to create regex matching CIDRs.
     """
     def __init__(self, parsers = {}, supportedType = {"cidr", "ip"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
@@ -41,7 +41,7 @@ class ToCIDR24Action(actionInterface):
 class ReservedIPAction(actionInterface):
     """Parse IP to sort reserved/local IP. By default returns only IP that are NOT reserved or local. 
 
-You can set the `Reserved` parameter to `True` to return only  the reserved IP addresses.
+You can set the `Reserved` parameter to `True` to return only the reserved IP addresses.
     """
     def __init__(self, parsers = {}, supportedType = {"ip","ipv6"}, complex_param={"Reserved":{"type":"bool","value":False}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)

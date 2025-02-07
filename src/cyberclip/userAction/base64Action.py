@@ -7,9 +7,10 @@ import random
 
 class B64DecodeAction(actionInterface):
     """A action module, to decode base 64.  
-    For example : 
     
-    - `dG90bw==` returns `toto`
+For example : 
+
+- `dG90bw==` returns `toto`
     """
     def __init__(self, parsers = {}, supportedType = {"b64"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
@@ -36,9 +37,10 @@ class B64DecodeAction(actionInterface):
 
 class B64EncodeAction(actionInterface):
     """A action module, to encode in base 64.  
-    For example :
     
-    - `toto` returns `dG90bw==`
+For example :
+
+- `toto` returns `dG90bw==`
     """
     def __init__(self, parsers = {}, supportedType = {"text"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
@@ -66,9 +68,11 @@ class B64EncodeAction(actionInterface):
 
 
 class Base64PermutateAction(actionInterface):
-    """A action module, to return permutation encode of a string in base 64.  Allowing to create YARA rule or search Malware or Phishing sample using specific functions.
-    For example :
-    - `document.location` returns `Y3VtZW50LmxvY2F0,b2N1bWVudC5sb2Nh,dW1lbnQubG9jYXRp`
+    """Return permutation encode of a string in base 64.  Allowing to create YARA rule or search Malware or Phishing sample using specific functions.
+
+For example :
+
+- `document.location` returns `Y3VtZW50LmxvY2F0,b2N1bWVudC5sb2Nh,dW1lbnQubG9jYXRp`
     """
     def __init__(self, parsers = {}, supportedType = {"text"}):
         super().__init__(parsers = parsers, supportedType = supportedType)

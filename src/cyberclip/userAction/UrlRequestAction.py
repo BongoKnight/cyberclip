@@ -38,7 +38,7 @@ class UrlToHtmlAction(actionInterface):
         return "\n".join([html for html in self.results.values()])
 
 class GetCertificatesAction(actionInterface):
-    """A action module to recover certificate from Domain or IP."""
+    """A action module to recover certificate from Domain or IP. Request the domain to do so."""
     CONF = {"Port":{"type":"text", "value":"443"}}
     def __init__(self, parsers = {}, supportedType = {"domain","ip"}, complex_param = CONF):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)

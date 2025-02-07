@@ -52,8 +52,8 @@ def get_JAX_data():
 
 
 class JA4Action(actionInterface):
-    """A action module, to search for JA4+.  
-    Return the software or librairy associated to a JA4 fingerprint.
+    """Search for JA4+. Use JA4DB data.
+Return the software or librairy associated to a JA4 fingerprint.
     """
 
     def __init__(self, parsers = {}, supportedType = {"ja4"}):
@@ -83,8 +83,8 @@ class JA4Action(actionInterface):
         return  df[["Matching_Values","application", "library", "device", "os", "user_agent_string", "certificate_authority", "verified", "notes"]].to_csv(sep="\t", index=None)
 
 class JA3Action(actionInterface):
-    """A action module, to search for JA3.  
-    Return the software or librairy associated to a JA3 fingerprint.
+    """A action module, to search for JA3. Use JA3.me data.
+Return the software or librairy associated to a JA3 fingerprint.
     """
 
     def __init__(self, parsers = {}, supportedType = {"md5"}):

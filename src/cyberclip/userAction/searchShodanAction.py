@@ -17,10 +17,12 @@ class searchInShodanAction(actionInterface):
     """Search all type of observables with the Shodan API. The API Key is passed in the config file. Only IP are handled atm.
     No bulk search on basic plan, wait 1s between each querry.
 
-    A configuration is neeeded : 
+A configuration is neeeded : 
 
-    Shodan:
-    - api-key: <API Key>
+```yaml
+Shodan:
+- api-key: <API Key>
+```
     """    
     def __init__(self, parsers ={}, supportedType = {"ip"}, complex_param={ "IP Analysis fields":{"type":"tags","value":["$.ports","$.domains","$.data[:].http.server","$.data[:].http.html_hash","$.data[:].http.title","$.data[:].http.port","$.data[:].http.headers_hash"]}, "Allow bulk search":{"type":"boolean","value":False}, "Free account":{"type":"boolean","value":False}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
