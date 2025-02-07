@@ -92,10 +92,7 @@ class ContentView(Static):
             for button in buttons:
                 button.remove()
         for type_of_data in parser_types:
-            if type_of_data != "text":
-                self.parent.query_one(DataLoader).add_dataType(type_of_data, active=True)
-            else:
-                self.parent.query_one(DataLoader).add_dataType(type_of_data, active=False)
+            self.parent.query_one(DataLoader).add_dataType(type_of_data, active=True)
         existing_action = set()
         for action_name, action in self.app.parser.actions.items():
             for action_button in self.parent.query(ActionButton):

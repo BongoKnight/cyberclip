@@ -104,8 +104,11 @@ VirusTotal:
                         cleaned_selector = cleaned_selector.replace(".data.attributes.", "")
                     if cleaned_selector.startswith(".data.relationships."):
                         cleaned_selector = cleaned_selector.replace(".data.relationships.", "")
-                    if seen := jq.compile(selector).input_value(result):
-                        data[cleaned_selector] = seen.text()
+                    if result and (seen := jq.compile(selector).input_value(result)):
+                        try:
+                            data[cleaned_selector] = seen.text()
+                        except:
+                            data[cleaned_selector] = ""
                     else:
                         data[cleaned_selector] = ""
             self.results[observable] = data

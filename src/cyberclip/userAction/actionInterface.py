@@ -1,8 +1,7 @@
 import os
 import sys
-import yaml
-import copy
-from yaml.loader import SafeLoader
+import re
+from dotenv import dotenv_values
 from pathlib import Path
 script_dir = os.path.dirname( __file__ )
 parser_dir = os.path.join( script_dir, '..')
@@ -49,19 +48,17 @@ class actionInterface():
         self.indicators = ""
 
     
-    def load_conf(self, conf_name, path='../data/conf.yml'):
+    def load_conf(self, conf_name, path='../.env'):
         conf = {}
         try:
-            with open(Path(__file__).parent / path, encoding="utf8") as f:
-                self.config = yaml.load(f, Loader=SafeLoader)
-                if self.config and self.config.get(conf_name):
-                    for i in self.config.get(conf_name, {}):
-                        if isinstance(i,dict):
-                            for key, value in i.items():
-                                conf.update({key:value})
-                    self.conf = dict(conf)
+            env = dotenv_values(Path(__file__).parent / path)
+            for key, value in env.items():
+                if key.lower().startswith(conf_name.lower()):
+                    key_name = re.sub(f"^{conf_name.lower()}_","",key.lower()).lower()
+                    conf[key_name]=value
+            self.conf = dict(conf)
         except Exception as e:
-            print("Error while loading conf.yaml.")
+            print("Error while loading config from .env")
         return self.conf
     
     def get_observables(self) -> dict:

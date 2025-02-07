@@ -1,4 +1,5 @@
 clipboard.txt
+.env
 /src/cyberclip/genericEnricher.py
 /src/cyberclip/enrich/*
 /src/cyberclip/tools.py
