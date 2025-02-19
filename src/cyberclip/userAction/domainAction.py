@@ -8,6 +8,7 @@ import time
 import json
 import requests
 import tldextract
+import pandas as pd
 import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -87,18 +88,16 @@ class inTop1MAction(actionInterface):
         file_name = Path(__file__).parent / "../data/top1m.csv"
         if not os.path.exists(file_name) or (time.time() - os.path.getmtime(file_name) ) / 3600 > 24*7:
             try:
-                last_week_start = datetime.today() - timedelta(days=datetime.today().weekday() % 7 + 7)
-                last_week_end = last_week_start + timedelta(days=7)
-                url = f"https://radar.cloudflare.com/charts/LargerTopDomainsTable/attachment?id=1545&top=1000000&startDate={last_week_start.date()}&endDate={last_week_end.date()}"
-                response = requests.get(url, stream=True)
-                with open(file_name, 'wb') as f:
-                    shutil.copyfileobj(response.raw,f)
+                url = f"https://downloads.majestic.com/majestic_million.csv"
+                response = requests.get(url)
+                with open(file_name, 'wb+') as f:
+                    f.write(response.content)
                 del response
             except Exception as e:
-                print("Error while retriving database from CloudFlare", e)
+                print("Error while retriving database from Majestic Million", e)
         TOP1M = []
         with open(file_name, "r", encoding="utf-8") as f:
-            TOP1M = set(f.read().splitlines()[1:])
+            TOP1M = set(pd.read_csv(file_name)["Domain"])
         if self.get_param_value("Get domain NOT IN top 1M"):
             self.results = list(set(self.observables.get("domain")).difference(TOP1M))
         else:

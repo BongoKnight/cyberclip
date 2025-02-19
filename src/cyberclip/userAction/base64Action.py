@@ -30,7 +30,7 @@ For example :
         for key, value in self.decoded_b64.items():
             if value!="" :
                 try:
-                    results.append(f"{key}\n{str(value, encoding='utf-8')}")
+                    results.append(f"{str(value, encoding='utf-8')}")
                 except:
                     results.append(f"{value}")
         return  "\n".join(results)
