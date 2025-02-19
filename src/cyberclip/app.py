@@ -1,6 +1,6 @@
 import sys
 import argparse
-import pyperclip
+import networkx as nx
 from io import StringIO
 import pandas as pd
 import traceback
@@ -18,9 +18,11 @@ from textual.app import App, CSSPathType, ComposeResult
 from textual.containers import Grid
 from textual.driver import Driver
 from textual.widgets import Footer, TabbedContent, TabPane, TextArea
-from utilities import clean_tsv
+from netext.textual_widget.widget import GraphView
+from utilities import clean_tsv, add_node
 try:
     from cyberclip.tui.DataTypePannel import DataLoader
+    from cyberclip.tui.GraphPannel import GraphPannel
     from cyberclip.tui.ContentView import ContentView
     from cyberclip.tui.ActionPannel import ActionPannel, ActionCommands
     from cyberclip.tui.TableView import FiltrableDataFrame
@@ -34,6 +36,7 @@ try:
 except:
     from tui.DataTypePannel import DataLoader
     from tui.ContentView import ContentView
+    from tui.GraphPannel import GraphPannel
     from tui.ActionPannel import ActionPannel, ActionCommands
     from tui.TableView import FiltrableDataFrame
     from tui.RecipesPannel import RecipesPannel, RecipeButton, Recipe
@@ -73,6 +76,8 @@ class ClipBrowser(App):
 
     parser = var(clipParser())
     recipe_parser = var(clipParser())
+    graph = var(nx.DiGraph())
+    active_node = var({})
     text = reactive("Waiting for Update...", init=False)
     active_tab : str = ""
     try:
@@ -84,12 +89,14 @@ class ClipBrowser(App):
 
     def __init__(self, driver_class: type[Driver] | None = None, css_path: CSSPathType | None = None, watch_css: bool = False):
         super().__init__(driver_class, css_path, watch_css)
+        if self.is_web:
+            self.COMMAND_PALETTE_BINDING = "ctrl+j"
         self.actions = []
 
     async def on_mount(self):
         self.parser.load_all()
         self.recipe_parser.load_all()
-        self.app.notify(f"Loaded parsers: {len(self.parser.parsers.keys())}\nLoaded actions: {len(self.parser.actions.keys())}")
+        self.notify(f"Loaded parsers: {len(self.parser.parsers.keys())}\nLoaded actions: {len(self.parser.actions.keys())}")
 
     def compose(self) -> ComposeResult:
         """Compose the main UI. Generate three tabs corresponding to the three modes of the application :
@@ -112,10 +119,12 @@ class ClipBrowser(App):
                     ActionPannel(id="action-pannel"),
                     id="maingrid"
                 )
-            with TabPane('TableView', id="tableview"):
+            with TabPane('Table View', id="tableview"):
                 yield FiltrableDataFrame(pd.DataFrame(), id="main-table")
             with TabPane('Recipes', id="recipes"):
                 yield RecipesPannel()
+            with TabPane("Graph View", id="graphview"):
+                yield GraphPannel()
         yield Footer()
 
     def action_quit(self):
@@ -127,14 +136,14 @@ class ClipBrowser(App):
             self.deliver_text(f, encoding="utf-8")
 
     def action_copy(self):
-        self.app.copy_to_clipboard(self.text)
+        self.copy_to_clipboard(self.text)
         self.notify("Copied in clipboard!")
 
     def action_reset(self):
         self.text = get_clipboard_text()
 
     def action_select_action_filter(self):
-        filter = self.app.query_one("#action-filter").focus()
+        filter = self.query_one("#action-filter").focus()
         filter.value = ""
 
     @property
@@ -144,22 +153,24 @@ class ClipBrowser(App):
     @on(TabbedContent.TabActivated)
     def check_TSV(self, event: TabbedContent.TabActivated):
         self.active_tab = event.tab.label_text
-        if self.active_tab == "TableView":
+        if self.active_tab == "Table View":
             df = pd.DataFrame()
             parser = TSVParser.tsvParser(self.text)
             if parser.extract():            
                 try:
                     df = pd.read_csv(StringIO(self.text), sep="\t", header=None, skip_blank_lines=False)
                     df.columns = [str(i) for i in df.columns]
-                    self.app.call_after_refresh(self.update_dataframe, df)
+                    self.call_after_refresh(self.update_dataframe, df)
                 except Exception as e:
-                    self.app.notify(f"Error : {str(e)}" ,title="Error while loading data...", timeout=5, severity="error")
+                    self.notify(f"Error : {str(e)}" ,title="Error while loading data...", timeout=5, severity="error")
         if self.active_tab == ClipBrowser.APP_TITLE:
             self.parser.parseData(self.text)
         if self.active_tab == "Recipes":
             self.query_one(RecipesPannel).refresh_recipes()
             if querybuttons:= self.query(RecipeButton):
                 querybuttons[0].press()
+        if self.active_tab == "Graph View":
+            self.query_one(GraphPannel).refresh(recompose=True)
 
     async def update_dataframe(self, df):
         tab = self.query_one("#tableview")
@@ -188,12 +199,28 @@ class ClipBrowser(App):
     async def handle_param(self, actionnable : actionInterface | ParserInterface ,  complex_param : dict | None = None, recipe_parser : bool = False):
         if complex_param :
             actionnable.complex_param = complex_param
+
         if self.active_tab == ClipBrowser.APP_TITLE:
             try:
-                self.text = await self.parser.apply_actionable(actionnable, self.app.query_one(TextArea).text)
+                self.text = await self.parser.apply_actionable(actionnable, self.query_one(TextArea).text)
+
+                # Add executed action to graph view
+                previous_node = self.active_node
+                _node = {
+                        "label": actionnable.description, 
+                        "supported":actionnable.supportedType,
+                        "params":actionnable.complex_param
+                        }
+                action_node = add_node(self.graph, _node, "action", previous_node)
+                text_node = {"text":self.text, "detected":self.parser.detectedType}
+                self.active_node = add_node(self.graph, text_node, "text", action_node)
+                if not self.graph.get_edge_data(previous_node.get("id"),action_node.get("id")):
+                    self.graph.add_edge(previous_node.get("id"), action_node.get("id"))
+                    self.graph.add_edge(action_node.get("id"), self.active_node.get("id"))
+
             except Exception as e:
-                self.app.notify("Error applying action..." + str(e) + traceback.format_exc(), severity="error")  
-        elif self.active_tab == "TableView":
+                self.notify("Error applying action..." + str(e) + traceback.format_exc(), severity="error")  
+        elif self.active_tab == "Table View":
             dataframe = self.query_one(FiltrableDataFrame)
             column_name = dataframe.datatable.df.columns[dataframe.datatable.cursor_column]
             new_column_name = dataframe.datatable.get_column_name(f"{actionnable.__class__.__name__}_{column_name}")
@@ -207,7 +234,7 @@ class ClipBrowser(App):
                     dataframe.datatable.df[new_column_name] = dataframe.datatable.df.apply(lambda x: clean_tsv(x[new_column_name], x[column_name]), axis=1)
                     dataframe.datatable.update_displayed_df(dataframe.datatable.df)
             except Exception as e:
-                self.app.notify("Error executing an action..." + str(e) + traceback.format_exc(), severity="error")
+                self.notify("Error executing an action..." + str(e) + traceback.format_exc(), severity="error")
 
 
 
@@ -218,7 +245,7 @@ def main():
     args = parser.parse_args()
     if args.web:
         from textual_serve.server import Server
-        server = Server(f"python {Path(__file__).parent / "app.py"}", host="0.0.0.0")
+        server = Server(f"python {Path(__file__).parent / "app.py"}")
         server.serve()
     else:
         cyberClip = ClipBrowser()

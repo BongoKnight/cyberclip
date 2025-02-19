@@ -4,6 +4,7 @@ from textual.reactive import var
 from textual.containers import  VerticalScroll, Horizontal, Vertical
 from textual.widgets import Static,  Button, Switch, TextArea
 from textual.app import ComposeResult
+from utilities import add_node
 
 try:
     from cyberclip.clipboardHandler import get_clipboard_text
@@ -34,6 +35,16 @@ class DataTypeButton(Static):
             contentView = self.parent.ancestors[-1].query_one(ContentView)
             if contentView:
                 self.app.text = "\n".join(self.app.parser.results["matches"].get(self.parser_type, ""))
+                results = self.app.parser.results["matches"].get(self.parser_type, [])
+                
+                # Add data to investigation graph
+                previous_node = self.app.active_node
+                parser_node = add_node(self.app.graph, {"label": self.parser_type, "detected":results}, "parser")
+                text_node = {"text":self.app.text, "detected":self.app.parser.detectedType}
+                self.app.active_node = add_node(self.app.graph, text_node, "text", parser_node)
+                if self.parser_type !="text" and not self.app.graph.get_edge_data(previous_node.get("id"),parser_node.get("id")):
+                    self.app.graph.add_edge(previous_node.get("id"), parser_node.get("id"))
+                    self.app.graph.add_edge(parser_node.get("id"), self.app.active_node.get("id"))
                 contentView.filter_action()
     
     @property
@@ -60,8 +71,17 @@ class DataLoader(Static):
         textArea = self.app.contentview.query_one(TextArea)
         if event.button.id == "update-button":
             self.app.text = get_clipboard_text()
+            graph_node = {"text":self.app.text,
+                          "detected":self.app.parser.detectedType
+                          }
+            self.app.active_node = add_node(self.app.graph, graph_node, "text")
         if event.button.id == "text-update-button":
             self.app.text = textArea.text
+            graph_node = {
+                        "detected":self.app.parser.detectedType,
+                        "text":self.app.text
+                         }
+            self.app.active_node = add_node(self.app.graph, graph_node, "text")
         if event.button.id == "filter-button":
             self.select_all_datatype = not  self.select_all_datatype 
             for switch in self.query(Switch):

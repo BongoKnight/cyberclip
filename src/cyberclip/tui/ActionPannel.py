@@ -1,7 +1,6 @@
-import re
-import time
 import asyncio
 import traceback
+from functools import partial
 
 from textual import on, work
 from textual.reactive import var
@@ -9,7 +8,8 @@ from textual.containers import  VerticalScroll
 from textual.widgets import Static, Button, Input, TabbedContent, TextArea
 from textual.app import ComposeResult
 from textual.command import Hit, Hits, Provider
-from functools import partial
+
+from utilities import add_node
 
 try:
     from userAction.actionInterface import actionInterface
@@ -45,7 +45,6 @@ class ActionButton(Button):
         """Event handler called when a  button is pressed."""
         self.app.get_param(self.actionnable)
 
-
 class ActionCommands(Provider):
     """A command provider to return all actions for the current text."""
     
@@ -69,7 +68,7 @@ class ActionCommands(Provider):
                             self.app.notify("Error while applying recipe: " + str(e) + traceback.format_exc(), severity="error")
             
             
-            elif self.app.active_tab == "Tableview":    
+            elif self.app.active_tab == "Table View":    
                 dataframe = self.app.query_one(FiltrableDataFrame)
                 if dataframe.visible:
                     column_name = dataframe.datatable.df.columns[dataframe.datatable.cursor_column]
