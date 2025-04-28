@@ -21,6 +21,7 @@ log.log
 !/src/cyberclip/userTypeParser/private/__init__.py
 /src/cyberclip/radialUI.py
 /.venv
+/src/cyberclip/cyberclip.egg-info/*
 cyberclip.egg-info/*
 /dist/*
 /build/*

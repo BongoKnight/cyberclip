@@ -3,6 +3,7 @@ from textual.containers import Horizontal, HorizontalScroll
 from textual.app import ComposeResult
 from textual.reactive import reactive, var
 from textual import on, events
+from textual.message import Message
 
 class TagsInput(Static):
     value = var(set())
@@ -14,10 +15,10 @@ class TagsInput(Static):
         layout: horizontal;
         padding: 1;
     }
-    Input {
+    TagsInput > Input {
         width: 25;
     }
-    Label{
+    TagsInput > Label{
         margin-top: 1;
         width: 25;
     }
@@ -28,6 +29,7 @@ class TagsInput(Static):
 
     """
     BINDINGS = [("ctrl+r", "delete_all", "Delete all tags")]
+    _value = reactive(set[str], recompose=True)
     def __init__(self, label : str ="", value : set = set(), **kwargs):
         super().__init__(**kwargs)
         self._value = set(value)
@@ -51,11 +53,17 @@ class TagsInput(Static):
         
     def action_delete_all(self):
         self._value = set()
-        self.query_one(HorizontalScroll).remove_children()
+        for child in self.query_one(HorizontalScroll).children:
+            assert isinstance(child, Tag)
+            child.post_message(child.Deleted(child.value))
+            child.remove()
 
     @property
     def value(self):
         return list(self._value)
+    
+
+
             
 
         
@@ -103,9 +111,16 @@ class Tag(Static):
                 self.parent_input._value.remove(self.value)
             else:
                 self.parent_input._value.remove(self.value)
+                self.post_message(self.Deleted(self.value))
             self.remove()
         event.stop()
-
+        
+    
+    class Deleted(Message):
+        """Deleted Value"""
+        def __init__(self, value: str) -> None:
+            self.value = value
+            super().__init__()
 
 if __name__ == "__main__":
     from textual.app import App

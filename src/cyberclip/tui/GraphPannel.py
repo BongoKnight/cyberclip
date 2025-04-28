@@ -1,22 +1,15 @@
 import networkx as nx
 import json
 
-from rich import print
 from rich.table import Table
 from rich.text import Text
-from rich.markdown import Markdown
 
-from textual import on, work
-from textual.app import App
-from textual.screen import ModalScreen
-from textual.message import Message
-from textual.reactive import var, reactive
-from textual.containers import  Horizontal, Vertical, VerticalScroll
-from textual.widgets import Static, Button, Input, Label, TextArea, Switch, Select
+from textual import on
+from textual.widgets import Static
 from textual.app import ComposeResult
 
 from netext.textual_widget.widget import GraphView
-from netext import EdgeRoutingMode, EdgeSegmentDrawingMode, ArrowTip, ConsoleGraph, EdgeProperties
+from netext import EdgeRoutingMode, EdgeSegmentDrawingMode, ArrowTip
 
 
 

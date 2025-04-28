@@ -4,12 +4,14 @@ from textual.reactive import var
 from textual.containers import  VerticalScroll, Horizontal, Vertical
 from textual.widgets import Static,  Button, Switch, TextArea
 from textual.app import ComposeResult
-from utilities import add_node
+
 
 try:
     from cyberclip.clipboardHandler import get_clipboard_text
+    from cyberclip.utilities import add_node
 except:
     from clipboardHandler import get_clipboard_text
+    from utilities import add_node
 
 class DataTypeButton(Static):
     """A dataType widget to extract and handle actions on one specific types of data."""

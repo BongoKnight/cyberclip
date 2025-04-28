@@ -52,27 +52,30 @@ Shodan:
                     data = self.api.host(self.observables.get("ip"))
                     for info in data:
                         self.results[info["ip_str"]] = info
-        clean_results = {i:dict() for i in self.results.keys()}
         for observable, result in self.results.items():
-            for path in self.get_param_value("IP Analysis fields"):
-                unitary_paths, value = jsonpath.jsonpath(result, path, result_type="PATH"), jsonpath.jsonpath(result, path)
-                if isinstance(value, str):
-                    clean_results[observable].update({path:value})
-                # lots of nested list fields in shodan API
-                elif type(value) == list and value and value!=[[]]:
-                    if isinstance(value[0], list):
-                        clean_results[observable].update({path:value[0]})
-                    else:
-                        clean_results[observable].update({path:value})
-                else:
-                    clean_results[observable].update({path:str(value)})
+            fields = self.get_param_value("IP Analysis fields")
+            if fields:
+                clean_results = {i:dict() for i in self.results.keys()}
 
-        self.results = clean_results
+                for path in fields:
+                    unitary_paths, value = jsonpath.jsonpath(result, path, result_type="PATH"), jsonpath.jsonpath(result, path)
+                    if isinstance(value, str):
+                        clean_results[observable].update({path:value})
+                    # lots of nested list fields in shodan API
+                    elif type(value) == list and value and value!=[[]]:
+                        if isinstance(value[0], list):
+                            clean_results[observable].update({path:value[0]})
+                        else:
+                            clean_results[observable].update({path:value})
+                    else:
+                        clean_results[observable].update({path:str(value)})
+
+                self.results = clean_results
         return self.results
     
     def __str__(self):
         self.execute()
-        return "\n".join(f"{k}\t{v}" for k,v in self.results.items())
+        return "\n".join(f"{json.dumps(v)}" for k,v in self.results.items())
 
 if __name__=='__main__':
     from userTypeParser.IPParser import ipv4Parser

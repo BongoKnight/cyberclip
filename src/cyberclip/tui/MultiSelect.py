@@ -130,7 +130,7 @@ if __name__ == "__main__":
         
         @on(Select.Changed)
         def update(self, event: Select.Changed):
-            values = event.select.parent.parent.value
+            values = event.select.parent.parent._value
             self.app.query_one(Log).write_line(str(values))
     app = SelectApp()
     app.run()

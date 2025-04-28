@@ -66,7 +66,10 @@ class clipParser():
                     self.log.error(f"Error while loading {modules} from {file} : {e}")
         return modules_imports
         
-    def create_instance(self, classes, class_name, arg):
+    def create_instance(self, classes, class_name, **kwargs):
+        return classes[class_name](**kwargs)
+
+    def create_parser_instance(self, classes, class_name, arg):
         return classes[class_name](arg)
 
     def load_all(self):
@@ -91,7 +94,7 @@ class clipParser():
                            in getmembers(parserModules[parserModule], isclass))
             for className in classes.keys():
                 if "Parser" in className and "ParserInterface" not in className:
-                    instance = self.create_instance(classes, className, data)
+                    instance = self.create_parser_instance(classes, className, data)
                     self.parsers.update({instance.parsertype:instance})
 
         # Load all actions
@@ -106,7 +109,7 @@ class clipParser():
                            in getmembers(actionModules[actionModule], isclass))
             for className in classes.keys():
                 if "Action" in className and not "ActionInterface" in className:
-                    instance = self.create_instance(classes, className, self.parsers)
+                    instance = self.create_instance(classes, className, parsers=self.parsers)
                     if hasattr(instance, "description"):
                         # Adding action in a dict of all parsers relative to the input
                         self.actions.update({instance.description : instance})

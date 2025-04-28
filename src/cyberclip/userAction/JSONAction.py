@@ -53,7 +53,7 @@ With the JSON above:
 - `.d[] | select(.c>2)` selector will return `{"a": "elem3","b": "elem4","c": 5}`
 
     """
-    CONF = {"Selectors":{"type":"tags", "value":[]}, "Get only values":{"type":"bool","value": True}}
+    CONF = {"Selectors":{"type":"json", "value":[]}, "Get only values":{"type":"bool","value": True}}
     def __init__(self, parsers = {}, supportedType = {"json","yaml"}, complex_param=CONF):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
         self.description = "Extract from JSON/YAML with Path Selector"

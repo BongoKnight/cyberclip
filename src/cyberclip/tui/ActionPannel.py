@@ -9,8 +9,6 @@ from textual.widgets import Static, Button, Input, TabbedContent, TextArea
 from textual.app import ComposeResult
 from textual.command import Hit, Hits, Provider
 
-from utilities import add_node
-
 try:
     from userAction.actionInterface import actionInterface
     from userTypeParser.ParserInterface import ParserInterface

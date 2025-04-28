@@ -1,6 +1,9 @@
 beautifulsoup4
 dnspython
 jsonpath
+dotenv
+netext
+networkx
 jq
 pandas
 pycti

@@ -62,7 +62,7 @@ class QueryUrlScanAction(actionInterface):
         self.results = {}
         try:
             query = self.get_param_value("Query")
-            query_url = BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}" 
+            query_url = BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size=10000" 
             response = requests.get(query_url, headers=self.headers)
             self.results = response.json()
         except Exception as e:

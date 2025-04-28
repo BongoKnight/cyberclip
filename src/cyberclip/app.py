@@ -19,7 +19,7 @@ from textual.containers import Grid
 from textual.driver import Driver
 from textual.widgets import Footer, TabbedContent, TabPane, TextArea
 from netext.textual_widget.widget import GraphView
-from utilities import clean_tsv, add_node
+
 try:
     from cyberclip.tui.DataTypePannel import DataLoader
     from cyberclip.tui.GraphPannel import GraphPannel
@@ -33,6 +33,7 @@ try:
     from cyberclip.userAction.actionInterface import actionInterface
     from cyberclip.userTypeParser.ParserInterface import ParserInterface
     from cyberclip.clipboardHandler import get_clipboard_text
+    from cyberclip.utilities import add_node, clean_tsv
 except:
     from tui.DataTypePannel import DataLoader
     from tui.ContentView import ContentView
@@ -46,6 +47,7 @@ except:
     from userAction.actionInterface import actionInterface
     from userTypeParser.ParserInterface import ParserInterface
     from clipboardHandler import get_clipboard_text
+    from utilities import add_node, clean_tsv
 
 
 

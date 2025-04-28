@@ -4,6 +4,7 @@ import requests
 import os
 import json
 import time
+import re
 try:
     from userAction.actionInterface import actionInterface
 except:
@@ -83,7 +84,7 @@ Return the software or librairy associated to a JA4 fingerprint.
         return  df[["Matching_Values","application", "library", "device", "os", "user_agent_string", "certificate_authority", "verified", "notes"]].to_csv(sep="\t", index=None)
 
 class JA3Action(actionInterface):
-    """A action module, to search for JA3. Use JA3.me data.
+    """Search for JA3. Use JA3.me data.
 Return the software or librairy associated to a JA3 fingerprint.
     """
 
@@ -110,12 +111,41 @@ Return the software or librairy associated to a JA3 fingerprint.
         return  df[["digest","first_seen","last_seen","user_agent","ja3","source"]].to_csv(sep="\t", index=None)
 
 
+class FindJAXAction(actionInterface, description = "JAX: Search by name", indicators = "📑", complex_param={"User-Agent":{"type":"text","value":""}}, supportedType = {"text"}):
+    """Find JA3 and JA4 that matches a User-Agent name. Use JA3.me and JA4DB data.
+Software could be passed in regex format.
+    """
+        
+    def execute(self) -> object:
+        """
+        Return JA3 data. Data returned include: digest, first_seen, last_seen, user_agent, ja3, source.
+        """
+        get_JAX_data()
+        if ua  := self.get_param_value("User-Agent"):
+            JA3_results = JA3_DB[JA3_DB['user_agent'].str.contains(ua)]
+            JA4_results = JA4_DB[JA4_DB.apply(lambda row: row.astype(str).str.contains(ua, regex=True).any(), axis=1)]
+            return pd.concat([JA3_results, JA4_results])
+        else:
+            return pd.DataFrame(columns=["digest","first_seen","last_seen","user_agent","ja3","source"]) 
+
+    
+    def __str__(self):
+        """Returns a TSV representation of the dataframe returned by `execute`"""
+        df = self.execute()
+        return  df.to_csv(sep="\t", index=None)
+
+
 if __name__=='__main__':
     from userTypeParser.JA4Parser import ja4Parser
     from userTypeParser.MD5Parser import md5Parser
+    from userTypeParser.TextParser import TextParser
     data = "ip\tt13d301200_1d37bd780c83_d339722ba4af info\n154.0.123.1\tT1548 0b2012eb6e9a1f76ba56587d4a391211"
+    data2 = {"User-Agent":{"type":"text","value":"fasthttp"}}
     ja4_parser = ja4Parser(data)
     ja3_parser = md5Parser(data)
-    a = str(JA4Action({"ja4":ja4_parser},["ja4"]))
-    print(a, ja4_parser.objects)
-    print(str(JA3Action({"md5":ja3_parser},["md5"])), ja3_parser.objects)
+    text_parser = TextParser(data2)
+    #a = str(JA4Action({"ja4":ja4_parser},["ja4"]))
+    b = FindJAXAction(parsers={"text":text_parser}, complex_param = data2)
+    print(b.description, str(b.__class__), hasattr(b, "description"))
+    #print(a, ja4_parser.objects)
+    #print(str(JA3Action({"md5":ja3_parser},["md5"])), ja3_parser.objects)

@@ -57,3 +57,4 @@ mkdocs gh-deploy
 - [CyberChef](https://gchq.github.io/CyberChef/)
 - [Visidata](https://www.visidata.org/)
 - [Cheepy](https://github.com/securisec/chepy)
+- [Cyberbro](https://github.com/stanfrbd/cyberbro)

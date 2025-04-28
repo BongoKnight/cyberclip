@@ -33,19 +33,28 @@ class actionInterface():
 
     """
     
-    def __init__(self, parsers: dict = {}, supportedType: list[str] = {}, complex_param: dict = {}):
+    def __init__(self, **kwargs):
         """
         Args: 
             complex_param (dict): A dictionnary of value needed for executing the action properly typically a filename, config options, users choices, etc... This parameter is parsed by  
+            parsers (dict of str:ParserInterface): A dict of parsers interface, these are used to 
+            extract observales from text
+            conf (dict): A configuration extracted from `conf.yaml`, this store data needed 
+                for the action to be executed (API Key for example) 
+            supportedType (list of str):  A list of type defined in the varaible `parsertype` 
+                that are supported by the current action.        
+            description (str): A short description/name of the action
+            indicators (str): used to describe some action limitation (i.e. requires API-Key, external files, is slow...)
         """
-        self.supportedType = supportedType
-        self.parsers = parsers
-        self.description = "Quick description of the action."
-        self.complex_param = complex_param
-        self.observables = {}
-        self.results = {}
-        self.conf = {}
-        self.indicators = ""
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__()
+        allowed_params = {"description":"", "supportedType":[], "indicators":"", "complex_param":{}, "conf":{}, "parsers":{}}
+        for param in allowed_params:
+            setattr(cls, param, kwargs.get(param, allowed_params[param]))
 
     
     def load_conf(self, conf_name, path='../.env'):

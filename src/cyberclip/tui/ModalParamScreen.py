@@ -8,16 +8,16 @@ from textual.reactive import var
 
 
 try:
-    from cyberclip.tui.ActionPannel import ActionButton
     from cyberclip.tui.TagsInput import TagsInput
+    from cyberclip.tui.JSONSelector import SimpleJSONInput
     from cyberclip.tui.SimpleInput import SimpleInput, SimpleSelect, SimpleTextArea
     from cyberclip.tui.FileInput import FileInput
     from cyberclip.tui.SelectionInput import SelectionInput
     from cyberclip.tui.MultiSelect import MultiSelect
     from cyberclip.userAction import actionInterface
 except:
-    from tui.ActionPannel import ActionButton
     from tui.TagsInput import TagsInput
+    from tui.JSONSelector import SimpleJSONInput
     from tui.FileInput import FileInput
     from tui.SimpleInput import SimpleInput, SimpleSelect, SimpleTextArea
     from tui.SelectionInput import SelectionInput
@@ -99,6 +99,8 @@ class ParamScreen(Screen):
                 params.update({key: {"value":value, "type":"compactlist", "choices": widget.options}})
             if isinstance(widget, Checkbox):
                 params.update({str(widget.label): {"value":value, "type":"bool"}})
+            if isinstance(widget, SimpleJSONInput):
+                params.update({str(widget.label): {"value":value, "type":"jsonpath","scheme":widget.json_scheme}})
         return params
 
     def get_complex_param_widgets(self):
@@ -129,6 +131,13 @@ class ParamScreen(Screen):
                         widgets.append(MultiSelect(label=key, options=options, classes="complex-input"))
                     elif input_type.lower() == "bool" or input_type.lower() == "boolean":
                         widgets.append(Checkbox(label=key, value=stored_values, classes="complex-input"))
+                    elif input_type.lower() == "json" or input_type.lower() == "jsonpath":
+                        json_scheme = ""
+                        if scheme := value.get("scheme", ""):
+                            json_scheme = scheme
+                        elif json_parser := self.app.parser.parsers.get("json"):
+                            json_scheme = json_parser.extract()[0]
+                        widgets.append(SimpleJSONInput(label=key, value=stored_values, json_scheme=json_scheme ,classes="complex-input"))
                 if isinstance(value, str) and len(value)<100:
                     widgets.append(SimpleInput(label=key, value=stored_values, classes="complex-input"))
                     self.actionnable.complex_param.update({key:{"type":"text","value":stored_values}})
