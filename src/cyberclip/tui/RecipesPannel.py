@@ -195,7 +195,7 @@ class RecipesPannel(Static):
                 recipes.append(recipe_widget.recipe.to_dict())
         if all_valid:
             self.app.recipes = [Recipe(recipe_dict=recipe) for recipe in recipes]
-            with open(Path(__file__).parent / '../data/recipes.yml', "w", encoding="utf8") as f:
+            with open(Path(__file__).parent / '../data/recipes.yml', "w+", encoding="utf8") as f:
                 rules = yaml.dump(recipes)
                 f.write(rules)
                 self.notify("☑  Recipes saved!")

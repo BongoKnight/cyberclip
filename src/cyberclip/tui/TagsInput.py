@@ -36,7 +36,7 @@ class TagsInput(Static):
         self.label = label
     
     def compose(self) -> ComposeResult:
-        yield Label(renderable=self.label)
+        yield Label(content=self.label)
         yield Input(placeholder=f"Enter {self.label.lower()}...",classes="inputag")
         yield HorizontalScroll(*[Tag(value=value, parent_input = self) for value in self._value] ,classes="tag-storage")
     
@@ -73,12 +73,10 @@ class Tag(Static):
     Tag > Button {
         border: none;
         min-width: 3;
-        background: $primary;
         height: 1;
     }
 
     Tag > Button:hover {
-        background: $primary-lighten-1;
         border: none;
         height: 1;
     }
@@ -99,8 +97,8 @@ class Tag(Static):
         self.parent_input = parent_input
 
     def compose(self) -> ComposeResult:
-        yield Button(self.value, id="tag-value")
-        yield Button("❌", id="delete")
+        yield Button(self.value, id="tag-value", compact=True, variant="primary")
+        yield Button("❌", id="delete", compact=True, variant="primary")
 
     @on(Button.Pressed)
     def edit_tag(self, event : Button.Pressed):

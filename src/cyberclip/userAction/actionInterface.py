@@ -46,6 +46,9 @@ class actionInterface():
             description (str): A short description/name of the action
             indicators (str): used to describe some action limitation (i.e. requires API-Key, external files, is slow...)
         """
+        self.supportedType : set[str] = set()
+        self.parsers : dict[str,ParserInterface] = {}
+        self.complex_param : dict[str,dict] = {}
         for k, v in kwargs.items():
             setattr(self, k, v)
 
@@ -70,7 +73,7 @@ class actionInterface():
             print("Error while loading config from .env")
         return self.conf
     
-    def get_observables(self) -> dict:
+    def get_observables(self) -> dict[str,dict]:
         """
         Returns:
             self.observables (dict): Populate the `self.observables` by a dictionnary with the following structure :  
@@ -94,7 +97,7 @@ class actionInterface():
                 self.observables[parser.parsertype] = parser.extract()
         return self.observables
     
-    def get_param_value(self, config_name):
+    def get_param_value(self, config_name) -> str:
         config = self.complex_param.get(config_name)
         if isinstance(config, dict):
             return config.get("value","")
@@ -104,7 +107,7 @@ class actionInterface():
             return ""
         
 
-    def execute(self) -> dict:
+    def execute(self) -> dict[str,dict]:
         """Execute the action
         
         Returns:

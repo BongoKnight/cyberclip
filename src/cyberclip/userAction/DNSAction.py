@@ -25,19 +25,19 @@ class DNSAction(actionInterface):
         self.dns_results = {}
         self.observables = self.get_observables()
         if self.observables.get("ip"):
-            for ip in self.observables.get("ip"):
+            for ip in self.observables.get("ip",[]):
                 try:
                     self.dns_results.update({ip: ','.join(i[0] for i in [socket.getnameinfo((ip, 0), 0)])})
                 except:
                     self.dns_results.update({ip:''})
         if self.observables.get("ipv6"):
-            for ip in self.observables.get("ipv6"):
+            for ip in self.observables.get("ipv6",[]):
                 try:
                     self.dns_results.update({ip: ','.join(i[0] for i in [socket.getnameinfo((ip, 0), 0)])})
                 except:
                     self.dns_results.update({ip: ''})
-        if self.observables.get("domain"):
-            for domain in self.observables.get("domain"):
+        if domains := self.observables.get("domain",[]):
+            for domain in domains:
                 dns_reccords = {}
                 for type in self.get_param_value("Reccords"):
                     try:

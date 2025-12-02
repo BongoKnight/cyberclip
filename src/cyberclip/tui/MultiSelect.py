@@ -37,14 +37,14 @@ class MultiSelect(Static):
         self.select_all = True
         if options:
             if isinstance(options[0], str) :
-                self.options = [(f"{FALSE_EMOTE} {option}", option) for option in options]
+                self.options = [(f"{TRUE_EMOTE} {option}", option) for option in options]
             elif isinstance(options[0], tuple):
                 self.options = [(f"{TRUE_EMOTE} {option}", option) if is_active else (f"{FALSE_EMOTE} {option}", option) for option, is_active in options]
         self.options.sort(key=lambda option: option[1])
     
     def compose(self) -> ComposeResult:
         yield Horizontal(
-            Label(renderable=self.label, id="title"),
+            Label(content=self.label, id="title"),
             Select(self.options, prompt=self.prompt ,classes="multiselect", allow_blank=True)
         )
     
@@ -102,7 +102,7 @@ class MultiSelect(Static):
         self._value = list(set(value))
         if self._value:
             if isinstance(self._value[0], str) :
-                self.options = [(f"{FALSE_EMOTE} {option}", option) for option in self._value]
+                self.options = [(f"{TRUE_EMOTE} {option}", option) for option in self._value]
             elif isinstance(self._value[0], tuple):
                     self.options = [(f"{TRUE_EMOTE} {option}", option) if is_active else (f"{FALSE_EMOTE} {option}", option) for option, is_active in self._value]
             self.options.sort(key=lambda option: option[1])

@@ -70,10 +70,7 @@ class crtshCertificatesAction(actionInterface):
 
     def __str__(self):
         self.execute()
-        lines = []
-        for domain, certificates in self.results.items():
-            lines.append(f"{domain}\t{json.dumps(certificates, indent=None)}")
-        return "\n".join(lines)
+        return "\r\n".join(json.dumps(value) for value in self.results.values())
 
 if __name__=='__main__':
     from userTypeParser.domainParser import domainParser

@@ -6,6 +6,7 @@ import urllib.parse
 import requests
 import json
 import urllib
+import time
 
 BASE_SEARCH_URL = "https://urlscan.io/api/v1/search/"
 
@@ -17,6 +18,9 @@ class SearchInUrlScanAction(actionInterface):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "UrlScan: Search IoC"
         self.indicators = "🔑"
+        self.load_conf("UrlScan")
+        API_KEY = self.conf.get("api-key","")
+        self.headers = {"accept": "application/json", "API-Key": API_KEY}
 
         
     def execute(self) -> object:
@@ -26,8 +30,8 @@ class SearchInUrlScanAction(actionInterface):
             observables += self.get_observables().get(parsertype, [])
         for observable in set(observables):
             try:
-                query_url = BASE_SEARCH_URL + f"?q={observable}" 
-                response = requests.get(query_url)
+                query_url = BASE_SEARCH_URL + f"?q={observable}&size=20" 
+                response = requests.get(query_url, headers=self.headers)
                 self.results.update({observable:response.json()})
             except Exception as e:
                 self.results.update({observable:str(e)})
@@ -35,10 +39,11 @@ class SearchInUrlScanAction(actionInterface):
 
 
     def __str__(self):
-        return json.dumps(self.execute())
+        self.execute()
+        return "\r\n".join(json.dumps(value) for value in self.results.values())
 
 
-DEFAULT_QUERY_PARAMETERS = {"Query":{"type":"text","value":"*"}}
+DEFAULT_QUERY_PARAMETERS = {"Query":{"type":"text","value":"*"}, "Max results":{"type":"text","value":"20"}}
 
 class QueryUrlScanAction(actionInterface):
     """A action module to query URLScan through its API.
@@ -58,11 +63,12 @@ class QueryUrlScanAction(actionInterface):
         self.headers = {"accept": "application/json", "API-Key": API_KEY}
 
         
-    def execute(self) -> object:
+    def execute(self):
         self.results = {}
         try:
             query = self.get_param_value("Query")
-            query_url = BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size=10000" 
+            limit = int(self.get_param_value("Max results")) if  str(self.get_param_value("Max results")).isdecimal() else 20
+            query_url = BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size={limit}" 
             response = requests.get(query_url, headers=self.headers)
             self.results = response.json()
         except Exception as e:
@@ -71,7 +77,8 @@ class QueryUrlScanAction(actionInterface):
 
 
     def __str__(self):
-        return json.dumps(self.execute())
+        self.execute()
+        return "\r\n".join(json.dumps(value) for value in self.results.values())
 
 
 if __name__=='__main__':

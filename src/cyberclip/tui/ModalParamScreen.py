@@ -114,7 +114,7 @@ class ParamScreen(Screen):
                     options = value.get("choices", [])
                     assert "type" in value.keys()
                     assert "value" in value.keys()
-                    input_type = value.get("type")
+                    input_type = value.get("type", str)
                     if input_type.lower() == "text":
                         widgets.append(SimpleInput(label=key, value=stored_values, classes="complex-input"))
                     elif input_type.lower() == "longtext":
@@ -133,9 +133,7 @@ class ParamScreen(Screen):
                         widgets.append(Checkbox(label=key, value=stored_values, classes="complex-input"))
                     elif input_type.lower() == "json" or input_type.lower() == "jsonpath":
                         json_scheme = ""
-                        if scheme := value.get("scheme", ""):
-                            json_scheme = scheme
-                        elif json_parser := self.app.parser.parsers.get("json"):
+                        if json_parser := self.app.parser.parsers.get("json"):
                             json_scheme = json_parser.extract()[0]
                         widgets.append(SimpleJSONInput(label=key, value=stored_values, json_scheme=json_scheme ,classes="complex-input"))
                 if isinstance(value, str) and len(value)<100:

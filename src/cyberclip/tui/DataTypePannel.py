@@ -19,9 +19,10 @@ class DataTypeButton(Static):
 """
     parser_type = var("text")
 
-    def __init__(self, active: bool = True, renderable: RenderableType = "", *, expand: bool = False, shrink: bool = False, markup: bool = True, name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
-        super().__init__(renderable, expand=expand, shrink=shrink, markup=markup, name=name, id=id, classes=classes, disabled=disabled)
+    def __init__(self, active: bool = True, content: RenderableType = "", *, expand: bool = False, shrink: bool = False, markup: bool = True, name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
+        super().__init__(content, expand=expand, shrink=shrink, markup=markup, name=name, id=id, classes=classes, disabled=disabled)
         self._active = active
+        self.parser_type = str(content)
 
     def compose(self) -> ComposeResult:
         """Create child widgets of a dataType.""" 
@@ -91,7 +92,7 @@ class DataLoader(Static):
 
     def add_dataType(self, type_of_data: str, active : bool = True) -> DataTypeButton:
         """An action to add a timer."""
-        new_datatype = DataTypeButton(classes="datatype", active=active)
+        new_datatype = DataTypeButton(content=type_of_data, classes="datatype", active=active)
         self.query_one("#data-type-container").mount(new_datatype)
         new_datatype.scroll_visible()
         new_datatype.parser_type = type_of_data 

@@ -83,6 +83,9 @@ class ClipBrowser(App):
     text = reactive("Waiting for Update...", init=False)
     active_tab : str = ""
     try:
+        file = Path(__file__).parent / 'data/recipes.yml'
+        if not file.exists():
+            file.write_text("[]")
         with open(Path(__file__).parent / 'data/recipes.yml', "r", encoding="utf8") as f:
             recipes = var([Recipe(recipe_dict=i) for i in yaml.safe_load(f.read())])
     except Exception as e:
@@ -125,8 +128,8 @@ class ClipBrowser(App):
                 yield FiltrableDataFrame(pd.DataFrame(), id="main-table")
             with TabPane('Recipes', id="recipes"):
                 yield RecipesPannel()
-            with TabPane("Graph View", id="graphview"):
-                yield GraphPannel()
+            # with TabPane("Graph View", id="graphview"):
+            #     yield GraphPannel()
         yield Footer()
 
     def action_quit(self):
@@ -183,7 +186,8 @@ class ClipBrowser(App):
         if self.text or self.text == "":
             self.parser.parseData(self.text)
             self.contentview.update_text(new_text, force=True)
-            self.contentview.filter_action()
+            if self.active_tab == ClipBrowser.APP_TITLE:
+                self.query_one(ActionPannel).filter_action()
 
     @work()
     async def get_param(self, actionnable: actionInterface | ParserInterface):
@@ -206,19 +210,19 @@ class ClipBrowser(App):
             try:
                 self.text = await self.parser.apply_actionable(actionnable, self.query_one(TextArea).text)
 
-                # Add executed action to graph view
-                previous_node = self.active_node
-                _node = {
-                        "label": actionnable.description, 
-                        "supported":actionnable.supportedType,
-                        "params":actionnable.complex_param
-                        }
-                action_node = add_node(self.graph, _node, "action", previous_node)
-                text_node = {"text":self.text, "detected":self.parser.detectedType}
-                self.active_node = add_node(self.graph, text_node, "text", action_node)
-                if not self.graph.get_edge_data(previous_node.get("id"),action_node.get("id")):
-                    self.graph.add_edge(previous_node.get("id"), action_node.get("id"))
-                    self.graph.add_edge(action_node.get("id"), self.active_node.get("id"))
+                # # Add executed action to graph view
+                # previous_node = self.active_node
+                # _node = {
+                #         "label": actionnable.description, 
+                #         "supported":actionnable.supportedType,
+                #         "params":actionnable.complex_param
+                #         }
+                # action_node = add_node(self.graph, _node, "action", previous_node)
+                # text_node = {"text":self.text, "detected":self.parser.detectedType}
+                # self.active_node = add_node(self.graph, text_node, "text", action_node)
+                # if not self.graph.get_edge_data(previous_node.get("id"),action_node.get("id")):
+                #     self.graph.add_edge(previous_node.get("id"), action_node.get("id"))
+                #     self.graph.add_edge(action_node.get("id"), self.active_node.get("id"))
 
             except Exception as e:
                 self.notify("Error applying action..." + str(e) + traceback.format_exc(), severity="error")  

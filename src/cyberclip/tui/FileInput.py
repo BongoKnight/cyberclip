@@ -42,7 +42,7 @@ class FileInput(Static):
         
     @property
     def value(self):
-        return str(self.query_one(".selected", Label).renderable)
+        return str(self.query_one(".selected", Label).content)
     
     def show_selected(self, to_show: Path | None) -> None:
         """Show the file that was selected by the user.

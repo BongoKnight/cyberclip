@@ -16,7 +16,9 @@ class extractAction(actionInterface):
         self.exception = exception
 
 
+
     def execute(self) -> object:
+        self.observables = {}
         for parser_name, parser in self.parsers.items():
             if parser_name not in self.exception:
                 self.observables.update({parser_name:parser.extract()})

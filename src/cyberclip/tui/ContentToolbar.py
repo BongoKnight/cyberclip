@@ -30,7 +30,7 @@ class ContentToolbar(Static):
         from tui.ContentView import ContentView
         button_id = event.button.id
         if button_id == "copy-button":
-            self.app.copy_to_clipboard(self.app.text)
+            self.app.copy_to_clipboard(self.app.query_one("#clip-content", TextArea).text)
             self.app.notify("Copied to clipboard!")
         if button_id == "clear-button":
             self.app.text = ""

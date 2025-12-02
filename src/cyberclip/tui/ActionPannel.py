@@ -1,11 +1,12 @@
 import asyncio
 import traceback
 from functools import partial
+import re
 
 from textual import on, work
 from textual.reactive import var
-from textual.containers import  VerticalScroll
-from textual.widgets import Static, Button, Input, TabbedContent, TextArea
+from textual.containers import  VerticalScroll, Horizontal
+from textual.widgets import Static, Button, Input, Switch, Label
 from textual.app import ComposeResult
 from textual.command import Hit, Hits, Provider
 
@@ -13,10 +14,12 @@ try:
     from userAction.actionInterface import actionInterface
     from userTypeParser.ParserInterface import ParserInterface
     from tui.RecipesPannel import Recipe
+    from tui.DataTypePannel import DataTypeButton
 except:
     from cyberclip.userAction.actionInterface import actionInterface
     from cyberclip.userTypeParser.ParserInterface import ParserInterface
     from cyberclip.tui.RecipesPannel import Recipe
+    from cyberclip.tui.DataTypePannel import DataTypeButton
 
 
 
@@ -93,10 +96,10 @@ class ActionCommands(Provider):
         for actionnable in self.actions:
             if  "Action" in actionnable.__module__ :
                 action_desc = actionnable.description
-                action_doc = actionnable.__doc__
+                action_doc = actionnable.__doc__.splitlines()[0]
                 scoreDesc = matcher.match(action_desc) 
                 scoreDoc = matcher.match(action_doc) 
-                if scoreDesc > 0 or scoreDoc > 0:
+                if scoreDesc > 0.3 or scoreDoc > 0.3:
                     yield Hit(
                         scoreDesc,
                         matcher.highlight(action_desc),
@@ -104,12 +107,12 @@ class ActionCommands(Provider):
                         help=matcher.highlight(action_doc.splitlines()[0]),
                     )
                  
-            if  "Parser" in actionnable.__module__ :
+            elif  "Parser" in actionnable.__module__ :
                 parser_desc = f"Extract {actionnable.parsertype}"
-                parser_doc = actionnable.extract.__doc__
+                parser_doc = actionnable.extract.__doc__.splitlines()[0]
                 scoreDesc = matcher.match(parser_desc) 
                 scoreDoc = matcher.match(parser_doc) 
-                if scoreDesc > 0 or scoreDoc > 0:
+                if scoreDesc > 0.3 or scoreDoc > 0.3:
                     yield Hit(
                         scoreDesc,
                         matcher.highlight(parser_desc),
@@ -117,12 +120,12 @@ class ActionCommands(Provider):
                         help=matcher.highlight(parser_doc.splitlines()[0]),
                     )
 
-            if isinstance(actionnable, Recipe):
+            elif isinstance(actionnable, Recipe):
                 recipe_desc = actionnable.name
-                recipe_doc = actionnable.description
+                recipe_doc = actionnable.description.splitlines()[0]
                 scoreDesc = matcher.match(recipe_desc) 
                 scoreDoc = matcher.match(recipe_doc) 
-                if scoreDesc > 0 or scoreDoc > 0:
+                if scoreDesc > 0.3 or scoreDoc > 0.3:
                     yield Hit(
                         scoreDesc,
                         matcher.highlight(recipe_desc),
@@ -135,7 +138,8 @@ class ActionPannel(Static):
 
     def compose(self) -> ComposeResult:
         yield Input(placeholder="Filter actions", id="action-filter")
-        yield VerticalScroll(id="action-container")   
+        yield VerticalScroll(id="action-container")
+        yield Horizontal(Switch(), Label("Display text actions"),id="textswitch")
 
     def add_action(self, action_module: actionInterface) -> ActionButton:
         new_action = ActionButton()
@@ -145,9 +149,49 @@ class ActionPannel(Static):
         new_action.scroll_visible()
         return new_action
 
-    def on_input_changed(self, event: Input.Changed) -> None:
-        self.app.contentview.filter_action()
+    def filter_action(self):
+        actionView = self.app.query_one(ActionPannel)
+        if actionView:
+            actions = actionView.query(ActionButton)
+            actual_detected_type = set(self.app.parser.detectedType)
+            for datatype_button in self.app.query(DataTypeButton):
+                # Update actions supported_type and hide action buttons where no type are supported
+                if datatype_button.switch and datatype_button.switch.value:
+                    for action_button in actions:
+                        # Add the supported type if the default action support it.
+                        if datatype_button.parser_type in action_button.action_supported_type:
+                            action_button.actionnable.supportedType.add(datatype_button.parser_type)
+                else:
+                    for action_button in actions:
+                        if datatype_button.parser_type in action_button.action_supported_type:
+                            action_button.actionnable.supportedType.discard(datatype_button.parser_type)
+            
+            filter_text = self.app.query_one(ActionPannel).query_one(Input).value
+            for action_button in actions:
+                if  (len(action_button.actionnable.supportedType.intersection(actual_detected_type)) >=1
+                    and len(action_button.actionnable.supportedType.intersection(action_button.action_supported_type)) >= 1
+                    ) :
+                    action_button.visible = True
+                    action_button.remove_class("no-height")
+                    self.app.actions.append(action_button)
+                    if filter_text:
+                        for word in filter_text.split():
+                            if not re.search(f"(?i){word}", action_button.actionnable.description, re.IGNORECASE):
+                                if not word in action_button.actionnable.supportedType:
+                                    action_button.visible = False
+                                    action_button.add_class("no-height")
+                else:
+                    action_button.visible = False
+                    action_button.add_class("no-height")
+                if "text" in action_button.actionnable.supportedType and self.query_one(Switch).value == False:
+                    action_button.visible = False
+                    action_button.add_class("no-height")                    
 
+    def on_input_changed(self, event: Input.Changed) -> None:
+        self.filter_action()
+
+    def on_switch_changed(self, event: Switch.Changed):
+        self.filter_action()
 
     def clean_filter(self):
         self.query_one(Input).value = ""

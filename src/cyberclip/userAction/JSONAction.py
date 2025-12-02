@@ -57,7 +57,8 @@ With the JSON above:
     def __init__(self, parsers = {}, supportedType = {"json","yaml"}, complex_param=CONF):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
         self.description = "Extract from JSON/YAML with Path Selector"
-        self.results = {}
+        self.results : dict[str, dict] = {}
+        self.observables: dict[str, dict] = {}
 
     def filter_json(self, json_str: str):
         if json_str:

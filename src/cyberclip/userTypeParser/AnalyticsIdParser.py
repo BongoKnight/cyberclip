@@ -4,7 +4,7 @@ try:
 except:
     from ParserInterface import ParserInterface
 
-BASE_REGEX = r"(\b|^)((GT|GTM|G|AW)-[A-Z0-9]{7,10}|UA-\d+-\d+|hjid:\d+|s_gi\([\"'][^\"']+[\"']\))(\b|$)"
+BASE_REGEX = r"(\b|^)((GT|GTM|G|AW)-[A-Z0-9]{7,15}|UA-\d+-\d+|hjid:\d+|s_gi\([\"'][^\"']+[\"']\))(\b|$)"
 
 class AnalyticsIdParser(ParserInterface):
     """Implementation of ParserInterface for various strings related to analytics.
