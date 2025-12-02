@@ -14,14 +14,14 @@ class defangAction(actionInterface):
         
     def execute(self) -> list:
         observables = []
-        results = []
+        self.results = {}
         for parsertype in self.supportedType:
             observables += self.get_observables().get(parsertype, [])
         for observable in set(observables):
             defanged = observable.replace(".","[.]")
             defanged = re.sub("^http","hxxp", defanged)
-            results[observable] = defanged 
-        return results
+            self.results[observable] = defanged 
+        return self.results
     
     def __str__(self):
         self.execute()
@@ -37,14 +37,14 @@ class fangAction(actionInterface):
         
     def execute(self) :
         observables = []
-        results = []
+        self.results = {}
         for parsertype in self.supportedType:
             observables += self.get_observables().get(parsertype, [])
         for observable in set(observables):
             fanged = observable.replace("[.]",".")
             fanged = re.sub("(\[:/?/?\])","://", fanged)
             fanged = re.sub("^hxxp","http", fanged)
-            results[observable] = fanged 
+            self.results[observable] = fanged 
     
     def __str__(self):
         self.execute()
