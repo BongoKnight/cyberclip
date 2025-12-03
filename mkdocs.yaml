@@ -51,14 +51,13 @@ plugins:
     default_handler: python
     handlers:
       python:
-        path: [src]
         options:
           merge_init_into_class: true
           docstring_options:
-          ignore_init_summary: true
+            ignore_init_summary: true
           show_source: false
           show_docstring_modules: true
-          docstring_parser: google
+          docstring_style: google
           filters:
             # Hide some methods that we don't want to be shown in the docs.
             - "!generic"
