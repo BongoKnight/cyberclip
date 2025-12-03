@@ -14,8 +14,10 @@ python.exe -m pipx install "cyberclip @ git+https://github.com/BongoKnight/cyber
 
 > You might need to use `python.exe -m pipx ensurepath` in order to add the binary to your PATH.
 
-- Create the config in `cyberclip/data/config.yml` from the `cyberclip/data/config.yml.bak`
+- Create the .env file in `cyberclip` installation path
 - Add customs parser/actions in the `private` directory under `cyberclip/userAction` and `cyberclip/userTypeParser`, some example will be added in the "Getting started" tutoriel and in the `graveyard` directory.
+
+> If installed with pipx, the installation path should be something like `C:\Users\<user>\pipx\venvs\cyberclip\Lib\site-packages\cyberclip` (Windows) or `/home/<user>/.local/share/pipx/venvs/cyberclip/lib/python3.13/site-packages/cyberclip/` (Linux)
 
 Then you should be able to run the script with :
 

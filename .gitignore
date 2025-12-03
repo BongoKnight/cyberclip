@@ -5,7 +5,7 @@ clipboard.txt
 /src/cyberclip/tools.py
 *.gz
 /src/cyberclip/data/*
-!/src/cyberclip/data/conf.yml.bak
+!/src/cyberclip/data/recipes.yml.bak
 __pycache__/
 /src/conf.yml
 /src/*.csv
