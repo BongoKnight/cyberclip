@@ -29,7 +29,7 @@ dependencies = [
   "jq",
   "pandas",
   "pycti",
-  "pywin32",
+  "pywin32; platform_system=='Windows'",
   "pyperclip",
   "requests",
   "shodan",
