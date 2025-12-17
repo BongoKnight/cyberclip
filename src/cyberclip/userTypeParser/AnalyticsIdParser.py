@@ -19,7 +19,7 @@ class AnalyticsIdParser(ParserInterface):
     """
         
     
-    def __init__(self, text: str, parsertype="cve"):
+    def __init__(self, text: str, parsertype="analytics"):
         self.text = text
         self.parsertype = "analytics"
         self.objects = []
