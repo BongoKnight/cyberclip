@@ -36,6 +36,156 @@ def flatten(dictionary, parent_key=False, separator='.'):
             items.append((new_key, value))
     return dict(items)
 
+
+class JSONExtractActionv2(actionInterface):
+    """Extract data from a JSON or YAML object using jq.
+       This version preserves the JSON/YAML architecture by grouping selectors by prefix
+       and reconstructing a pruned structure that keeps only the selected fields.
+       You can test your jq selectors here: https://jqplay.org/
+    """
+
+    CONF = {"Selectors": {"type": "json", "value": []},
+            "Get only values": {"type": "bool", "value": True}}
+
+    def __init__(self, parsers = {}, supportedType = {"json","yaml"}, complex_param=CONF):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
+        self.description = "Extract from JSON/YAML with Path Selector (hierarchy preserved)"
+        self.results: dict[str, object] = {}
+        self.observables: dict[str, dict] = {}
+
+    # --- internal helpers ---
+
+    @staticmethod
+    def _get_at_path(data, path):
+        cur = data
+        for key in path:
+            cur = cur[key]
+        return cur
+
+    @staticmethod
+    def _assign(container, path, value):
+        """Return a container with value assigned at path, creating intermediate nodes.
+           - Dict keys for string keys
+           - Lists for integer indices (preserving indices with None placeholders)
+        """
+        if not path:
+            return value
+        key, rest = path[0], path[1:]
+
+        if isinstance(key, int):
+            # Ensure list container
+            if container is None or not isinstance(container, list):
+                container = []
+            # Ensure size
+            while len(container) <= key:
+                container.append(None)
+            container[key] = JSONExtractActionv2._assign(container[key], rest, value)
+            return container
+        else:
+            # Ensure dict container
+            if container is None or not isinstance(container, dict):
+                container = {}
+            container[key] = JSONExtractActionv2._assign(container.get(key), rest, value)
+            return container
+
+    @staticmethod
+    def _iter_scalar_values(obj):
+        """Yield all scalar (non-dict, non-list) values from nested structure."""
+        if isinstance(obj, dict):
+            for v in obj.values():
+                yield from JSONExtractActionv2._iter_scalar_values(v)
+        elif isinstance(obj, list):
+            for v in obj:
+                yield from JSONExtractActionv2._iter_scalar_values(v)
+        else:
+            yield obj
+
+    # --- core extraction ---
+
+    def filter_json(self, json_str: str):
+        if not json_str:
+            return self.results
+
+        try:
+            data = json.loads(json_str)
+        except Exception as e:
+            # Keep a trace of error per input
+            self.results[json_str] = {"error": f"Invalid JSON: {e}"}
+            return self.results
+
+        selectors = self.get_param_value("Selectors") or []
+        pruned = None  # let _assign decide root type if needed
+
+        for selector in selectors:
+            try:
+                # Get all paths for the selector, e.g., ["a","b",0,"c"]
+                paths = jq.compile(f'path({selector})').input_value(data).all()
+            except Exception as e:
+                # Record selector error but continue others
+                pruned = pruned or {}
+                sel_errs = pruned.setdefault("_selector_errors", [])
+                sel_errs.append({selector: f"{e}"})
+                continue
+
+            # For each concrete path, copy the value and rebuild structure
+            for p in paths:
+                try:
+                    value = self._get_at_path(data, p)
+                    pruned = self._assign(pruned, p, value)
+                except Exception as e:
+                    pruned = pruned or {}
+                    sel_errs = pruned.setdefault("_selector_errors", [])
+                    sel_errs.append({selector: f"{e}"})
+
+        # If nothing matched, default to empty dict
+        self.results[json_str] = pruned if pruned is not None else {}
+        return self.results
+
+    def execute(self) -> object:
+        self.results = {}
+        self.observables = self.get_observables()
+
+        if json_objects := self.observables.get("json"):
+            for _json in json_objects:
+                self.filter_json(_json)
+
+        # If only YAML is present, parse to JSON strings and process
+        if self.observables.get("yaml") and not self.observables.get("json"):
+            json_objects = []
+            for yaml_str in self.observables.get("yaml"):
+                try:
+                    parsed = yaml.safe_load(yaml_str)
+                    json_objects.append(json.dumps(parsed))
+                except Exception as e:
+                    self.results[yaml_str] = {"error": f"Invalid YAML: {e}"}
+            for _json in json_objects:
+                self.filter_json(_json)
+
+        return self.results
+
+    def __str__(self):
+        self.execute()
+        text = []
+        only_values = self.get_param_value("Get only values")
+
+        if only_values:
+            # Print only scalar values extracted from the pruned structures
+            for _json, pruned in self.results.items():
+                for v in self._iter_scalar_values(pruned):
+                    text.append(str(v))
+        else:
+            # Print original input + its pruned JSON, grouped by prefixes (hierarchy preserved)
+            for k, v in self.results.items():
+                try:
+                    text.append(f"{json.dumps(v, ensure_ascii=False, indent=2)}")
+                except Exception:
+                    # Fallback if non-serializable values sneak in
+                    text.append(f"{k}\t{str(v)}")
+
+        return "\n".join(text)
+
+
+
 class JSONExtractAction(actionInterface):
     """Extract data from a JSON or YAML object using jq. You can test your queries here: https://jqplay.org/
 
