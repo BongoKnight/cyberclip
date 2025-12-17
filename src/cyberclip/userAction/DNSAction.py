@@ -14,7 +14,7 @@ class DNSAction(actionInterface):
     """Return reverse DNS for an IP, and DNS for a domain.  
     For a domain the a list of DNS reccord can be specified (default A) : ie. AAA,SPF,TXT.
     """
-    CONF = {"Reccords":{"type":"tags","value":["A","TXT","SOA","NS","MX"]}}
+    CONF = {"Records":{"type":"tags","value":["A","TXT","SOA","NS","MX"]}}
     def __init__(self, parsers = {}, supportedType = {"ipv6","ip","domain"}, complex_param = CONF):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param= complex_param)
         self.description = "DNS/Reverse DNS"
@@ -38,13 +38,13 @@ class DNSAction(actionInterface):
                     self.dns_results.update({ip: ''})
         if domains := self.observables.get("domain",[]):
             for domain in domains:
-                dns_reccords = {}
-                for type in self.get_param_value("Reccords"):
+                dns_records = {}
+                for type in self.get_param_value("Records"):
                     try:
-                        dns_reccords.update({type:",".join([ip.to_text() for ip in resolver.resolve(domain, type)])})
+                        dns_records.update({type:",".join([ip.to_text() for ip in resolver.resolve(domain, type)])})
                     except:
-                        dns_reccords.update({type:"Error getting DNS reccord"})
-                self.dns_results.update({domain:dns_reccords})
+                        dns_records.update({type:"Error getting DNS reccord"})
+                self.dns_results.update({domain:dns_records})
         return self.dns_results
     
     def __str__(self):
