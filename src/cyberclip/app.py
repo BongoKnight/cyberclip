@@ -76,6 +76,41 @@ class ClipBrowser(App):
     ]
     CLOSE_TIMEOUT = None
 
+    orange_theme =  Theme(
+        name="orange",
+        primary="#f16e00",
+        secondary="#ffb4e6",
+        warning="#ffcc00",
+        error="#ba3c5b",
+        success="#50be87",
+        accent="#a885d8",
+        foreground="#cdd6f4",
+        background="#000000",
+        surface="#181512",
+        panel="#201d1b",
+        variables={
+            "block-cursor-background":"#f16e00",
+            "footer-key-foreground": "#f16e00",
+        })
+
+    orange_theme_light =  Theme(
+        name="orange-light",
+        primary="#f16e00",
+        secondary="#ffb4e6",
+        warning="#ffcc00",
+        error="#ba3c5b",
+        success="#50be87",
+        accent="#a885d8",
+        foreground="#160b01",
+        background="#E4DCD0",
+        surface="#F0E3D3",
+        panel="#EECEA5",
+        dark=False,
+        variables={
+            "block-cursor-background":"#f16e00",
+            "footer-key-foreground": "#f16e00",
+        })
+
     parser = var(clipParser())
     recipe_parser = var(clipParser())
     graph = var(nx.DiGraph())
@@ -131,6 +166,8 @@ class ClipBrowser(App):
             # with TabPane("Graph View", id="graphview"):
             #     yield GraphPannel()
         yield Footer()
+        self.register_theme(self.orange_theme)
+        self.register_theme(self.orange_theme_light)
 
     def action_quit(self):
         sys.exit()

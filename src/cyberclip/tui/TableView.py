@@ -213,7 +213,7 @@ class FiltrableDataFrame(Static):
     }
 
     #selectmode{
-        border-title-color: white;
+        border-title-color: $accent;
     }
 
     DataFrameTable{

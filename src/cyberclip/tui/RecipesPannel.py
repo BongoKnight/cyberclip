@@ -143,7 +143,8 @@ class RecipesPannel(Static):
     }
     #recipe-viewer{
         width: 2fr;
-        border: white;
+        padding: 1;
+        border: $accent round;
     }
     #recipes_actions{
         height: 5;
