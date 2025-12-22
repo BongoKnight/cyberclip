@@ -39,7 +39,7 @@ For example :
         self.execute()
         lines = []
         for key, value in self.results.items():
-            lines.append(f"{key}\t{value}")
+            lines.append(f"{value}")
         return  "\n".join(lines)
     
 
