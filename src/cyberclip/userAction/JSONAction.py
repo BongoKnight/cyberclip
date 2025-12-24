@@ -184,7 +184,24 @@ class JSONExtractActionv2(actionInterface):
 
         return "\n".join(text)
 
+class JSONBeautifierAction(actionInterface):
+    """Pretty print JSON
+    """
+    def __init__(self, parsers = {}, supportedType = {"json"}):
+        super().__init__(parsers = parsers, supportedType = supportedType)
+        self.description = 'Pretty print JSON'
+        self.results = {}
 
+    def execute(self) -> dict[str, dict]:
+        self.observables = self.get_observables()
+        self.results = self.observables.get("json")
+
+    def __str__(self):
+        self.execute()
+        if len(self.results) == 1:
+            return json.dumps(json.loads(self.results[0]),indent=4)
+        else:
+            return json.dumps(json.loads(self.results),indent=4)
 
 class JSONExtractAction(actionInterface):
     """Extract data from a JSON or YAML object using jq. You can test your queries here: https://jqplay.org/
