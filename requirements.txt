@@ -10,6 +10,7 @@ pycti
 pyperclip
 pywin32; platform_system=="Windows"
 textual
+textual_serve
 textual[syntax]
 textual-fspicker
 textual-serve

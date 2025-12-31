@@ -37,6 +37,7 @@ dependencies = [
   "netext",
   "networkx",
   "textual",
+  "textual_serve",
   "textual[syntax]",
   "textual-fspicker",
   "urllib3"
