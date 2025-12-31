@@ -1,4 +1,3 @@
-import networkx as nx
 import json
 
 from rich.table import Table

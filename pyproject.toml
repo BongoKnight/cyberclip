@@ -14,7 +14,7 @@ authors = [
 ]
 description = "A parser for handling recognisable data such as IP, domain, MD5 and process them with custom actions."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10,<3.14"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -35,7 +35,6 @@ dependencies = [
   "shodan",
   "dotenv",
   "netext",
-  "networkx",
   "textual",
   "textual_serve",
   "textual[syntax]",

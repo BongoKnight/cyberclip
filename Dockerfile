@@ -4,5 +4,5 @@ COPY requirements.txt /
 RUN pip install -r /requirements.txt
 COPY src/ /app
 WORKDIR /app
-CMD ["python", "/app/cyberclip/server.py"]
+CMD ["python", "/app/cyberclip/app.py","--d"]
 EXPOSE 8000
