@@ -2560,11 +2560,13 @@
 <ul>
 <li>Git</li>
 <li>Docker (for docker deployment)</li>
-<li>Python 3.12</li>
+<li>Python 3.10 to 3.13</li>
 </ul>
 <h2 id="with-uv-recommended">With uv (recommended)<a class="headerlink" href="#with-uv-recommended" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code># For trying
 uv tool run git+https://github.com/BongoKnight/cyberclip
+# if you have some errors you can try to enforce python version or to `uv cache clean`
+uv tool run --python 3.10 git+https://github.com/BongoKnight/cyberclip
 
 # For installation
 uv tool install git+https://github.com/BongoKnight/cyberclip
