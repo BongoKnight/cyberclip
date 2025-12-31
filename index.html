@@ -437,6 +437,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#env-file-and-api-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Env file and API keys
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-custom-actionsparser" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create custom actions/parser
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2494,6 +2516,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#env-file-and-api-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Env file and API keys
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-custom-actionsparser" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create custom actions/parser
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2539,14 +2583,22 @@ cd cyberclip
 docker build -t cyberclip .
 docker run -d -p 8000:8000 cyberclip
 </code></pre></div>
-<ul>
-<li>Create the .env file in <code>cyberclip</code> installation path</li>
-</ul>
+<h2 id="env-file-and-api-keys">Env file and API keys<a class="headerlink" href="#env-file-and-api-keys" title="Permanent link">&para;</a></h2>
+<p>Create the .env file in <code>cyberclip</code> installation path</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># If installed with uv, the default should be:</span>
 C:<span class="se">\U</span>sers<span class="se">\&lt;</span>user&gt;<span class="se">\A</span>ppData<span class="se">\R</span>oaming<span class="se">\u</span>v<span class="se">\t</span>ools<span class="se">\c</span>yberclip<span class="se">\L</span>ib<span class="se">\s</span>ite-packages<span class="se">\c</span>yberclip
 <span class="c1"># If installed with pipx, the default should be:</span>
 C:<span class="se">\U</span>sers<span class="se">\&lt;</span>user&gt;<span class="se">\p</span>ipx<span class="se">\v</span>envs<span class="se">\c</span>yberclip<span class="se">\L</span>ib<span class="se">\s</span>ite-packages<span class="se">\c</span>yberclip
 </code></pre></div>
+<p>.env file is used to store API KEY needed for various services:</p>
+<div class="highlight"><pre><span></span><code>DATALAKE_EMAIL=
+DATALAKE_PASSWORD=
+DEEPL_API-KEY=
+SHODAN_API-KEY=
+URLSCAN_API-KEY=
+VIRUSTOTAL_API-KEY=
+</code></pre></div>
+<h2 id="create-custom-actionsparser">Create custom actions/parser<a class="headerlink" href="#create-custom-actionsparser" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Add customs parser/actions in the <code>private</code> directory under <code>cyberclip/userAction</code> and <code>cyberclip/userTypeParser</code>, some example will be added in the "Getting started" tutoriel and in the <code>graveyard</code> directory.</li>
 </ul>
