@@ -15,6 +15,7 @@ __pycache__/
 /src/*.zip
 *.pyc
 log.log
+log.log*
 /src/cyberclip/userAction/private/*
 !/src/cyberclip/userAction/private/__init__.py
 /src/cyberclip/userTypeParser/private/*
@@ -22,6 +23,7 @@ log.log
 /src/cyberclip/radialUI.py
 /.venv
 /src/cyberclip/cyberclip.egg-info/*
+/src/cyberclip.egg-info/*
 cyberclip.egg-info/*
 /dist/*
 /build/*
@@ -29,3 +31,4 @@ cyberclip.egg-info/*
 /docs/*
 !/docs/static
 !/docs/*.md
+uv.lock

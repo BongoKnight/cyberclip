@@ -26,6 +26,18 @@ VIRUSTOTAL_API-KEY="<VIRUS TOTAL API KEY>"
 - Docker (for docker deployment)
 - Python 3.12
 
+## With uv
+
+```
+# For trying
+uv tool run git+https://github.com/BongoKnight/cyberclip
+
+# For installation
+uv tool install git+https://github.com/BongoKnight/cyberclip
+cyberclip
+```
+
+
 ## With pipx
 
 ```

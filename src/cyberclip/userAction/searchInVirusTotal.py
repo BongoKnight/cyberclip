@@ -3,12 +3,8 @@ try:
 except:
     from actionInterface import actionInterface
 
-import jq
-import re
-import json
-from pathlib import Path
-from yaml.loader import SafeLoader
 import requests
+import json
 
 """Search observables in Virus Total."""
 

@@ -1,6 +1,5 @@
 import sys
 import argparse
-import networkx as nx
 from io import StringIO
 import pandas as pd
 import traceback
@@ -33,7 +32,7 @@ try:
     from cyberclip.userAction.actionInterface import actionInterface
     from cyberclip.userTypeParser.ParserInterface import ParserInterface
     from cyberclip.clipboardHandler import get_clipboard_text
-    from cyberclip.utilities import add_node, clean_tsv
+    from cyberclip.utilities import clean_tsv
 except:
     from tui.DataTypePannel import DataLoader
     from tui.ContentView import ContentView
@@ -47,7 +46,7 @@ except:
     from userAction.actionInterface import actionInterface
     from userTypeParser.ParserInterface import ParserInterface
     from clipboardHandler import get_clipboard_text
-    from utilities import add_node, clean_tsv
+    from utilities import  clean_tsv
 
 
 
@@ -113,7 +112,7 @@ class ClipBrowser(App):
 
     parser = var(clipParser())
     recipe_parser = var(clipParser())
-    graph = var(nx.DiGraph())
+    #graph = var(nx.DiGraph())
     active_node = var({})
     text = reactive("Waiting for Update...", init=False)
     active_tab : str = ""
@@ -285,11 +284,16 @@ class ClipBrowser(App):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-w","--web", help="Serve as a web app", action="store_true")
+    parser.add_argument("-d","--docker", help="Serve in a docker container", action="store_true")
     args = parser.parse_args()
+    path = Path(__file__)
     if args.web:
         from textual_serve.server import Server
-        path = Path(__file__).parent / "app.py"
         server = Server(f"python {path}")
+        server.serve()
+    elif args.docker:
+        from textual_serve.server import Server
+        server = Server(f"python {path}", host="0.0.0.0")
         server.serve()
     else:
         cyberClip = ClipBrowser()

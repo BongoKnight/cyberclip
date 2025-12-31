@@ -74,7 +74,7 @@ For example :
 
 
 class inTop1MAction(actionInterface):
-    """Return a list of domain in or out (default) of the top 1M domains. The data are recovered from Cloudflare list.
+    """Return a list of domain in or out (default) of the top 1M domains. The data are recovered from Majestic list.
     """
     def __init__(self, parsers = {}, supportedType = {"domain"}, complex_param={"Get domain NOT IN top 1M":{"type":"bool","value":True}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
