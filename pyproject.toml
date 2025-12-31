@@ -34,7 +34,6 @@ dependencies = [
   "requests",
   "shodan",
   "dotenv",
-  "netext",
   "textual",
   "textual_serve",
   "textual[syntax]",

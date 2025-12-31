@@ -160,7 +160,8 @@ class clipParser():
                 if actionable.complex_param:
                     action.complex_param = actionable.complex_param
                 self.log.debug(f"Action params : {actionable.complex_param}")
-                self.log.debug(f"Action parsers : {",".join([str(parser.__class__) for parser in actionable.parsers.values()])}")
+                parsers_str = ",".join([str(parser.__class__) for parser in actionable.parsers.values()])
+                self.log.debug(f"Action parsers : {parsers_str}")
                 result = str(action)
                 self.log.debug(f"Action result : {result}")
                 if isinstance(result, str):

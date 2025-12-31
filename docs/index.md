@@ -8,13 +8,15 @@ title: "Getting started"
 
 - Git
 - Docker (for docker deployment)
-- Python 3.12
+- Python 3.10 to 3.13
 
 ## With uv (recommended)
 
 ```
 # For trying
 uv tool run git+https://github.com/BongoKnight/cyberclip
+# if you have some errors you can try to enforce python version or to `uv cache clean`
+uv tool run --python 3.10 git+https://github.com/BongoKnight/cyberclip
 
 # For installation
 uv tool install git+https://github.com/BongoKnight/cyberclip

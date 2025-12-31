@@ -31,7 +31,8 @@ def get_path(node: tree.TreeNode):
         if str(node.parent.label).startswith("[]"):
             if not node.children:
                 # Add array index for leaf key 
-                return get_path(node.parent)[:-2] + f'[{clean_path.replace('"',"")}]'
+                clean_key = clean_path.replace('"',"")
+                return get_path(node.parent)[:-2] + f'[{clean_key}]'
             else:
                 return get_path(node.parent)
         else:
