@@ -17,11 +17,9 @@ from textual.app import App, CSSPathType, ComposeResult
 from textual.containers import Grid
 from textual.driver import Driver
 from textual.widgets import Footer, TabbedContent, TabPane, TextArea
-from netext.textual_widget.widget import GraphView
 
 try:
     from cyberclip.tui.DataTypePannel import DataLoader
-    from cyberclip.tui.GraphPannel import GraphPannel
     from cyberclip.tui.ContentView import ContentView
     from cyberclip.tui.ActionPannel import ActionPannel, ActionCommands
     from cyberclip.tui.TableView import FiltrableDataFrame
@@ -36,7 +34,6 @@ try:
 except:
     from tui.DataTypePannel import DataLoader
     from tui.ContentView import ContentView
-    from tui.GraphPannel import GraphPannel
     from tui.ActionPannel import ActionPannel, ActionCommands
     from tui.TableView import FiltrableDataFrame
     from tui.RecipesPannel import RecipesPannel, RecipeButton, Recipe
@@ -210,8 +207,6 @@ class ClipBrowser(App):
             self.query_one(RecipesPannel).refresh_recipes()
             if querybuttons:= self.query(RecipeButton):
                 querybuttons[0].press()
-        if self.active_tab == "Graph View":
-            self.query_one(GraphPannel).refresh(recompose=True)
 
     async def update_dataframe(self, df):
         tab = self.query_one("#tableview")
