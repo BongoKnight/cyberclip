@@ -4,17 +4,53 @@ title: "Getting started"
 
 # Installation
 
-I only tested the installation using pipx :
+## Requirements
 
-```bash
-# Windows users might need to specify the full python.exe path
-python.exe -m pip install pipx
-python.exe -m pipx install "cyberclip @ git+https://github.com/BongoKnight/cyberclip"
+- Git
+- Docker (for docker deployment)
+- Python 3.12
+
+## With uv (recommended)
+
+```
+# For trying
+uv tool run git+https://github.com/BongoKnight/cyberclip
+
+# For installation
+uv tool install git+https://github.com/BongoKnight/cyberclip
+cyberclip
 ```
 
-> You might need to use `python.exe -m pipx ensurepath` in order to add the binary to your PATH.
+
+## With pipx
+
+```
+python -m pip install pipx
+python -m pipx install "cyberclip @ git+https://github.com/BongoKnight/cyberclip"
+```
+
+> You might need to use `python -m pipx ensurepath` in order to add the binary to your PATH. Sometimes pipx install is glitchy and thus not recommended.
+
+
+## With Docker
+
+```
+git clone https://github.com/BongoKnight/cyberclip
+cd cyberclip
+docker build -t cyberclip .
+docker run -d -p 8000:8000 cyberclip
+```
+
 
 - Create the .env file in `cyberclip` installation path
+
+```bash
+# If installed with uv, the default should be:
+C:\Users\<user>\AppData\Roaming\uv\tools\cyberclip\Lib\site-packages\cyberclip
+# If installed with pipx, the default should be:
+C:\Users\<user>\pipx\venvs\cyberclip\Lib\site-packages\cyberclip
+```
+
 - Add customs parser/actions in the `private` directory under `cyberclip/userAction` and `cyberclip/userTypeParser`, some example will be added in the "Getting started" tutoriel and in the `graveyard` directory.
 
 > If installed with pipx, the installation path should be something like `C:\Users\<user>\pipx\venvs\cyberclip\Lib\site-packages\cyberclip` (Windows) or `/home/<user>/.local/share/pipx/venvs/cyberclip/lib/python3.13/site-packages/cyberclip/` (Linux)
