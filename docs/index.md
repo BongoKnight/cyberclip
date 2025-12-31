@@ -41,8 +41,9 @@ docker build -t cyberclip .
 docker run -d -p 8000:8000 cyberclip
 ```
 
+## Env file and API keys
 
-- Create the .env file in `cyberclip` installation path
+Create the .env file in `cyberclip` installation path
 
 ```bash
 # If installed with uv, the default should be:
@@ -50,6 +51,19 @@ C:\Users\<user>\AppData\Roaming\uv\tools\cyberclip\Lib\site-packages\cyberclip
 # If installed with pipx, the default should be:
 C:\Users\<user>\pipx\venvs\cyberclip\Lib\site-packages\cyberclip
 ```
+
+.env file is used to store API KEY needed for various services:
+
+```
+DATALAKE_EMAIL=
+DATALAKE_PASSWORD=
+DEEPL_API-KEY=
+SHODAN_API-KEY=
+URLSCAN_API-KEY=
+VIRUSTOTAL_API-KEY=
+```
+
+## Create custom actions/parser
 
 - Add customs parser/actions in the `private` directory under `cyberclip/userAction` and `cyberclip/userTypeParser`, some example will be added in the "Getting started" tutoriel and in the `graveyard` directory.
 
