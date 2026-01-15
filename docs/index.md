@@ -49,9 +49,9 @@ Create the .env file in `cyberclip` installation path
 
 ```bash
 # If installed with uv, the default should be:
-C:\Users\<user>\AppData\Roaming\uv\tools\cyberclip\Lib\site-packages\cyberclip
+C:\Users\%USERNAME%\AppData\Roaming\uv\tools\cyberclip\Lib\site-packages\cyberclip
 # If installed with pipx, the default should be:
-C:\Users\<user>\pipx\venvs\cyberclip\Lib\site-packages\cyberclip
+C:\Users\%USERNAME%\pipx\venvs\cyberclip\Lib\site-packages\cyberclip
 ```
 
 .env file is used to store API KEY needed for various services:
@@ -69,7 +69,7 @@ VIRUSTOTAL_API-KEY=
 
 - Add customs parser/actions in the `private` directory under `cyberclip/userAction` and `cyberclip/userTypeParser`, some example will be added in the "Getting started" tutoriel and in the `graveyard` directory.
 
-> If installed with pipx, the installation path should be something like `C:\Users\<user>\pipx\venvs\cyberclip\Lib\site-packages\cyberclip` (Windows) or `/home/<user>/.local/share/pipx/venvs/cyberclip/lib/python3.13/site-packages/cyberclip/` (Linux)
+> If installed with pipx, the installation path should be something like `C:\Users\%USERNAME%\pipx\venvs\cyberclip\Lib\site-packages\cyberclip` (Windows) or `/home///<user>/.local/share/pipx/venvs/cyberclip/lib/python3.13/site-packages/cyberclip/` (Linux)
 
 Then you should be able to run the script with :
 
@@ -79,7 +79,7 @@ cyberclip
 # On Windows
 cyberclip.exe
 # Or alternatively with :
-cd "C:\Users\<user>\AppData\Local\Programs\Python\Python312\Lib\site-packages\cyberclip" && python3 app.py
+cd "C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python312\Lib\site-packages\cyberclip" && python3 app.py
 ```
 
 # Requests and improvments

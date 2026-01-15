@@ -78,7 +78,7 @@ class QueryUrlScanAction(actionInterface):
 
     def __str__(self):
         self.execute()
-        return "\r\n".join(json.dumps(value) for value in self.results.values())
+        return json.dumps(self.results)
 
 
 if __name__=='__main__':
