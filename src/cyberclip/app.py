@@ -18,6 +18,8 @@ from textual.containers import Grid
 from textual.driver import Driver
 from textual.widgets import Footer, TabbedContent, TabPane, TextArea
 
+
+from utilities import find_delimiter
 try:
     from cyberclip.tui.DataTypePannel import DataLoader
     from cyberclip.tui.ContentView import ContentView
@@ -25,7 +27,7 @@ try:
     from cyberclip.tui.TableView import FiltrableDataFrame
     from cyberclip.tui.RecipesPannel import RecipesPannel, RecipeButton, Recipe
     from cyberclip.tui.ModalParamScreen import ParamScreen
-    from cyberclip.userTypeParser import TSVParser
+    from cyberclip.userTypeParser import CSVParser
     from cyberclip.clipParser import clipParser
     from cyberclip.userAction.actionInterface import actionInterface
     from cyberclip.userTypeParser.ParserInterface import ParserInterface
@@ -38,7 +40,7 @@ except:
     from tui.TableView import FiltrableDataFrame
     from tui.RecipesPannel import RecipesPannel, RecipeButton, Recipe
     from tui.ModalParamScreen import ParamScreen
-    from userTypeParser import TSVParser
+    from userTypeParser import CSVParser
     from clipParser import clipParser
     from userAction.actionInterface import actionInterface
     from userTypeParser.ParserInterface import ParserInterface
@@ -193,10 +195,10 @@ class ClipBrowser(App):
         self.active_tab = event.tab.label_text
         if self.active_tab == "Table View":
             df = pd.DataFrame()
-            parser = TSVParser.tsvParser(self.text)
+            parser = CSVParser.csvParser(self.text)
             if parser.extract():            
                 try:
-                    df = pd.read_csv(StringIO(self.text), sep="\t", header=None, skip_blank_lines=False)
+                    df = pd.read_csv(StringIO(self.text), sep=find_delimiter(self.text), header=None, skip_blank_lines=False)
                     df.columns = [str(i) for i in df.columns]
                     self.call_after_refresh(self.update_dataframe, df)
                 except Exception as e:

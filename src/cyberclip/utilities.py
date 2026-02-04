@@ -1,5 +1,6 @@
 import re
 import uuid
+import csv
 
 def clean_tsv(new_text: str, text:str):
     """If new_text is a TSV value that starts with text as a first field, returns everythings except this field
@@ -15,6 +16,11 @@ def clean_tsv(new_text: str, text:str):
         result = re.sub("^"+re.escape(text)+"\t", "", new_text)
     return result
 
+
+def find_delimiter(text: str):
+    sniffer = csv.Sniffer()
+    delimiter = sniffer.sniff(text[0:min(len(text), 5000)]).delimiter
+    return delimiter
 
 def get_rectangle_text(text: str, max_width: int, max_height:int):
     clean_text = ""
