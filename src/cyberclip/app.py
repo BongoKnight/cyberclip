@@ -19,7 +19,6 @@ from textual.driver import Driver
 from textual.widgets import Footer, TabbedContent, TabPane, TextArea
 
 
-from utilities import find_delimiter
 try:
     from cyberclip.tui.DataTypePannel import DataLoader
     from cyberclip.tui.ContentView import ContentView
@@ -32,7 +31,7 @@ try:
     from cyberclip.userAction.actionInterface import actionInterface
     from cyberclip.userTypeParser.ParserInterface import ParserInterface
     from cyberclip.clipboardHandler import get_clipboard_text
-    from cyberclip.utilities import clean_tsv
+    from cyberclip.utilities import clean_tsv, find_delimiter
 except:
     from tui.DataTypePannel import DataLoader
     from tui.ContentView import ContentView
@@ -45,7 +44,7 @@ except:
     from userAction.actionInterface import actionInterface
     from userTypeParser.ParserInterface import ParserInterface
     from clipboardHandler import get_clipboard_text
-    from utilities import  clean_tsv
+    from utilities import  clean_tsv, find_delimiter
 
 
 
