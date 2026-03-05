@@ -1,4 +1,5 @@
 import re
+import ipaddress
 try:
     from userTypeParser.ParserInterface import ParserInterface
 except:
@@ -59,7 +60,8 @@ class CIDRParser(ParserInterface):
         self.objects = ips
         return ips
 
-class ipv6Parser(ParserInterface):
+# The old ipv6Parser, will delete later if not needed anymore
+'''class ipv6Parser(ParserInterface):
     """Parser for ipv6."""
     def __init__(self, text: str, parsertype="ipv6"):
         self.text = text
@@ -79,7 +81,47 @@ class ipv6Parser(ParserInterface):
         ips = [ip.group().replace("[.]",".") for ip in ipsIter]
         ips = [re.sub(r"([\s\r\n\t]|^|$)", r'', ip) for ip in ips]
         self.objects = ips
-        return ips
+        return ips'''
+
+class ipv6Parser(ParserInterface):
+    """Parser for IPv6 addresses."""
+    def __init__(self, text: str, parsertype="ipv6"):
+        self.text = text
+        self.parsertype = "ipv6"
+        self.objects = []
+
+    def contains(self):
+        return len(self.extract()) > 0
+
+    def extract(self):
+        # 1) Find candidate tokens that contain ':' (IPv6-ish)
+        # This grabs things like "2a0b:f4c2:2::33", possibly with punctuation around.
+        candidates = re.findall(r"[0-9A-Fa-f:]{2,}", self.text)
+
+        ips = []
+        for cand in candidates:
+            cand = cand.strip().strip("[](){}<>,;\"'")  # remove common surrounding punctuation
+            if ":" not in cand:
+                continue
+            try:
+                ip_obj = ipaddress.ip_address(cand)
+                if isinstance(ip_obj, ipaddress.IPv6Address):
+                    # normalize (compressed form)
+                    ips.append(str(ip_obj))
+            except ValueError:
+                continue
+
+        # optional: deduplicate while preserving order
+        seen = set()
+        unique = []
+        for ip in ips:
+            if ip not in seen:
+                seen.add(ip)
+                unique.append(ip)
+
+        self.objects = unique
+        return unique
+
         
 if __name__=="__main__":
     a = ipv4Parser("1212.1.2.3")

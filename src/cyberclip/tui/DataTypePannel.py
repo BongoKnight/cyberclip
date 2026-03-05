@@ -1,4 +1,4 @@
-import pyperclip
+#import pyperclip
 from rich.console import RenderableType
 from textual.reactive import var
 from textual.containers import  VerticalScroll, Horizontal, Vertical

@@ -1,11 +1,15 @@
 import pandas as pd
 from io import StringIO
-from userTypeParser.ParserInterface import ParserInterface
-from utilities import find_delimiter
+try:
+    from userTypeParser.ParserInterface import ParserInterface
+    from utilities import find_delimiter
+except ImportError:
+    from ParserInterface import ParserInterface
+    from cyberclip.utilities import find_delimiter
 
 
 class csvParser(ParserInterface):
-    """Implementation of ParserInterface for tsv strings.
+    """Implementation of ParserInterface for csv strings.
 
     Code exemple ::
         a = csvParser("ccdf ")
@@ -34,7 +38,7 @@ class csvParser(ParserInterface):
             return False
     
     def extract(self):
-        """Return all tsv contained in text."""
+        """Return all csv contained in text."""
         return [str(self.objects.to_csv(sep=find_delimiter(self.text)))]
         
         

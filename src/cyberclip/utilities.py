@@ -17,10 +17,31 @@ def clean_tsv(new_text: str, text:str):
     return result
 
 
-def find_delimiter(text: str):
+'''def find_delimiter(text: str):
     sniffer = csv.Sniffer()
     delimiter = sniffer.sniff(text[0:min(len(text), 5000)]).delimiter
-    return delimiter
+    return delimiter'''
+
+def find_delimiter(text: str, default: str = ",") -> str:
+    """Detect a reasonable CSV delimiter. Return default if detection fails."""
+    if not text:
+        return default
+
+    sample = text[:5000]  # limite pour le sniffer
+
+    try:
+        delim = csv.Sniffer().sniff(sample).delimiter
+        if delim and delim not in ("\r", "\n", "\r\n"):
+            return delim
+    except csv.Error:
+        pass
+
+    candidates = [",", ";", "\t", "|", ":", ' '] # ajouter un regex qui regroupe les espaces pour avoir même nb de colonnes pour TableView
+    counts = {d: sample.count(d) for d in candidates}
+    best = max(counts, key=counts.get)
+    if counts[best] == 0:
+        return default
+    return best
 
 def get_rectangle_text(text: str, max_width: int, max_height:int):
     clean_text = ""
