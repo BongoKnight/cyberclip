@@ -35,9 +35,9 @@ class asnumParser(ParserInterface):
         Returns:
             bool: True if at least one AS number is found in the text.
         """
-        if re.search(r"\bAS\d+\b", self.text, re.IGNORECASE) :
+        if re.search(r"\bAS\d+\b", self.text, re.IGNORECASE):
             return True
-        else :
+        else:
             return False
 
     def extract(self) -> list[str]:
@@ -47,12 +47,12 @@ class asnumParser(ParserInterface):
             list[str]: A list of extracted AS number values (format: AS#### or as####).
         """
         asnumsIter = re.finditer(r"\bAS\d+\b", self.text, re.IGNORECASE)
-        asnums = [asnum.group().replace("[.]",".") for asnum in asnumsIter]
+        asnums = [asnum.group().replace("[.]", ".") for asnum in asnumsIter]
         self.objects = asnums
         return asnums
-        
-        
-if __name__=="__main__":
+
+
+if __name__ == "__main__":
     a = asnumParser("dqsdq. fdsf")
     b = asnumParser("AS2589")
     print(a.extract(), a.contains())
