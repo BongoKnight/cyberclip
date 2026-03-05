@@ -23,7 +23,6 @@ def clean_tsv(new_text: str, text:str):
     return delimiter'''
 
 def find_delimiter(text: str, default: str = ",") -> str:
-    """Detect a reasonable CSV delimiter. Return default if detection fails."""
     if not text:
         return default
 

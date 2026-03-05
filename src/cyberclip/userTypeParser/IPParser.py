@@ -94,24 +94,20 @@ class ipv6Parser(ParserInterface):
         return len(self.extract()) > 0
 
     def extract(self):
-        # 1) Find candidate tokens that contain ':' (IPv6-ish)
-        # This grabs things like "2a0b:f4c2:2::33", possibly with punctuation around.
         candidates = re.findall(r"[0-9A-Fa-f:]{2,}", self.text)
 
         ips = []
         for cand in candidates:
-            cand = cand.strip().strip("[](){}<>,;\"'")  # remove common surrounding punctuation
+            cand = cand.strip().strip("[](){}<>,;\"'")
             if ":" not in cand:
                 continue
             try:
                 ip_obj = ipaddress.ip_address(cand)
                 if isinstance(ip_obj, ipaddress.IPv6Address):
-                    # normalize (compressed form)
                     ips.append(str(ip_obj))
             except ValueError:
                 continue
 
-        # optional: deduplicate while preserving order
         seen = set()
         unique = []
         for ip in ips:

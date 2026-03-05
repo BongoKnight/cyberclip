@@ -14,8 +14,7 @@ class TorExitIPAction(actionInterface):
 
     TOR_EXITS_URL = "https://raw.githubusercontent.com/alireza-rezaee/tor-nodes/refs/heads/main/latest.exits.csv"
 
-    # Cache settings
-    CACHE_SECONDS = 6 * 3600  # refresh every 6 hours (repo updates hourly, but no need to spam it)
+    CACHE_SECONDS = 6 * 3600
     _tor_exit_set = None
     _tor_exit_set_ts = 0
 
@@ -35,7 +34,6 @@ class TorExitIPAction(actionInterface):
 
     @classmethod
     def _cache_file(cls) -> Path:
-        # Store alongside other cached data (same pattern as other actions)
         return Path(__file__).parent / "../data/tor_exits.csv"
 
     @classmethod
@@ -51,13 +49,11 @@ class TorExitIPAction(actionInterface):
         """
         now = time.time()
 
-        # 1) Use in-memory cache if fresh
         if cls._tor_exit_set is not None and (now - cls._tor_exit_set_ts) < cls.CACHE_SECONDS:
             return cls._tor_exit_set
 
         cache_path = cls._cache_file()
 
-        # 2) If disk cache exists and is fresh, load it
         try:
             if cache_path.exists() and (now - cache_path.stat().st_mtime) < cls.CACHE_SECONDS:
                 text = cache_path.read_text(encoding="utf-8", errors="ignore")
@@ -65,16 +61,13 @@ class TorExitIPAction(actionInterface):
                 cls._tor_exit_set_ts = now
                 return cls._tor_exit_set
         except Exception:
-            # If disk cache is corrupted/unreadable, we'll just re-download
             pass
 
-        # 3) Download from GitHub raw
         try:
             r = requests.get(cls.TOR_EXITS_URL, timeout=15)
             r.raise_for_status()
             text = r.text
 
-            # ensure data directory exists
             cache_path.parent.mkdir(parents=True, exist_ok=True)
             cache_path.write_text(text, encoding="utf-8")
 
@@ -82,7 +75,6 @@ class TorExitIPAction(actionInterface):
             cls._tor_exit_set_ts = now
             return cls._tor_exit_set
         except Exception as e:
-            # Fallback: try to load from disk even if stale; otherwise empty set
             try:
                 if cache_path.exists():
                     text = cache_path.read_text(encoding="utf-8", errors="ignore")
@@ -112,11 +104,9 @@ class TorExitIPAction(actionInterface):
             line = line.strip()
             if not line:
                 continue
-            # skip header
             if line.lower().startswith("fingerprint"):
                 continue
 
-            # Split by comma; expected: fingerprint, ipaddr, port
             parts = [p.strip() for p in line.split(",")]
             if len(parts) < 2:
                 continue
@@ -137,7 +127,6 @@ class TorExitIPAction(actionInterface):
 
         tor_exits = self.load_tor_exit_set()
 
-        # TUI-friendly: key = observable, value = result
         self.results = {ip: ("TOR_EXIT" if ip in tor_exits else "OK") for ip in ips}
         return self.results
 
@@ -148,9 +137,6 @@ class TorExitIPAction(actionInterface):
     
 
 if __name__ == "__main__":
-    # Test local sans TUI
-    # On essaie d'utiliser le vrai parser du projet. Si import impossible, on fait un parser minimal.
-
     try:
         from userTypeParser.IPParser import IPParser
 
