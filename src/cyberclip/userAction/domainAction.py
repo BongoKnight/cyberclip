@@ -3,6 +3,7 @@ try:
 except:
     from actionInterface import actionInterface
 
+import csv
 import os
 import time
 import json
@@ -94,7 +95,7 @@ class inTop1MAction(actionInterface):
                     f.write(response.content)
                 del response
             except Exception as e:
-                print("Error while retriving database from Majestic Million", e)
+                print("Error while retrieving database from Majestic Million", e)
         TOP1M = []
         with open(file_name, "r", encoding="utf-8") as f:
             TOP1M = set(pd.read_csv(file_name)["Domain"])
@@ -108,6 +109,60 @@ class inTop1MAction(actionInterface):
         self.execute()
         return  "\n".join(self.results)
     
+class domainRankAction(actionInterface):
+    """Return the rank of a domain in the top 1M domains. The data are recovered from Majestic list.
+    """
+    def __init__(self, parsers = {}, supportedType = {"domain"}, complex_param={}):
+        super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
+        self.description = "Domain: Rank in Top 1M"
+        self.indicators = "📑"
+        self.results = {}
+
+    def execute(self) -> object:
+        self.results = {}
+        self.observables = self.get_observables()
+        file_name = Path(__file__).parent / "../data/top1m.csv"
+        if not os.path.exists(file_name) or (time.time() - os.path.getmtime(file_name) ) / 3600 > 24*7:
+            try:
+                url = f"https://downloads.majestic.com/majestic_million.csv"
+                response = requests.get(url)
+                with open(file_name, 'wb+') as f:
+                    f.write(response.content)
+                del response
+            except Exception as e:
+                print("Error while retrieving database from Majestic Million", e)
+       
+        wanted_list = self.observables.get("domain", []) or []
+        wanted = set(wanted_list)
+        if not wanted:
+            return {}
+        
+        ranks = {}
+ 
+        try:
+            with file_name.open("r", encoding="utf-8", newline="") as f:
+                reader = csv.DictReader(f)
+                for rank, row in enumerate(reader, start=1):
+                    d = row.get("Domain")
+                    if d in wanted and d not in ranks:
+                        ranks[d] = rank
+                        if len(ranks) == len(wanted):
+                            break
+        except Exception as e:
+            print("Error while reading Majestic CSV:", e)
+            return {}
+ 
+        for d in wanted_list:
+            self.results[d] = ranks.get(d, 0)
+        return self.results
+
+    def __str__(self):
+        self.execute()
+        lines = []
+        for key, value in self.results.items():
+            lines.append(f"{value}\t{key}")
+        return  "\n".join(lines)
+
 
 if __name__=='__main__':
     from userTypeParser.domainParser import domainParser

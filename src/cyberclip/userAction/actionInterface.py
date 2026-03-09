@@ -13,7 +13,7 @@ from userTypeParser.ParserInterface import ParserInterface
 class actionInterface():
     """Action Interface defines the minimum functions a parser needs to implement.
 
-    - `execute` : The logic part of the action, this method define what the action does. 
+    - `execute` : The logic part of the action, this method defines what the action does. 
     - `__str__` : Visual representation of the action after being executed.
 
     Attributes:

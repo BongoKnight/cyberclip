@@ -1,16 +1,14 @@
 import pandas as pd
 import shutil
 import requests
-import asyncio
 import os
-import sys
 import re
 import ipaddress
 import time
 from pathlib import Path
 try:
     from userAction.actionInterface import actionInterface
-except:
+except ImportError:
     from actionInterface import actionInterface
 
 AS_DB = None
@@ -21,7 +19,7 @@ def get_AS_data():
     global AS_DB, AS_RANGE
     file_name = Path(__file__).parent / "../data/as.gz"
     if not os.path.exists(file_name) or (time.time() - os.path.getmtime(file_name) ) / 3600 > 24*7:
-        print("Getting data...")
+        print("Getting data...") #where is this printed?
         try:
             url = "https://iptoasn.com/data/ip2asn-v4-u32.tsv.gz"
             response = requests.get(url, stream=True)
@@ -29,14 +27,14 @@ def get_AS_data():
                 shutil.copyfileobj(response.raw,f)
             del response
         except Exception as e:
-            print("Error while retriving database from IpToASN")
+            print("Error while retriving database from IpToASN") #no timeout, no reponse.raise_for_status()?
     try: 
         if not AS_DB:
             AS_DB = pd.read_csv(file_name, header=None, sep="\t", compression="gzip")
             AS_DB.rename(columns={0:"min_ip",1:"max_ip",2:"as_num",3:"as_loc",4:"as_info"}, inplace=True)
             AS_DB["CIDRS"] = AS_DB.apply(lambda row: [i for i in ipaddress.summarize_address_range(
                 ipaddress.ip_address(row["min_ip"]),
-                ipaddress.ip_address(row["max_ip"]))], axis=1)
+                ipaddress.ip_address(row["max_ip"]))], axis=1) #coûteux ?
     except Exception as e:
         print("Error while loading AS database")
     return AS_DB
@@ -80,16 +78,16 @@ class AsToCidrAction(actionInterface):
     def execute(self) -> object:
         self.results = {}
         get_AS_data()
-        get_IPv6_AS_data()
+        get_IPv6_AS_data() #IPv6 data is not used in this action, is it necessary to load it?
         self.observables = self.get_observables()
         if self.observables.get("asnum", []):
             if len(AS_DB.columns):
                 AS_numbers = self.observables.get("asnum", [])
                 for as_num in AS_numbers:
-                    int_as = int(re.search(r"\d+",as_num).group())
+                    int_as = int(re.search(r"\d+",as_num).group()) #what if the AS number is not in the format "AS12345"? should we handle this case?
                     AS_RANGE = AS_DB.loc[AS_DB["as_num"]==int_as]
                     AS_RANGE = AS_RANGE[["as_num","CIDRS"]]
-                    AS_RANGE = AS_RANGE.groupby('as_num').agg(sum).reset_index()
+                    AS_RANGE = AS_RANGE.groupby("as_num", as_index=False)["CIDRS"].sum()
                     response = AS_RANGE.loc[AS_RANGE["as_num"]==int_as].to_dict(orient="records")
                     if len(response)>0:
                         infos = response[0]
@@ -131,8 +129,12 @@ class AsInformationAction(actionInterface):
                 for as_num in AS_numbers:
                     int_as = int(re.search(r"\d+",as_num).group())
                     AS_RANGE = AS_DB.loc[AS_DB["as_num"]==int_as]
-                    AS_RANGE = AS_RANGE[["as_num","as_info","as_loc","CIDRS"]]
-                    AS_RANGE = AS_RANGE.groupby(['as_num','as_info','as_loc']).agg(sum).reset_index()
+                    AS_RANGE = AS_RANGE[["as_num", "as_info", "as_loc", "CIDRS"]]
+                    AS_RANGE = (
+                        AS_RANGE
+                        .groupby(["as_num", "as_info", "as_loc"], as_index=False)["CIDRS"]
+                        .sum()
+                    )
                     response = AS_RANGE.loc[AS_RANGE["as_num"]==int_as].to_dict(orient="records")
                     if len(response)>0:
                         infos = response[0]
@@ -158,7 +160,7 @@ class AsInformationAction(actionInterface):
 
 
 class IpToAsAction(actionInterface):
-    """Return Autonomous System information refering to an IP address.
+    """Return Autonomous System information referring to an IP address.
 
     `8.8.8.8` will return `8.8.8.8	8.8.8.0	8.8.8.255	AS15169	US	GOOGLE`
     """
@@ -209,9 +211,88 @@ class IpToAsAction(actionInterface):
         return "\n".join(lines)  
 
 
+class BadASNAction(actionInterface):
+    """Flag ASNs that appear in a known list of bad ASNs (from bountyyfi)."""
+
+    BAD_ASN_URL = "https://raw.githubusercontent.com/bountyyfi/bad-asn-list/refs/heads/main/all.txt"
+    _bad_asns_cache = None
+    _bad_asns_cache_ts = 0
+    _cache_seconds = 24*3600 #1 day
+ 
+    def __init__(self, parsers={}, supportedType={"asnum"}, complex_param={}):
+        super().__init__(parsers=parsers, supportedType=supportedType, complex_param=complex_param)
+        self.description = "Bad ASN List"
+        self.indicators = "📑"
+        self.results = {}
+    
+    @staticmethod
+    def normalize_asn(asn: str) -> str:
+        s = str(asn).strip().upper()
+        if not s:
+            return ""
+        if not s.startswith("AS"):
+            m = re.search(r"\d+", s)
+            if m:
+                s = "AS" + m.group()
+        return s
+    
+    @classmethod
+    def load_bad_asn_list(cls) -> set[str]:
+        now = time.time()
+        if cls._bad_asns_cache is not None and now - cls._bad_asns_cache_ts < cls._cache_seconds:
+            return cls._bad_asns_cache
+
+        try:
+            response = requests.get(cls.BAD_ASN_URL, timeout=10)
+            response.raise_for_status()
+            bad = set()
+            for line in response.text.splitlines():
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                m = re.search(r"\bAS(\d+)\b", line.upper())
+                if m:
+                    bad.add(m.group())
+            cls._bad_asns_cache = bad
+            cls._bad_asns_cache_ts = now
+            return bad
+        except Exception as e:
+            if cls._bad_asns_cache is None:
+                cls._bad_asns_cache = set()
+            print(f"Error loading bad ASN list: {e}")
+            return cls._bad_asns_cache
+        
+    def execute(self):
+        self.results = {}
+        self.observables = self.get_observables()
+
+        raw = self.observables.get("asnum", []) or []
+        asns = [self.normalize_asn(asn) for asn in raw]
+        asns = [asn for asn in asns if asn] #remove empty
+
+        bad_set = self.load_bad_asn_list()
+
+        self.results = {asn: ("BAD" if asn in bad_set else "GOOD") for asn in asns}
+        return self.results
+        
+    def __str__(self):
+        self.execute()
+        #show only bad ASNs
+        bad_only = [asn for asn, status in self.results.items() if status == "BAD"]
+        return "\n".join(bad_only) if bad_only else "No bad ASNs found"
+
+
 if __name__=='__main__':
     from userTypeParser.ASNumberParser import asnumParser
-    data = "ip\tinfo\n154.0.123.1 as64286"
+    #data = "ip\tinfo\n154.0.123.1 as64286"
+    data = "AS15169 as13335 foo AS64512 ip\tinfo\n154.0.123.1 as64286 AS394362 AS20473 AS11508 The Constant Company, LLC (VULTR)"
     text_parser = asnumParser(data)
-    a = str(AsInformationAction({"asnum":text_parser},["asnum"]))
-    print(a, text_parser.objects)
+    '''a = str(AsInformationAction({"asnum":text_parser},["asnum"]))
+    print(a, text_parser.objects)'''
+
+    print("BadASNAction:")
+    a = BadASNAction({"asnum": text_parser})
+    print("DEBUG bad list size:", len(a.load_bad_asn_list()))
+    print("DEBUG bad list sample:", list(a.load_bad_asn_list())[:10])
+    print("Raw results:", a.execute())
+    print("String output:\n", str(a))
