@@ -6,241 +6,210 @@ import urllib.parse
 import requests
 import json
 import urllib
-import time
 
 BASE_SEARCH_URL = "https://urlscan.io/api/v1/search/"
 
-class SearchInUrlScanAction(actionInterface):
-    """An action module to search IP and domains on URLScan.  
-    """
 
-    def __init__(self, parsers = {}, supportedType = {"ip","domain","analytics"}):
-        super().__init__(parsers = parsers, supportedType = supportedType)
+class SearchInUrlScanAction(actionInterface):
+    """An action module to search IP and domains on URLScan. This action runs a search query per observable and returns up to 20 results for each IP, domain, or analytics value."""
+
+    def __init__(self, parsers={}, supportedType={"ip", "domain", "analytics"}):
+        super().__init__(parsers=parsers, supportedType=supportedType)
         self.description = "UrlScan: Search IoC"
         self.indicators = "🔑"
         self.load_conf("UrlScan")
-        API_KEY = self.conf.get("api-key","")
-        self.headers = {"accept": "application/json", "API-Key": API_KEY}
+        API_KEY = self.conf.get("api-key", "")
+        self.headers = {"accept": "application/json"}
+        if API_KEY:
+            self.headers["API-Key"] = API_KEY
 
-        
     def execute(self) -> object:
         self.results = {}
         observables = []
+        self.observables = self.get_observables()
         for parsertype in self.supportedType:
-            observables += self.get_observables().get(parsertype, [])
+            observables += self.observables.get(parsertype, [])
         for observable in set(observables):
             try:
-                query_url = BASE_SEARCH_URL + f"?q={observable}&size=20" 
-                response = requests.get(query_url, headers=self.headers)
-                self.results.update({observable:response.json()})
+                query_url = (
+                    BASE_SEARCH_URL + f"?q={urllib.parse.quote(observable)}&size=20"
+                )
+                response = requests.get(query_url, headers=self.headers, timeout=15)
+                response.raise_for_status()
+                self.results.update({observable: response.json()})
             except Exception as e:
-                self.results.update({observable:str(e)})
+                self.results.update({observable: str(e)})
         return self.results
-
 
     def __str__(self):
         self.execute()
         return "\r\n".join(json.dumps(value) for value in self.results.values())
 
 
-'''DEFAULT_QUERY_PARAMETERS = {"Query":{"type":"text","value":"*"}, "Max results":{"type":"text","value":"20"}}
-
-
-class QueryUrlScanAction(actionInterface):
-    """An action module to query URLScan through its API.
-
-    Some queries might require an API Key.
-
-    UrlScan:
-    - api_key: <VT API Key> 
-    """
-
-    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param=DEFAULT_QUERY_PARAMETERS):
-        super().__init__(parsers=parsers, supportedType=supportedType, complex_param=complex_param)
-        self.description = "UrlScan: Query"
-        self.indicators = "🔑"
-        self.load_conf("UrlScan")
-        API_KEY = self.conf.get("api-key","")
-        self.headers = {"accept": "application/json", "API-Key": API_KEY}
-
-        
-    def execute(self):
-        self.results = {}
-        try:
-            query = self.get_param_value("Query")
-            limit = int(self.get_param_value("Max results")) if  str(self.get_param_value("Max results")).isdecimal() else 20
-            query_url = BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size={limit}" 
-            response = requests.get(query_url, headers=self.headers)
-            self.results = response.json()
-        except Exception as e:
-            self.results = {"error":str(e)}
-        return self.results
-
-
-    def __str__(self):
-        self.execute()
-        return json.dumps(self.results)'''
-
 DEFAULT_QUERY_PARAMETERS = {
     "Query": {"type": "text", "value": "*"},
     "Max results": {"type": "text", "value": "20"},
-    "Fetch full results": {"type": "bool", "value": False},
-    "Fetch DOM": {"type": "bool", "value": False},
-    "Return summary": {"type": "bool", "value": True},
+    "Result mode": {"type": "bool", "value": False},
+    "Include DOM": {"type": "bool", "value": False},
 }
 
+
 class QueryUrlScanAction(actionInterface):
-    """Query urlscan.io Search API and optionally fetch full results (and DOM).
+    """An action module to query the URLScan API. An API key may be required depending on the query and rate limits.
 
-    Params:
-    - Query: urlscan search query (ex: "*", "domain:example.com", "ip:1.2.3.4")
-    - Max results: number of search hits to retrieve
-    - Fetch full results: follow each hit's result and fetch full JSON
-    - Fetch DOM: also fetch DOM snapshot (requires full results)
-    - Return summary: return a compact summary instead of full raw JSON
+    Use this action to retrieve either standard search results or detailed results for matching scans.
 
-    API key:
-    Put it in Cyberclip config under section "UrlScan" with key "api-key".
+    Options:
+    - Result mode: return detailed scan results instead of search results
+    - Include DOM: also fetch the DOM snapshot for each matching scan
     """
 
-    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param=DEFAULT_QUERY_PARAMETERS):
-        super().__init__(parsers=parsers, supportedType=supportedType, complex_param=complex_param)
+    def __init__(
+        self, parsers={}, supportedType={"text"}, complex_param=DEFAULT_QUERY_PARAMETERS
+    ):
+        super().__init__(
+            parsers=parsers, supportedType=supportedType, complex_param=complex_param
+        )
         self.description = "UrlScan: Query"
         self.indicators = "🔑"
         self.load_conf("UrlScan")
-        API_KEY = self.conf.get("api-key","")
+        API_KEY = self.conf.get("api-key", "")
         self.headers = {"accept": "application/json"}
         if API_KEY:
             self.headers["API-Key"] = API_KEY
+        self._dom_cache = {}
+        self._result_cache = {}
 
-    def _safe_int(self, value, default=20):
-        try:
-            return int(value)
-        except:
-            return default
+    def _extract_scan_ids(self, search_json):
 
-    def _extract_hits(self, search_json):
-        # urlscan search typically returns {"results":[...], "total":..., ...}
-        hits = search_json.get("results", []) if isinstance(search_json, dict) else []
-        return hits if isinstance(hits, list) else []
+        its = search_json.get("results", [])
+        scan_ids = []
 
-    def _hit_summary(self, hit):
-        # Common fields seen in urlscan search results.
-        # We keep it defensive because fields vary.
-        task = hit.get("task", {}) if isinstance(hit, dict) else {}
-        page = hit.get("page", {}) if isinstance(hit, dict) else {}
+        for it in its:
 
-        return {
-            "uuid": hit.get("_id") or hit.get("uuid") or hit.get("task", {}).get("uuid"),
-            "url": task.get("url") or page.get("url"),
-            "domain": page.get("domain") or task.get("domain"),
-            "ip": page.get("ip"),
-            "time": hit.get("sort") or hit.get("date") or hit.get("task", {}).get("time"),
-            "result": hit.get("result"),  # sometimes present as URL
-        }
+            sid = None
 
-    def _fetch_json(self, url):
+            result_url = it.get("result")
+
+            if result_url and "/api/v1/result/" in result_url:
+                sid = result_url.split("/api/v1/result/")[1].strip("/")
+
+            if not sid:
+                sid = it.get("_id")
+
+            if not sid:
+                task = it.get("task", {})
+                if isinstance(task, dict):
+                    sid = task.get("uuid")
+
+            if sid:
+                scan_ids.append(sid)
+
+        # remove duplicates while preserving order
+        seen = set()
+        unique_scan_ids = []
+
+        for sid in scan_ids:
+            if sid not in seen:
+                seen.add(sid)
+                unique_scan_ids.append(sid)
+
+        return unique_scan_ids
+
+    def _fetch_result(self, scan_id):
+        if scan_id in self._result_cache:
+            return self._result_cache[scan_id]
+
+        url = f"https://urlscan.io/api/v1/result/{scan_id}/"
+
         r = requests.get(url, headers=self.headers, timeout=15)
         r.raise_for_status()
-        return r.json()
+
+        data = r.json()
+
+        self._result_cache[scan_id] = data
+
+        return data
+
+    def _fetch_dom(self, scan_id: str) -> str:
+        """Fetch DOM snapshot text for a given urlscan scanId."""
+        if scan_id in self._dom_cache:
+            return self._dom_cache[scan_id]
+        dom_url = f"https://urlscan.io/dom/{scan_id}/"
+        r = requests.get(dom_url, headers=self.headers, timeout=15)
+        r.raise_for_status()
+        dom = r.text
+        self._dom_cache[scan_id] = dom
+        return dom
 
     def execute(self):
         self.results = {}
         try:
             query = self.get_param_value("Query")
-            limit = self._safe_int(self.get_param_value("Max results"), default=20)
+            limit = (
+                int(self.get_param_value("Max results"))
+                if str(self.get_param_value("Max results")).isdecimal()
+                else 20
+            )
+            result_mode = bool(self.get_param_value("Result mode"))
+            include_dom = bool(self.get_param_value("Include DOM"))
+            if not (result_mode):
+                query_url = (
+                    BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size={limit}"
+                )
+                response = requests.get(query_url, headers=self.headers, timeout=15)
+                response.raise_for_status()
+                self.results = response.json()
+                if include_dom:
+                    scan_ids = self._extract_scan_ids(self.results)
+                    dom_map = {}
+                    for sid in scan_ids[:limit]:
+                        try:
+                            dom_map[sid] = self._fetch_dom(sid)
+                        except Exception as e:
+                            dom_map[sid] = f"ERROR: {e}"
+                    self.results["_dom"] = dom_map
 
-            fetch_full = bool(self.get_param_value("Fetch full results"))
-            fetch_dom = bool(self.get_param_value("Fetch DOM"))
-            summary_only = bool(self.get_param_value("Return summary"))
-
-            query_url = BASE_SEARCH_URL + f"?q={urllib.parse.quote(str(query))}&size={limit}"
-            search_json = self._fetch_json(query_url)
-
-            hits = self._extract_hits(search_json)
-
-            # Base output: search results (raw or summary)
-            if summary_only:
-                base = [self._hit_summary(h) for h in hits]
             else:
-                base = hits
+                search_url = (
+                    BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size={limit}"
+                )
+                search_response = requests.get(
+                    search_url, headers=self.headers, timeout=15
+                )
+                search_response.raise_for_status()
+                search_json = search_response.json()
+                scan_ids = self._extract_scan_ids(search_json)
+                results = []
 
-            output = {
-                "query": query,
-                "size": limit,
-                "total": search_json.get("total"),
-                "results": base,
-            }
+                for sid in scan_ids[:limit]:
+                    try:
+                        entry = {"scanId": sid, "result": self._fetch_result(sid)}
+                        if include_dom:
+                            try:
+                                entry["dom"] = self._fetch_dom(sid)
+                            except Exception as e:
+                                entry["dom_error"] = str(e)
+                        results.append(entry)
+                    except Exception as e:
+                        results.append({"scanId": sid, "error": str(e)})
 
-            # Optional: fetch full results
-            if fetch_full:
-                full_results = []
-                dom_results = {}
-
-                for h in hits:
-                    result_url = h.get("result")
-                    uuid = h.get("_id") or h.get("uuid") or h.get("task", {}).get("uuid")
-
-                    # If result_url is present, it's the easiest: fetch it directly
-                    if result_url:
-                        try:
-                            full_json = self._fetch_json(result_url)
-                            full_results.append(full_json)
-
-                            # Optional DOM fetch (only if we can derive a DOM URL)
-                            if fetch_dom and uuid:
-                                # urlscan provides DOM snapshot endpoint (varies by plan/paths).
-                                # Common pattern in tooling is /dom/{uuid}/
-                                dom_url = f"https://urlscan.io/dom/{uuid}/"
-                                try:
-                                    dom_r = requests.get(dom_url, headers=self.headers, timeout=15)
-                                    if dom_r.status_code == 200:
-                                        dom_results[uuid] = dom_r.text
-                                except:
-                                    pass
-
-                        except Exception as e:
-                            full_results.append({"error": str(e), "result": result_url, "uuid": uuid})
-                        continue
-
-                    # If no result_url, try Result API with uuid (if present)
-                    if uuid:
-                        try:
-                            full_json = self._fetch_json(f"https://urlscan.io/api/v1/result/{uuid}/")
-                            full_results.append(full_json)
-
-                            if fetch_dom:
-                                dom_url = f"https://urlscan.io/dom/{uuid}/"
-                                try:
-                                    dom_r = requests.get(dom_url, headers=self.headers, timeout=15)
-                                    if dom_r.status_code == 200:
-                                        dom_results[uuid] = dom_r.text
-                                except:
-                                    pass
-
-                        except Exception as e:
-                            full_results.append({"error": str(e), "uuid": uuid})
-
-                output["full_results"] = full_results
-                if fetch_dom:
-                    output["dom"] = dom_results
-
-            self.results = output
+                self.results = results
 
         except Exception as e:
             self.results = {"error": str(e)}
-
         return self.results
 
     def __str__(self):
         self.execute()
-        return json.dumps(self.results, ensure_ascii=False)
+        return json.dumps(self.results)
 
 
-if __name__=='__main__':
+if __name__ == "__main__":
     from userTypeParser.domainParser import domainParser
+
     data = "urlscan.io"
     parser = domainParser(data)
-    a = str(SearchInUrlScanAction({"domain":parser},["domain"]))
+    a = str(SearchInUrlScanAction({"domain": parser}, ["domain"]))
     b = str(QueryUrlScanAction())
     print(b, parser.objects)
