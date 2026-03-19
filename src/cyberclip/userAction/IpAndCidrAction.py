@@ -9,6 +9,8 @@ import ipaddress
 def explode_to(network, prefixlen=24):
     if isinstance(network, str):
         network = ipaddress.ip_network(network)
+    # Ensure prefixlen is int (might come from params as string)
+    prefixlen = int(prefixlen)
     if network.prefixlen > prefixlen:
         return []
     if network.prefixlen == prefixlen:

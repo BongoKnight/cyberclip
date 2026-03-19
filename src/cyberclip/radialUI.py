@@ -821,7 +821,6 @@ class VerticalMenu(QWidget):
                 async_toast("⚠ Clipboard is empty")
                 return
 
-            print(f"[DEBUG] Clipboard text length: {len(clipboard_text)}")
             print(f"[DEBUG] Parsers loaded: {len(self.parser.parsers)}")
             print(f"[DEBUG] Actions loaded: {len(self.parser.actions)}")
 
@@ -829,7 +828,6 @@ class VerticalMenu(QWidget):
             detected_types = list(self.parser.detectedType)
 
             print(f"[DEBUG] Detected types: {detected_types}")
-            print(f"[DEBUG] Matches: {self.parser.matches}")
 
             if len(detected_types) < Config.MIN_BUTTONS:
                 async_toast(f"⚠ No parseable data found in clipboard (parsers: {len(self.parser.parsers)})")
