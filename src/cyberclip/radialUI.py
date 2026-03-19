@@ -62,11 +62,13 @@ except ImportError:
     _TOAST_AVAILABLE = False
 
 try:
+    from cyberclip import userTypeParser, userAction
     from cyberclip.clipParser import clipParser
     from cyberclip.tui.TagsInput import TagsInput
 except ImportError as e:
     print(f"Failed to import from cyberclip package: {e}")
     try:
+        import userTypeParser, userAction
         from clipParser import clipParser
     except ImportError as e2:
         print(f"Failed to import clipParser: {e2}")
@@ -75,6 +77,21 @@ except ImportError as e:
         from tui.TagsInput import TagsInput
     except ImportError:
         TagsInput = None
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# GLOBAL PARSER (loaded once like flask_app.py)
+# ══════════════════════════════════════════════════════════════════════════
+
+_parser: clipParser | None = None
+
+def get_parser() -> clipParser:
+    """Get or create the global clipParser instance."""
+    global _parser
+    if _parser is None:
+        _parser = clipParser()
+        _parser.load_all()
+    return _parser
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -746,9 +763,8 @@ class VerticalMenu(QWidget):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
 
-        # State
-        self.parser = clipParser()
-        self.parser.load_all()
+        # State - use global singleton parser
+        self.parser = get_parser()
         self.buttons: List[RectangleButton] = []
         self.hovered_button: Optional[RectangleButton] = None
 
