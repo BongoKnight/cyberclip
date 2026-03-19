@@ -1061,6 +1061,11 @@ def main():
     if not _TOAST_AVAILABLE:
         print("⚠ win11toast not available - using console notifications")
 
+    # Preload parser before creating Qt application
+    print("📡 Loading parsers and actions...")
+    parser = get_parser()
+    print(f"✓ Loaded {len(parser.parsers)} parsers and {len(parser.actions)} actions")
+
     app = QApplication(sys.argv)
     app.setApplicationName("CyberClip Menu")
 
