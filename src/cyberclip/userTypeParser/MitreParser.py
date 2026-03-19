@@ -6,31 +6,50 @@ except:
 
 
 class MitreParser(ParserInterface):
-    """Implementation of ParserInterface for URL strings.
+    r"""Parse and extract MITRE ATT&CK TTP identifiers from text.
 
-    Code exemple ::
-        a = URLParser("dsfsd sdfsdf sdfsdhj j")
-        b = URLParser("http://youpi.google.com/test.php?q=3Rte")
-        print(a.extract(), a.contains())
-        print(b.extract(), b.contains())
+    MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge)
+    identifiers in format T#### or T####.### (e.g., T1566 or T1566.001).
 
+    Regex Pattern:
+        ``\bT\d{4}(\.\d{3})?\b``
+
+    Defanging Support:
+        No. TTP identifiers are not typically defanged.
+
+    Example:
+        >>> parser = MitreParser("No TTP here")
+        >>> parser.contains()
+        False
+        >>> parser = MitreParser("Techniques: T1566.001 and T1059.005 detected")
+        >>> parser.contains()
+        True
+        >>> parser.extract()
+        ['T1566.001', 'T1059.005']
     """
-        
-    
+
     def __init__(self, text: str, parsertype="mitre"):
         self.text = text
         self.parsertype = "mitre"
         self.objects = []
-        
-    def contains(self):
-        """Return true if text contains at least one Mitre TTP."""
+
+    def contains(self) -> bool:
+        """Check whether the text contains at least one MITRE ATT&CK TTP.
+
+        Returns:
+            bool: True if at least one TTP identifier is found in the text.
+        """
         if re.search(r"\bT\d{4}(\.\d{3})?\b",self.text) :
             return True
         else :
             return False
-    
-    def extract(self):
-        """Return all TTP contained in text."""
+
+    def extract(self) -> list[str]:
+        """Extract all MITRE ATT&CK TTP instances from the text.
+
+        Returns:
+            list[str]: A list of extracted TTP identifier values.
+        """
         MitreIter = re.finditer(r"\bT\d{4}(\.\d{3})?\b", self.text)
         MitreTTPs = [TTP.group() for TTP in MitreIter]
         self.objects = MitreTTPs

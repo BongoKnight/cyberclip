@@ -3,35 +3,48 @@ from userTypeParser.ParserInterface import ParserInterface
 
 
 class asnumParser(ParserInterface):
-    """Implementation of ParserInterface for asnum strings.
+    r"""Parse and extract Autonomous System Numbers from text.
 
-    Code exemple ::
-        a = asnumParser("dqsdq. fdsf")
-        b = asnumParser("AS2456")
-        print(a.extract(), a.contains())
-        print(b.extract(), b.contains())
+    AS Numbers in format AS#### (e.g., AS15169 for Google).
+
+    Regex Pattern:
+        ``\bAS\d+\b`` (case-insensitive)
+
+    Defanging Support:
+        No. AS numbers are not typically defanged.
+
+    Example:
+        >>> parser = asnumParser("No AS number here")
+        >>> parser.contains()
+        False
+        >>> parser = asnumParser("Networks: AS15169 and as13335")
+        >>> parser.contains()
+        True
+        >>> parser.extract()
+        ['AS15169', 'as13335']
     """
-    
-    
+
     def __init__(self, text: str, parsertype="asnum"):
         self.text = text
         self.parsertype = "asnum"
         self.objects = []
-        
-    def contains(self):
-        """
-        Return True if text contains at least one asnum.
+
+    def contains(self) -> bool:
+        """Check whether the text contains at least one AS number.
+
+        Returns:
+            bool: True if at least one AS number is found in the text.
         """
         if re.search(r"\bAS\d+\b", self.text, re.IGNORECASE) :
             return True
         else :
             return False
-    
-    def extract(self):
-        """Return all asnum contained in text.
-        
-        Return:
-            asmums (list(str)): A list of as number with the following format : AS<Num> or as<num>
+
+    def extract(self) -> list[str]:
+        """Extract all AS number instances from the text.
+
+        Returns:
+            list[str]: A list of extracted AS number values (format: AS#### or as####).
         """
         asnumsIter = re.finditer(r"\bAS\d+\b", self.text, re.IGNORECASE)
         asnums = [asnum.group().replace("[.]",".") for asnum in asnumsIter]

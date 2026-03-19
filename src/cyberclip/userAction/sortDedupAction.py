@@ -5,30 +5,72 @@ except:
 import re
 
 class sortDedupAction(actionInterface):
-    """Sort and deduplicates lines contained in the keyboard."""
+    r"""Sort and deduplicate lines in text.
+
+    Removes duplicate lines and sorts the remaining lines alphabetically.
+
+    Supported Types:
+        text
+
+    Example:
+        >>> from userTypeParser.TextParser import TextParser
+        >>> parser = TextParser("banana\napple\nbanana\ncherry\napple")
+        >>> action = sortDedupAction({"text": parser})
+        >>> print(action)
+        apple
+        banana
+        cherry
+    """
 
     def __init__(self, parsers = {}, supportedType = {"text"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
         self.description = "Deduplicate and sort lines."
 
     def execute(self) -> object:
+        """Execute sort and deduplication on text.
+
+        Returns:
+            str: Sorted, deduplicated lines (empty lines removed).
+        """
         self.observables = self.get_observables()
         if self.observables.get("text"):
             lines = list(set(self.observables.get("text")[0].splitlines()))
             lines.sort()
             return "\n".join([i for i in lines if i!=""])
         return ""
-    
+
     def __str__(self):
+        """Return human-readable representation of sorted results.
+
+        Returns:
+            str: Formatted sorted and deduplicated text.
+        """
         return  self.execute()
 
 
-class sortAction(actionInterface):    
-    """A action module, to sort lines of a text.  
-Parameter can be passed over : 
+class sortAction(actionInterface):
+    r"""Sort lines in text with configurable options.
 
-- if desc or reverse in param revert the order
-- if num, int, version in param sort by number
+    Sorts lines alphabetically or numerically, with optional reverse ordering.
+
+    Supported Types:
+        text
+
+    Parameters:
+        Numeric sort (bool): Sort by leading numbers instead of alphabetically.
+            Default: False
+        Reverse sort (bool): Reverse the sort order (Z-A or high-low).
+            Default: False
+
+    Example:
+        >>> from userTypeParser.TextParser import TextParser
+        >>> parser = TextParser("10 items\n2 items\n100 items")
+        >>> action = sortAction({"text": parser})
+        >>> action.complex_param["Numeric sort"]["value"] = True
+        >>> print(action)
+        2 items
+        10 items
+        100 items
     """
 
     params = {"Numeric sort":{"type":"boolean","value":False} , "Reverse sort":{"type":"boolean","value":False}}

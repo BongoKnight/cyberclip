@@ -7,31 +7,49 @@ except:
 RFC_REGEX = r"\bRFC\s?\d+\b"
 
 class RFCParser(ParserInterface):
-    """Implementation of ParserInterface to detect mention of RFC (Request for comment).
+    r"""Parse and extract RFC (Request for Comments) document numbers from text.
 
-    Code exemple ::
-        a = RFCParser("dsfsd sdfsdf sdfsdhj j")
-        b = RFCParser("RFC 2646")
-        print(a.extract(), a.contains())
-        print(b.extract(), b.contains())
+    RFC identifiers in format "RFC ####" or "RFC####" (case-insensitive).
 
+    Regex Pattern:
+        ``\bRFC\s?\d+\b`` (case-insensitive)
+
+    Defanging Support:
+        No. RFC identifiers are not typically defanged.
+
+    Example:
+        >>> parser = RFCParser("No RFC here")
+        >>> parser.contains()
+        False
+        >>> parser = RFCParser("See RFC 2646 and rfc9110 for details")
+        >>> parser.contains()
+        True
+        >>> parser.extract()
+        ['RFC 2646', 'rfc9110']
     """
-        
-    
+
     def __init__(self, text: str, parsertype="rfc"):
         self.text = text
         self.parsertype = "rfc"
         self.objects = []
-        
-    def contains(self):
-        """Return true if text contains at least one RFC."""
+
+    def contains(self) -> bool:
+        """Check whether the text contains at least one RFC identifier.
+
+        Returns:
+            bool: True if at least one RFC identifier is found in the text.
+        """
         if re.search(RFC_REGEX, self.text, re.IGNORECASE) :
             return True
         else :
             return False
-    
-    def extract(self):
-        """Return all RFC contained in text."""
+
+    def extract(self) -> list[str]:
+        """Extract all RFC identifier instances from the text.
+
+        Returns:
+            list[str]: A list of extracted RFC identifier values.
+        """
         rfcIter = re.finditer(RFC_REGEX, self.text, re.IGNORECASE)
         rfcs = [rfc.group() for rfc in rfcIter]
         self.objects = rfcs

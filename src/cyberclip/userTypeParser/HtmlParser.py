@@ -4,30 +4,53 @@ from userTypeParser.ParserInterface import ParserInterface
 
 
 class HtmlParser(ParserInterface):
-    """Implementation of ParserInterface for HTML strings.
+    """Parse and extract HTML content from text.
 
-    Code exemple ::
-        a = HtmlParser("dsfsd sdfsdf sdfsdhj j")
-        b = HtmlParser("Hello, <b>world</b>")
-        print(a.extract(), a.contains())
-        print(b.extract(), b.contains())
+    HTML content detected using BeautifulSoup parsing.
 
-    Source : https://stackoverflow.com/questions/24856035/how-to-detect-with-python-if-the-string-contains-html-code
+    Regex Pattern:
+        Not regex-based. Uses BeautifulSoup HTML parser.
+
+    Defanging Support:
+        No. HTML content is not typically defanged.
+
+    Example:
+        >>> parser = HtmlParser("No HTML here")
+        >>> parser.contains()
+        False
+        >>> parser = HtmlParser("Hello, <b>world</b>")
+        >>> parser.contains()
+        True
+        >>> parser.extract()
+        ['Hello, <b>world</b>']
+
+    Source:
+        https://stackoverflow.com/questions/24856035/how-to-detect-with-python-if-the-string-contains-html-code
     """
     def __init__(self, text: str, parsertype="html"):
         self.text = text
         self.parsertype = "html"
         self.objects = []
-        
-    def contains(self):
-        """Return true if text contains at least one Mitre TTP."""
+
+    def contains(self) -> bool:
+        """Check whether the text contains at least one HTML element.
+
+        Returns:
+            bool: True if at least one HTML element is found in the text.
+        """
         if bool(BeautifulSoup(self.text, "html.parser").find()) :
             return True
         else :
             return False
-    
-    def extract(self):
-        """Return the whole text as object."""
+
+    def extract(self) -> list[str]:
+        """Extract all HTML content from the text.
+
+        Returns the entire text as HTML if it contains HTML elements.
+
+        Returns:
+            list[str]: A list containing the extracted HTML content.
+        """
         html_entries = BeautifulSoup(self.text, "html.parser").select("html")
         if len(html_entries)>1:
             self.objects = [str(html_entry) for html_entry in html_entries]

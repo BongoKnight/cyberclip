@@ -42,6 +42,15 @@ VirusTotal:
 
         
     def execute(self):
+        """Execute VirusTotal lookups for all parsed observables.
+
+        Queries the VirusTotal API for each observable (IP, domain, or file hash)
+        and retrieves analysis results including optional relationship data.
+
+        Returns:
+            dict[str, Any]: Keys are observable strings, values are VirusTotal
+                API response JSON objects.
+        """
         self.observables = self.get_observables()
         self.results = {}
         
@@ -71,17 +80,19 @@ VirusTotal:
                         self.results[file_hash] = response.json()
                     except:
                         self.results[file_hash] = {}
-                for observable, result in self.results.items():
-                    try: 
-                        self.results[observable] = result
-                    except:
-                        self.results[observable] = {}
 
         return self.results
     
     def __str__(self):
+        """Return human-readable representation of VirusTotal results.
+
+        Calls :meth:`execute` and formats output as indented JSON.
+
+        Returns:
+            str: Formatted JSON containing all VirusTotal lookup results.
+        """
         self.execute()
-        return json.dumps(list(self.results.values()), indent=3)
+        return json.dumps(self.results, indent=3)
 
 if __name__=='__main__':
     from userTypeParser.MD5Parser import md5Parser

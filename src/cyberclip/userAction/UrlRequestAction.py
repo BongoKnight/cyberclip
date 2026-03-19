@@ -9,8 +9,27 @@ import socket
 import json
 
 class UrlToHtmlAction(actionInterface):
-    """A action module to recover HTML from an URL.  
-    Perform a get request on the URL with a desktop-like User-Agent.
+    r"""Fetch HTML content from URLs via HTTP GET requests.
+
+    Performs HTTP GET requests with a desktop Firefox user-agent to retrieve
+    HTML content from URLs.
+
+    Supported Types:
+        url
+
+    Network Activity:
+        Makes GET requests to provided URLs.
+
+    Example:
+        >>> from userTypeParser.URLParser import URLParser
+        >>> parser = URLParser("https://example.com")
+        >>> action = UrlToHtmlAction({"url": parser})
+        >>> results = action.execute()
+        >>> print(results["https://example.com"][:50])
+        <!doctype html>
+        <html>
+        <head>
+            <title>Example...
     """
 
     def __init__(self, parsers = {}, supportedType = {"url"}):
@@ -20,6 +39,14 @@ class UrlToHtmlAction(actionInterface):
 
         
     def execute(self) -> object:
+        """Execute HTTP GET requests on all parsed URL observables.
+
+        Fetches HTML content from each URL with desktop user-agent.
+
+        Returns:
+            dict[str, str]: Keys are URLs, values are HTML response text or
+                error messages.
+        """
         self.results = {}
         for url in self.get_observables().get("url", []):
             try:
@@ -34,11 +61,40 @@ class UrlToHtmlAction(actionInterface):
 
 
     def __str__(self):
+        """Return human-readable representation of HTML content.
+
+        Calls :meth:`execute` and formats output as concatenated HTML.
+
+        Returns:
+            str: HTML content from all URLs, one per line.
+        """
         self.execute()
         return "\n".join([html for html in self.results.values()])
 
 class GetCertificatesAction(actionInterface):
-    """A action module to recover certificate from Domain or IP. Request the domain to do so."""
+    r"""Retrieve SSL/TLS certificates from domains and IP addresses.
+
+    Connects to domains or IPs via SSL/TLS and retrieves certificate details
+    including issuer, subject, validity dates, and SANs.
+
+    Supported Types:
+        domain, ip
+
+    Network Activity:
+        Makes SSL/TLS connections to provided hosts.
+
+    Parameters:
+        Port (text): TCP port number for SSL/TLS connection.
+            Default: 443
+
+    Example:
+        >>> from userTypeParser.domainParser import domainParser
+        >>> parser = domainParser("example.com")
+        >>> action = GetCertificatesAction({"domain": parser})
+        >>> results = action.execute()
+        >>> print(results["example.com"][:100])
+        {"subject": ((("commonName", "example.com"),),), "issuer": ...
+    """
     CONF = {"Port":{"type":"text", "value":"443"}}
     def __init__(self, parsers = {}, supportedType = {"domain","ip"}, complex_param = CONF):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
@@ -54,6 +110,14 @@ class GetCertificatesAction(actionInterface):
                 return cert
 
     def execute(self) -> object:
+        """Execute SSL certificate retrieval on all parsed observables.
+
+        Connects to each domain/IP and retrieves SSL certificate via handshake.
+
+        Returns:
+            dict[str, str]: Keys are domains/IPs, values are JSON-formatted
+                certificate details or error messages.
+        """
         self.results = {}
         observables = set(self.get_observables().get("ip",[]) +  self.get_observables().get("domain",[]))
         for observable in observables:
@@ -65,12 +129,39 @@ class GetCertificatesAction(actionInterface):
         return self.results
     
     def __str__(self):
+        """Return human-readable representation of certificates.
+
+        Calls :meth:`execute` and formats output as TSV with JSON certificates.
+
+        Returns:
+            str: TSV of domain/IP and certificate JSON, one per line.
+        """
         self.execute()
         return "\r\n".join(f"{observable}\t{str(certif)}" for observable, certif in self.results.items())
 
 class UrlToFaviconHashAction(actionInterface):
-    """A action module to recover mmh3 hash of a favicon for a domain or Url.  
-    Perform a get request on the URL with a desktop-like User-Agent.
+    r"""Compute MurmurHash3 (mmh3) of favicon for URLs and domains.
+
+    Fetches favicon.ico from URLs or domains and computes its mmh3 hash.
+    Useful for Shodan searches with ``http.favicon.hash`` filter.
+
+    Supported Types:
+        url, domain
+
+    Network Activity:
+        Makes GET requests to /favicon.ico on provided hosts.
+
+    Example:
+        >>> from userTypeParser.domainParser import domainParser
+        >>> parser = domainParser("example.com")
+        >>> action = UrlToFaviconHashAction({"domain": parser})
+        >>> results = action.execute()
+        >>> print(results)
+        {'example.com': -1234567890}
+
+    Note:
+        Requires mmh3 library. Use hash with Shodan:
+        ``http.favicon.hash:-1234567890``
     """
 
     def __init__(self, parsers = {}, supportedType = {"url","domain"}):
@@ -79,6 +170,14 @@ class UrlToFaviconHashAction(actionInterface):
         self.indicators = "🚩"
         
     def execute(self) -> object:
+        """Execute favicon hash computation on all parsed observables.
+
+        Fetches favicon.ico and computes mmh3 hash for URLs and domains.
+
+        Returns:
+            dict[str, int | str]: Keys are URLs/domains, values are mmh3 hash
+                integers or error messages.
+        """
         results = {}
         self.observables = self.get_observables()
         for url in self.observables.get("url", []):
@@ -109,6 +208,13 @@ class UrlToFaviconHashAction(actionInterface):
 
 
     def __str__(self):
+        """Return human-readable representation of favicon hashes.
+
+        Calls :meth:`execute` and formats output as TSV with hash values.
+
+        Returns:
+            str: TSV of URL/domain and mmh3 hash, one per line.
+        """
         lines = []
         hashes = self.execute()
         for observable, hash in hashes.items():

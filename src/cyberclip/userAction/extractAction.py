@@ -8,7 +8,35 @@ except:
 
 
 class extractAction(actionInterface):
-    """Extract all the observables of specified types, by default everything is returned."""
+    r"""Extract observables of specified types from parsed data.
+
+    Collects and outputs all parsed observables, optionally filtered by type.
+    By default excludes long-form content types (text, html, json, yaml).
+
+    Supported Types:
+        domain, analytics, md5, sha1, sha256, ja3, ja4, url, ip, cve,
+        mittre, ipv6, phone, email, text
+
+    Parameters:
+        Extract (tags): Observable types to extract. Use "all" for everything
+            or specify types like ["ip", "domain", "md5"].
+            Default: ["all"]
+
+    Example:
+        >>> from userTypeParser.IPParser import ipv4Parser
+        >>> from userTypeParser.MD5Parser import md5Parser
+        >>> data = "127.0.0.1 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa user@example.com"
+        >>> ip_parser = ipv4Parser(data)
+        >>> md5_parser = md5Parser(data)
+        >>> action = extractAction({"ip": ip_parser, "md5": md5_parser})
+        >>> print(action)
+        127.0.0.1
+        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+    Note:
+        text, html, json, yaml types are excluded by default unless
+        explicitly specified in Extract parameter.
+    """
     
     def __init__(self, parsers = {}, supportedType = {"domain","analytics","md5","sha1","sha256","ja3","ja4","url","ip","cve","mittre","ipv6","phone","email","text"}, exception = ["text","html", "json", "yaml"], complex_param={"Extract":{"type":"tags","value":["all"]}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
@@ -18,6 +46,14 @@ class extractAction(actionInterface):
 
 
     def execute(self) -> object:
+        """Execute observable extraction from all parsers.
+
+        Extracts observables from all parsers except those in exception list.
+
+        Returns:
+            dict[str, list]: Keys are parser types, values are lists of
+                extracted observables.
+        """
         self.observables = {}
         for parser_name, parser in self.parsers.items():
             if parser_name not in self.exception:
@@ -25,6 +61,13 @@ class extractAction(actionInterface):
         return self.observables
 
     def __str__(self):
+        """Return human-readable representation of extracted observables.
+
+        Calls :meth:`execute` and formats output based on Extract parameter.
+
+        Returns:
+            str: All extracted observables, one per line.
+        """
         self.observables = self.execute()
         extracted_items = []
         extracted_types = self.get_param_value("Extract")

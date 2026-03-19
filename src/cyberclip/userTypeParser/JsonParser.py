@@ -8,23 +8,38 @@ except:
 
 
 class JSONParser(ParserInterface):
-    """Implementation of ParserInterface for JSON strings.  
-    Use json.loads
+    """Parse and extract JSON data from text.
 
-    Code exemple ::
-        a = JsonParser("ccdf ")
-        b = JsonParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-        print(a.extract(), a.contains())
-        print(b.extract(), b.contains())
+    JSON data validated with json.loads(). Attempts to parse entire text,
+    then falls back to extracting JSON objects or parsing line-by-line.
 
+    Regex Pattern:
+        Not fully regex-based. Uses json.loads() for validation.
+
+    Defanging Support:
+        No. JSON data is not typically defanged.
+
+    Example:
+        >>> parser = JSONParser("Not JSON")
+        >>> parser.contains()
+        False
+        >>> parser = JSONParser('{"key": "value", "number": 42}')
+        >>> parser.contains()
+        True
+        >>> parser.extract()
+        ['{"key": "value", "number": 42}']
     """
-    
+
     def __init__(self, text: str, parsertype="json"):
         self.text = text
         self.parsertype = "json"
-        
-    def contains(self):
-        """Return true if text contains JSON valid data"""
+
+    def contains(self) -> bool:
+        """Check whether the text contains valid JSON data.
+
+        Returns:
+            bool: True if valid JSON is found in the text.
+        """
         try:
             valid_json = json.loads(self.text)
             if valid_json :
@@ -45,9 +60,13 @@ class JSONParser(ParserInterface):
             return False
         else :
             return False
-    
-    def extract(self):
-        """Return all JSON contained in text."""
+
+    def extract(self) -> list[str]:
+        """Extract all JSON data from the text.
+
+        Returns:
+            list[str]: A list containing JSON-encoded extracted data.
+        """
         self.objects = []
         try:
             self.objects = json.loads(self.text)

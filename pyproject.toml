@@ -35,17 +35,46 @@ dependencies = [
   "shodan",
   "dotenv",
   "textual",
-  "textual_serve",
   "textual[syntax]",
   "textual-fspicker",
-  "urllib3"
+  "urllib3",
+  "tldextract"
+]
+
+[project.optional-dependencies]
+# Radial GUI menu (Qt-based) - Windows-focused
+gui = [
+  "PyQt5>=5.15.0",
+  "keyboard>=0.13.0",
+  "win11toast>=0.34; platform_system=='Windows'"
+]
+
+# Web interface (Flask-based)
+web = [
+  "flask>=2.0.0",
+  "textual_serve"
+]
+
+# All optional features
+all = [
+  "PyQt5>=5.15.0",
+  "keyboard>=0.13.0",
+  "win11toast>=0.34; platform_system=='Windows'",
+  "flask>=2.0.0",
+  "textual_serve"
 ]
 
 [tool.setuptools.package-data]
 "cyberclip.data" = ["*.bak"]
 
 [project.scripts]
-cyberclip = "cyberclip.app:main"
+# Main unified entry point with interface selector
+cyberclip = "cyberclip.__main__:main"
+
+# Direct interface launchers
+cyberclip-tui = "cyberclip.app:main"
+cyberclip-gui = "cyberclip.radialUI:main"
+cyberclip-web = "cyberclip.flask_app:main"
 
 [project.urls]
 Homepage = "https://github.com/BongoKnight/cyberclip"

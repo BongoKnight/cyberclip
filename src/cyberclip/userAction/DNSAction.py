@@ -11,8 +11,30 @@ import json
 from dns import resolver
 
 class DNSAction(actionInterface):
-    """Return reverse DNS for an IP, and DNS for a domain.  
-    For a domain the a list of DNS reccord can be specified (default A) : ie. AAA,SPF,TXT.
+    r"""Perform DNS lookups for domains and reverse DNS for IP addresses.
+
+    Queries DNS records for domains and performs reverse DNS resolution for IPs.
+    Supports multiple DNS record types with configurable query parameters.
+
+    Supported Types:
+        ip, ipv6, domain
+
+    Network Activity:
+        Makes DNS queries to configured DNS resolvers.
+
+    Parameters:
+        Records (tags): DNS record types to query for domains.
+            Common values: A, AAAA, MX, TXT, SOA, NS, CNAME, SPF, DMARC
+            Default: ["A", "TXT", "SOA", "NS", "MX"]
+
+    Example:
+        >>> from userTypeParser.domainParser import domainParser
+        >>> parser = domainParser("example.com google.com")
+        >>> action = DNSAction({"domain": parser})
+        >>> results = action.execute()
+        >>> print(action)
+        example.com	{"A": "93.184.216.34", "TXT": "v=spf1..."}
+        google.com	{"A": "142.250.185.46", "TXT": "..."}
     """
     CONF = {"Records":{"type":"tags","value":["A","TXT","SOA","NS","MX"]}}
     def __init__(self, parsers = {}, supportedType = {"ipv6","ip","domain"}, complex_param = CONF):
@@ -21,7 +43,16 @@ class DNSAction(actionInterface):
         self.dns_results = {}
         
     def execute(self) -> object:
-        """A action module, to return reverse DNS for an IP, and DNS for a domain."""
+        """Execute DNS lookups on all parsed observables.
+
+        Performs reverse DNS lookups for IP addresses and forward DNS queries
+        for domains with specified record types.
+
+        Returns:
+            dict[str, Any]: Keys are observables (IPs/domains), values are
+                DNS results. For IPs: hostname string. For domains: dict of
+                record types to values.
+        """
         self.dns_results = {}
         self.observables = self.get_observables()
         if self.observables.get("ip"):
@@ -48,7 +79,13 @@ class DNSAction(actionInterface):
         return self.dns_results
     
     def __str__(self):
-        """Return result of DNS request for domain and of Reverse DNS for IP. For domain the type of NS reccord can be inputed as a parameter."""
+        """Return human-readable representation of DNS results.
+
+        Calls :meth:`execute` and formats output as TSV (tab-separated values).
+
+        Returns:
+            str: Formatted DNS results, one line per observable.
+        """
         self.execute()
         results = []
         for key, value in self.dns_results.items():

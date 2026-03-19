@@ -13,15 +13,42 @@ import time
 """A action module, to open search observables contained in a text in Shodan."""
 
 class searchInShodanAction(actionInterface):
-    """Search all type of observables with the Shodan API. The API Key is passed in the config file. Only IP are handled atm.
-    No bulk search on basic plan, wait 1s between each querry.
+    r"""Search IP addresses using the Shodan API.
 
-A configuration is neeeded : 
+    Queries Shodan for detailed information about IP addresses including open
+    ports, services, vulnerabilities, and banners. Rate-limits requests for
+    free accounts.
 
-```yaml
-Shodan:
-- api-key: <API Key>
-```
+    Supported Types:
+        ip
+
+    Configuration:
+        Requires the following in ``.env``::
+
+            Shodan:
+            - api-key: <your Shodan API key>
+
+    Network Activity:
+        Makes requests to: api.shodan.io
+
+    Parameters:
+        Allow bulk search (boolean): Use bulk search API (requires paid plan).
+            Default: False
+        Free account (boolean): Add 1-second delay between requests to avoid
+            rate limits on free accounts.
+            Default: False
+
+    Example:
+        >>> from userTypeParser.IPParser import ipv4Parser
+        >>> parser = ipv4Parser("8.8.8.8")
+        >>> action = searchInShodanAction({"ip": parser})
+        >>> results = action.execute()
+        >>> print(results["8.8.8.8"]["org"])
+        Google LLC
+
+    Note:
+        Free accounts have rate limits. Enable "Free account" parameter to
+        automatically wait 1 second between requests.
     """    
     def __init__(self, parsers ={}, supportedType = {"ip"}, complex_param={"Allow bulk search":{"type":"boolean","value":False}, "Free account":{"type":"boolean","value":False}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
@@ -35,6 +62,14 @@ Shodan:
 
         
     def execute(self) -> object:
+        """Execute Shodan lookups on all parsed IP observables.
+
+        Queries Shodan API for each IP with rate limiting if configured.
+
+        Returns:
+            dict[str, dict]: Keys are IP addresses, values are Shodan host
+                information dictionaries.
+        """
         self.results = {}
         self.observables = self.get_observables()
         if self.api:
@@ -54,6 +89,13 @@ Shodan:
         return self.results
     
     def __str__(self):
+        """Return human-readable representation of Shodan results.
+
+        Calls :meth:`execute` and formats output as JSON per IP.
+
+        Returns:
+            str: JSON-formatted Shodan data, one IP per line.
+        """
         self.execute()
         return "\n".join(f"{json.dumps(v)}" for k,v in self.results.items())
 

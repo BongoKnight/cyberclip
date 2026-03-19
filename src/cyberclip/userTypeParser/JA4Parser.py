@@ -5,32 +5,52 @@ except:
     from ParserInterface import ParserInterface
 
 class ja4Parser(ParserInterface):
-    """Implementation of ParserInterface for JA4 hash.
+    r"""Parse and extract JA4 fingerprints from text.
 
-    Code exemple ::
-        a = ja4Parser("1.3.4.5")
-        b = ja4Parser("ge11cn020000_9ed1ff1f7b03_cd8dafe26982")
-        print(a.extract(), a.contains())
-        print(b.extract(), b.contains())
+    JA4 fingerprints for TLS/HTTP/SSH client identification.
+    Supports JA4, JA4H, JA4X, JA4SSH, JA4S, JA4T, and JA4TScan variants.
 
+    Regex Pattern:
+        ``\b(JA4(H|X|SSH|S|T|TScan)?=?)?([a-z0-9]{4,20}_[a-z0-9]{4,20}(_[a-z0-9]{4,20})?|(\d+)_\d+-[\d\-_]+)\b``
+
+    Defanging Support:
+        No. JA4 fingerprints are not typically defanged.
+
+    Example:
+        >>> parser = ja4Parser("No JA4 here")
+        >>> parser.contains()
+        False
+        >>> parser = ja4Parser("JA4=t13d1516h2_8daaf6152771_02713d6af862")
+        >>> parser.contains()
+        True
+        >>> parser.extract()
+        ['t13d1516h2_8daaf6152771_02713d6af862']
     """
-    
+
     def __init__(self, text: str, parsertype="ja4"):
         self.text = text
         self.parsertype = "ja4"
         self.objects = []
-        
-    def contains(self):
-        """Return true if text contains at least one JA4."""
+
+    def contains(self) -> bool:
+        """Check whether the text contains at least one JA4 fingerprint.
+
+        Returns:
+            bool: True if at least one JA4 fingerprint is found in the text.
+        """
         if re.search(r"\b(JA4(H|X|SSH|S|T|TScan)?=?)?([a-z0-9]{4,20}_[a-z0-9]{4,20}(_[a-z0-9]{4,20})?|(\d+)_\d+-[\d\-_]+)\b",self.text) :
             return True
         else :
             return False
-    
-    def extract(self):
-        """Return all JA4 contained in text."""
+
+    def extract(self) -> list[str]:
+        """Extract all JA4 fingerprint instances from the text.
+
+        Returns:
+            list[str]: A list of extracted JA4 fingerprint values.
+        """
         ja4sIter = re.finditer(r"\b(JA4(H|X|SSH|S|T|TScan)?=?)?([a-z0-9]{4,20}_[a-z0-9]{4,20}(_[a-z0-9]{4,20})?|(\d+)_\d+-[\d\-_]+)\b", self.text)
-        ja4s = [ja4.group(3) for ja4 in ja4sIter if re.search("\d{2}", ja4.group(3))]
+        ja4s = [ja4.group(3) for ja4 in ja4sIter if re.search(r"\d{2}", ja4.group(3))]
         self.objects = ja4s
         return ja4s
         

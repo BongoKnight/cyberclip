@@ -38,10 +38,35 @@ def flatten(dictionary, parent_key=False, separator='.'):
 
 
 class JSONExtractActionv2(actionInterface):
-    """Extract data from a JSON or YAML object using jq.
-       This version preserves the JSON/YAML architecture by grouping selectors by prefix
-       and reconstructing a pruned structure that keeps only the selected fields.
-       You can test your jq selectors here: https://jqplay.org/
+    r"""Extract data from JSON or YAML using jq selectors while preserving hierarchy.
+
+    Uses jq-style selectors to extract specific fields from JSON/YAML data while
+    maintaining the original nested structure. Creates a pruned copy that contains
+    only the selected paths.
+
+    Supported Types:
+        json, yaml
+
+    Parameters:
+        Selectors (json): List of jq-style path selectors to extract.
+            Examples: ".a", ".d[].a", ".[] | select(.c>2)"
+            Default: []
+        Get only values (bool): If True, return only scalar values extracted.
+            If False, return the full pruned JSON structure.
+            Default: True
+
+    Example:
+        >>> from userTypeParser.JsonParser import JSONParser
+        >>> data = '{"a":"elem1","b":"elem2","c":3,"d":[{"a":"elem3","c":5}]}'
+        >>> parser = JSONParser(data)
+        >>> action = JSONExtractActionv2({"json": parser})
+        >>> action.complex_param["Selectors"]["value"] = [".a", ".d[].a"]
+        >>> print(action)
+        elem1
+        elem3
+
+    Note:
+        Test selectors at https://jqplay.org/
     """
 
     CONF = {"Selectors": {"type": "json", "value": []},
@@ -142,6 +167,15 @@ class JSONExtractActionv2(actionInterface):
         return self.results
 
     def execute(self) -> object:
+        """Execute jq extraction on all parsed JSON/YAML observables.
+
+        Applies all configured selectors to each JSON/YAML object and builds
+        pruned structures containing only selected paths.
+
+        Returns:
+            dict[str, Any]: Keys are original JSON/YAML strings, values are
+                pruned structures or error dicts.
+        """
         self.results = {}
         self.observables = self.get_observables()
 
@@ -164,6 +198,13 @@ class JSONExtractActionv2(actionInterface):
         return self.results
 
     def __str__(self):
+        """Return human-readable representation of extracted data.
+
+        Calls :meth:`execute` and formats output based on "Get only values" parameter.
+
+        Returns:
+            str: Either scalar values (one per line) or formatted JSON structures.
+        """
         self.execute()
         text = []
         only_values = self.get_param_value("Get only values")
@@ -185,7 +226,24 @@ class JSONExtractActionv2(actionInterface):
         return "\n".join(text)
 
 class JSONBeautifierAction(actionInterface):
-    """Pretty print JSON
+    r"""Format JSON with indentation for readability.
+
+    Pretty-prints JSON objects with 4-space indentation.
+
+    Supported Types:
+        json
+
+    Example:
+        >>> from userTypeParser.JsonParser import JSONParser
+        >>> data = '{"a":"elem1","b":"elem2","c":3}'
+        >>> parser = JSONParser(data)
+        >>> action = JSONBeautifierAction({"json": parser})
+        >>> print(action)
+        {
+            "a": "elem1",
+            "b": "elem2",
+            "c": 3
+        }
     """
     def __init__(self, parsers = {}, supportedType = {"json"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
@@ -193,10 +251,22 @@ class JSONBeautifierAction(actionInterface):
         self.results = {}
 
     def execute(self) -> dict[str, dict]:
+        """Execute beautification on all parsed JSON observables.
+
+        Returns:
+            dict[str, dict]: Parsed JSON objects ready for pretty-printing.
+        """
         self.observables = self.get_observables()
         self.results = self.observables.get("json")
 
     def __str__(self):
+        """Return human-readable representation of beautified JSON.
+
+        Calls :meth:`execute` and formats output with 4-space indentation.
+
+        Returns:
+            str: Formatted JSON with indentation.
+        """
         self.execute()
         if len(self.results) == 1:
             return json.dumps(json.loads(self.results[0]),indent=4)
@@ -204,21 +274,42 @@ class JSONBeautifierAction(actionInterface):
             return json.dumps(json.loads(self.results),indent=4)
 
 class JSONExtractAction(actionInterface):
-    """Extract data from a JSON or YAML object using jq. You can test your queries here: https://jqplay.org/
+    r"""Extract data from JSON or YAML using jq selectors.
 
-Example::
+    Uses jq-style selectors to extract and filter fields from JSON/YAML data.
+    Results are flattened rather than preserving hierarchy (see JSONExtractActionv2
+    for hierarchy-preserving extraction).
 
-```json
-{"a":"elem1","b":"elem2","c":3, "d":[{"a":"elem3","b":"elem4","c":5},{"a":"elem5","b":"elem6","c":2}]}
-```
+    Supported Types:
+        json, yaml
 
-With the JSON above: 
+    Parameters:
+        Selectors (json): List of jq-style path selectors to extract.
+            Examples: ".a", ".d[].a", ".[] | select(.c>2)"
+            Default: []
+        Get only values (bool): If True, return only extracted values.
+            If False, return selector-to-value mappings per input.
+            Default: True
 
-- `.a` selector will return `"elem1"`
-- `.c` selector  will return `3`
-- `.d[].a` selector will return `"elem3"\n"elem5"`
-- `.d[] | select(.c>2)` selector will return `{"a": "elem3","b": "elem4","c": 5}`
+    Example:
+        >>> from userTypeParser.JsonParser import JSONParser
+        >>> data = '{"a":"elem1","b":"elem2","c":3,"d":[{"a":"elem3","c":5},{"a":"elem5","c":2}]}'
+        >>> parser = JSONParser(data)
+        >>> action = JSONExtractAction({"json": parser})
+        >>> action.complex_param["Selectors"]["value"] = [".a", ".d[].a"]
+        >>> print(action)
+        elem1
+        elem3
+        elem5
 
+    Selector Examples:
+        - ``.a`` returns ``"elem1"``
+        - ``.c`` returns ``3``
+        - ``.d[].a`` returns ``"elem3"`` and ``"elem5"``
+        - ``.d[] | select(.c>2)`` returns ``{"a": "elem3", "c": 5}``
+
+    Note:
+        Test selectors at https://jqplay.org/
     """
     CONF = {"Selectors":{"type":"json", "value":[]}, "Get only values":{"type":"bool","value": True}}
     def __init__(self, parsers = {}, supportedType = {"json","yaml"}, complex_param=CONF):
@@ -250,18 +341,35 @@ With the JSON above:
         return self.results
         
     def execute(self) -> object:
+        """Execute jq extraction on all parsed JSON/YAML observables.
+
+        Applies all configured selectors to each JSON/YAML object and stores
+        extracted values keyed by selector.
+
+        Returns:
+            dict[str, dict[str, str]]: Keys are original JSON/YAML strings,
+                values are dicts mapping selectors to their extracted values.
+        """
         self.results = []
         self.observables = self.get_observables()
         if json_objects:=self.observables.get("json"):
             for _json in json_objects:
-                self.filter_json(_json)          
+                self.filter_json(_json)
         if self.observables.get("yaml") and not self.observables.get("json"):
             json_objects = [json.dumps(yaml.safe_load(yaml_str)) for yaml_str in self.observables.get("yaml")]
             for _json in json_objects:
-                self.filter_json(_json)    
+                self.filter_json(_json)
         return self.results
     
     def __str__(self):
+        """Return human-readable representation of extracted data.
+
+        Calls :meth:`execute` and formats output based on "Get only values" parameter.
+
+        Returns:
+            str: Either extracted values (one per line) or TSV of input and
+                selector-to-value mappings.
+        """
         self.execute()
         text = []
         if self.get_param_value("Get only values"):
@@ -275,26 +383,28 @@ With the JSON above:
 
 
 class JSONSchemeAction(actionInterface):
-    """Display the scheme of a JSON object.
+    r"""Display the structural schema of JSON or YAML data.
 
-Example::
+    Recursively traverses JSON/YAML structure and outputs all available paths
+    in jq-style notation. Useful for discovering which selectors to use with
+    JSONExtractAction.
 
-```json
-{"a":"elem1","b":"elem2","c":3, "d":[{"a":"elem3","b":"elem4","c":5},{"a":"elem5","b":"elem6","c":2}]}
-```
+    Supported Types:
+        json, yaml
 
-With the JSON above returns:
-
-```
-a
-b
-c
-d
-d[]
-d[].a
-d[].b
-d[].c
-```
+    Example:
+        >>> from userTypeParser.JsonParser import JSONParser
+        >>> data = '{"a":"elem1","b":"elem2","c":3,"d":[{"a":"elem3","c":5}]}'
+        >>> parser = JSONParser(data)
+        >>> action = JSONSchemeAction({"json": parser})
+        >>> print(action)
+        a
+        b
+        c
+        d
+        d[]
+        d[].a
+        d[].c
     """
     def __init__(self, parsers = {}, supportedType = {"json","yaml"}):
         super().__init__(parsers = parsers, supportedType = supportedType)
@@ -320,18 +430,32 @@ d[].c
 
         
     def execute(self) -> set:
+        """Execute schema extraction on all parsed JSON/YAML observables.
+
+        Recursively walks all structures and collects all available paths.
+
+        Returns:
+            set[str]: Set of all unique path strings in jq-style notation.
+        """
         self.json_paths = set()
         self.observables = self.get_observables()
         if json_objects:=self.observables.get("json"):
             for _json in json_objects:
-                self.get_json_paths(json.loads(_json))          
+                self.get_json_paths(json.loads(_json))
         if self.observables.get("yaml") and not self.observables.get("json"):
             json_objects = [json.dumps(yaml.safe_load(yaml_str)) for yaml_str in self.observables.get("yaml")]
             for _json in json_objects:
-                self.get_json_paths(_json)    
+                self.get_json_paths(_json)
         return self.json_paths
     
     def __str__(self):
+        """Return human-readable representation of JSON schema.
+
+        Calls :meth:`execute` and formats output as one path per line.
+
+        Returns:
+            str: All discovered paths, one per line.
+        """
         return "\r\n".join(list(self.execute()))
 
 
@@ -341,7 +465,21 @@ d[].c
 
 
 class JSONFlattenAction(actionInterface):
-    """A action module to flatten data from a JSON object.  
+    r"""Flatten nested JSON or YAML into dot-notation key-value pairs.
+
+    Converts nested dictionaries and arrays into a single-level dictionary where
+    keys use dot notation to represent the original hierarchy (e.g., "a.b.0.c").
+
+    Supported Types:
+        json, yaml
+
+    Example:
+        >>> from userTypeParser.JsonParser import JSONParser
+        >>> data = '{"a":"elem1","b":{"c":"elem2","d":3},"e":[1,2,3]}'
+        >>> parser = JSONParser(data)
+        >>> action = JSONFlattenAction({"json": parser})
+        >>> print(action)
+        {'a': 'elem1', 'b.c': 'elem2', 'b.d': 3, 'e.0': 1, 'e.1': 2, 'e.2': 3}
     """
 
     def __init__(self, parsers = {}, supportedType = {"json","yaml"}):
@@ -350,6 +488,15 @@ class JSONFlattenAction(actionInterface):
         self.results = {}
         
     def execute(self) -> object:
+        """Execute flattening on all parsed JSON/YAML observables.
+
+        Applies recursive flattening to convert nested structures to
+        dot-notation dictionaries.
+
+        Returns:
+            dict[str, dict]: Keys are original JSON/YAML strings, values are
+                flattened dictionaries with dot-notation keys.
+        """
         self.results = {}
         self.observables = self.get_observables()
         json_objects = {}
@@ -362,6 +509,13 @@ class JSONFlattenAction(actionInterface):
         return self.results
     
     def __str__(self):
+        """Return human-readable representation of flattened JSON.
+
+        Calls :meth:`execute` and formats output as Python dictionaries.
+
+        Returns:
+            str: Flattened dictionaries, one per line.
+        """
         self.execute()
         return  "\n".join([str(json_object) for json_object in self.results.values()])
 

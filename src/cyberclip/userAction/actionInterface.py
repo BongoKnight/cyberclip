@@ -27,24 +27,49 @@ class actionInterface():
         results (list of object): Storing the result of the action execution
 
     Note:
-        While overwriting `execute` method in a class which inherits from `ActionInterface`, 
-        you should modify the `results` attributes in order to return a dictionnary where 
+        While overwriting `execute` method in a class which inherits from `ActionInterface`,
+        you should modify the `results` attributes in order to return a dictionnary where
         keys are the parsed observable and values are the results of the action.
 
+    Alternative Initialization:
+        Actions can also declare defaults using class kwargs::
+
+            class MyAction(actionInterface,
+                           description="My Action",
+                           supportedType={"ip"},
+                           indicators="🔑"):
+                pass
+
     """
-    
+
     def __init__(self, **kwargs):
-        """
-        Args: 
-            complex_param (dict): A dictionnary of value needed for executing the action properly typically a filename, config options, users choices, etc... This parameter is parsed by  
-            parsers (dict of str:ParserInterface): A dict of parsers interface, these are used to 
-            extract observales from text
-            conf (dict): A configuration extracted from `conf.yaml`, this store data needed 
-                for the action to be executed (API Key for example) 
-            supportedType (list of str):  A list of type defined in the varaible `parsertype` 
-                that are supported by the current action.        
-            description (str): A short description/name of the action
-            indicators (str): used to describe some action limitation (i.e. requires API-Key, external files, is slow...)
+        """Initialize the action interface.
+
+        Args:
+            complex_param (dict[str, dict]): Configuration parameters for the action.
+                Each key is a parameter name, each value is a dict with schema:
+
+                - ``type`` (str): Parameter widget type. One of: "text", "bool",
+                  "tags", "list", "fixedlist", "json", "longtext", "save".
+                - ``value`` (Any): Default value matching the type.
+                - ``choices`` (list, optional): For "list" and "fixedlist" types.
+
+                See docs/Reference.md for detailed type documentation.
+
+            parsers (dict[str, ParserInterface]): Injected parsers keyed by type.
+            supportedType (set[str]): Parser types this action works with
+                (e.g., {"ip", "domain"}). Only parsers matching these types
+                will be available in ``self.parsers``.
+            description (str): Short action name shown in TUI button.
+            indicators (str): Emoji flags indicating action requirements:
+
+                - 🔑 Requires API key in ``.env``
+                - 📑 Requires external data file
+                - 🌍 Makes network requests
+                - 🚩 Potentially dangerous operation
+                - 🐌 Slow operation
+
+            conf (dict): Loaded configuration from ``.env`` file.
         """
         self.supportedType : set[str] = set()
         self.parsers : dict[str,ParserInterface] = {}

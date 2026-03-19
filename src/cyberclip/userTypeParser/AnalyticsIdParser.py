@@ -7,33 +7,50 @@ except:
 BASE_REGEX = r"(\b|^)((GT|GTM|G|AW)-[A-Z0-9]{7,15}|UA-\d+-\d+|hjid:\d+|s_gi\([\"'][^\"']+[\"']\))(\b|$)"
 
 class AnalyticsIdParser(ParserInterface):
-    """Implementation of ParserInterface for various strings related to analytics.
-    Supports Google Analytics, Adobe Analytics and Hotjar.
+    r"""Parse and extract analytics tracking IDs from text.
 
-    Code exemple ::
-        a = AnalyticsIdParser("dsfsd sdfsdf sdfsdhj j")
-        b = AnalyticsIdParser("G-XXXXXXX")
-        print(a.extract(), a.contains())
-        print(b.extract(), b.contains())
+    Supports Google Analytics (UA, GA4, GTM), Adobe Analytics, and Hotjar identifiers.
 
+    Regex Pattern:
+        ``(\b|^)((GT|GTM|G|AW)-[A-Z0-9]{7,15}|UA-\d+-\d+|hjid:\d+|s_gi\([\"'][^\"']+[\"']\))(\b|$)``
+        (case-insensitive)
+
+    Defanging Support:
+        No. Analytics IDs are not typically defanged.
+
+    Example:
+        >>> parser = AnalyticsIdParser("No analytics here")
+        >>> parser.contains()
+        False
+        >>> parser = AnalyticsIdParser("Trackers: UA-12345678-1 and G-XXXXXXXXX")
+        >>> parser.contains()
+        True
+        >>> parser.extract()
+        ['UA-12345678-1', 'G-XXXXXXXXX']
     """
-        
-    
+
     def __init__(self, text: str, parsertype="analytics"):
         self.text = text
         self.parsertype = "analytics"
         self.objects = []
-        
-    def contains(self):
-        """Return true if text contains at least one analytics id."""
+
+    def contains(self) -> bool:
+        """Check whether the text contains at least one analytics ID.
+
+        Returns:
+            bool: True if at least one analytics ID is found in the text.
+        """
         if re.search(BASE_REGEX, self.text, re.IGNORECASE) :
             return True
         else :
             return False
 
+    def extract(self) -> list[str]:
+        """Extract all analytics ID instances from the text.
 
-    def extract(self):
-        """Return all analytics id contained in text."""
+        Returns:
+            list[str]: A list of extracted analytics ID values.
+        """
         analyticsIter = re.finditer(BASE_REGEX, self.text, re.IGNORECASE)
         analyticsIds = [analytic.group(0) for analytic in analyticsIter]
         self.objects = analyticsIds
