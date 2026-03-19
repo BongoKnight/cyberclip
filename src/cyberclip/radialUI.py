@@ -64,8 +64,13 @@ except ImportError:
 try:
     from cyberclip.clipParser import clipParser
     from cyberclip.tui.TagsInput import TagsInput
-except ImportError:
-    from clipParser import clipParser
+except ImportError as e:
+    print(f"Failed to import from cyberclip package: {e}")
+    try:
+        from clipParser import clipParser
+    except ImportError as e2:
+        print(f"Failed to import clipParser: {e2}")
+        raise
     try:
         from tui.TagsInput import TagsInput
     except ImportError:
@@ -797,11 +802,18 @@ class VerticalMenu(QWidget):
                 async_toast("⚠ Clipboard is empty")
                 return
 
+            print(f"[DEBUG] Clipboard text length: {len(clipboard_text)}")
+            print(f"[DEBUG] Parsers loaded: {len(self.parser.parsers)}")
+            print(f"[DEBUG] Actions loaded: {len(self.parser.actions)}")
+
             self.parser.parseData(clipboard_text)
             detected_types = list(self.parser.detectedType)
 
+            print(f"[DEBUG] Detected types: {detected_types}")
+            print(f"[DEBUG] Matches: {self.parser.matches}")
+
             if len(detected_types) < Config.MIN_BUTTONS:
-                async_toast("⚠ No parseable data found in clipboard")
+                async_toast(f"⚠ No parseable data found in clipboard (parsers: {len(self.parser.parsers)})")
                 return
 
             if len(detected_types) > Config.MAX_BUTTONS:
