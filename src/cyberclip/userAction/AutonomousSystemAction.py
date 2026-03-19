@@ -89,7 +89,7 @@ class AsToCidrAction(actionInterface):
                     int_as = int(re.search(r"\d+",as_num).group())
                     AS_RANGE = AS_DB.loc[AS_DB["as_num"]==int_as]
                     AS_RANGE = AS_RANGE[["as_num","CIDRS"]]
-                    AS_RANGE = AS_RANGE.groupby('as_num').agg(sum).reset_index()
+                    AS_RANGE = AS_RANGE.groupby('as_num').agg({'CIDRS': lambda x: sum(x, [])}).reset_index()
                     response = AS_RANGE.loc[AS_RANGE["as_num"]==int_as].to_dict(orient="records")
                     if len(response)>0:
                         infos = response[0]
@@ -132,7 +132,7 @@ class AsInformationAction(actionInterface):
                     int_as = int(re.search(r"\d+",as_num).group())
                     AS_RANGE = AS_DB.loc[AS_DB["as_num"]==int_as]
                     AS_RANGE = AS_RANGE[["as_num","as_info","as_loc","CIDRS"]]
-                    AS_RANGE = AS_RANGE.groupby(['as_num','as_info','as_loc']).agg(sum).reset_index()
+                    AS_RANGE = AS_RANGE.groupby(['as_num','as_info','as_loc']).agg({'CIDRS': lambda x: sum(x, [])}).reset_index()
                     response = AS_RANGE.loc[AS_RANGE["as_num"]==int_as].to_dict(orient="records")
                     if len(response)>0:
                         infos = response[0]
