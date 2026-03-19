@@ -3,12 +3,16 @@
 from inspect import getmembers, isfunction, isclass, ismodule, iscode
 import traceback
 
-
-import userTypeParser
-import userTypeParser.private
-
-import userAction
-import userAction.private
+try:
+    from cyberclip import userTypeParser
+    from cyberclip.userTypeParser import private
+    from cyberclip import userAction
+    from cyberclip.userAction import private as action_private
+except ImportError:
+    import userTypeParser
+    import userTypeParser.private
+    import userAction
+    import userAction.private
 
 import re
 import os
