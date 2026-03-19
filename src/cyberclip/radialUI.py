@@ -6,6 +6,9 @@ Triggered with Ctrl+Alt+M, displays parsed data types as alphabetically sorted r
 """
 
 import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import threading
 from dataclasses import dataclass
 from enum import Enum
