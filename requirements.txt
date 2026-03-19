@@ -1,3 +1,4 @@
+# Core dependencies
 beautifulsoup4
 dnspython
 jsonpath
@@ -8,10 +9,20 @@ pycti
 pyperclip
 pywin32; platform_system=="Windows"
 textual
-textual_serve
 textual[syntax]
 textual-fspicker
-textual-serve
 tldextract
 urllib3
 XlsxWriter
+PyYAML
+requests
+shodan
+
+# Optional: GUI (Radial Menu) - Install with: pip install cyberclip[gui]
+# PyQt5>=5.15.0
+# keyboard>=0.13.0
+# win11toast>=0.34; platform_system=="Windows"
+
+# Optional: Web Interface - Install with: pip install cyberclip[web]
+# flask>=2.0.0
+# textual_serve

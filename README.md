@@ -22,32 +22,62 @@ VIRUSTOTAL_API-KEY="<VIRUS TOTAL API KEY>"
 
 ## Requirements
 
-- Git
+- Python 3.10+ (up to 3.13)
+- Git (for source installation)
 - Docker (for docker deployment)
-- Python 3.12
+
+## Quick Start
+
+### Basic Installation (TUI only)
+
+```bash
+pip install cyberclip
+```
+
+### With Optional Features
+
+```bash
+# With GUI (Radial Menu - Qt-based)
+pip install cyberclip[gui]
+
+# With Web Interface (Flask-based)
+pip install cyberclip[web]
+
+# With all optional features
+pip install cyberclip[all]
+```
+
+📖 **See [INSTALL.md](INSTALL.md) for detailed installation options and platform-specific notes.**
 
 ## With uv
 
-```
-# For trying
+```bash
+# Basic installation
+uv tool install git+https://github.com/BongoKnight/cyberclip
+
+# With all features
+uv tool install "git+https://github.com/BongoKnight/cyberclip[all]"
+
+# For trying (temporary)
 uv tool run git+https://github.com/BongoKnight/cyberclip
 
-# For installation
-uv tool install git+https://github.com/BongoKnight/cyberclip
+# Run
 cyberclip
 ```
 
-
 ## With pipx
 
-```
-python -m pip install pipx
-python -m pipx install "cyberclip @ git+https://github.com/BongoKnight/cyberclip"
+```bash
+# Basic installation
+pipx install "cyberclip @ git+https://github.com/BongoKnight/cyberclip"
+
+# With all features
+pipx install "cyberclip[all] @ git+https://github.com/BongoKnight/cyberclip"
 ```
 
 ## With Docker
 
-```
+```bash
 git clone https://github.com/BongoKnight/cyberclip
 cd cyberclip
 docker build -t cyberclip .

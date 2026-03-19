@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CyberClip Graph</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+  <script src="/static/js/vis-network.min.js"></script>
+</head>
+<body>
+
+<!-- ── Toast / Spinner (injected by utils.js) ────────────────────────────── -->
+<div id="toast-container"></div>
+<div id="spinner-overlay" class="hidden">
+  <div style="text-align:center">
+    <div class="spinner"></div>
+    <div class="spinner-label" id="spinner-label"></div>
+  </div>
+</div>
+
+<!-- ── Toolbar ───────────────────────────────────────────────────────────── -->
+<header id="toolbar">
+  <div class="toolbar-brand"><span class="brand-icon">🔗</span> CyberClip Graph</div>
+  <div class="toolbar-actions">
+    <button id="btn-import"      class="btn btn-primary" title="Import text (Ctrl+I)">⬆ Import</button>
+    <button id="btn-palette"     class="btn"             title="Command palette (Ctrl+K)">⚡ Actions</button>
+    <button id="btn-clear-graph" class="btn btn-danger"  title="Clear all">✕ Clear</button>
+  </div>
+</header>
+
+<!-- ── Main layout ───────────────────────────────────────────────────────── -->
+<div id="layout">
+
+  <!-- Filter pane -->
+  <aside id="filter-pane">
+    <div class="pane-header">
+      <span>Filters</span>
+      <button id="btn-add-filter" class="btn-icon" title="Add filter to last group">＋</button>
+    </div>
+    <div class="filter-logic-bar">
+      <span style="font-size:10px;color:var(--text3);margin-right:4px;">Groups:</span>
+      <label class="radio-label"><input type="radio" name="filter-logic" value="AND" checked/> AND</label>
+      <label class="radio-label"><input type="radio" name="filter-logic" value="OR"/>  OR</label>
+    </div>
+    <div id="filter-list"></div>
+    <div class="filter-section-title">Node types</div>
+    <div id="type-legend"></div>
+  </aside>
+
+  <div id="v-divider" class="divider divider-v"></div>
+
+  <!-- Center column -->
+  <div id="center-col">
+
+    <!-- Graph area -->
+    <div id="graph-area">
+      <!-- Node info panel (scrollable, top-left) -->
+      <div id="node-info" class="hidden">
+        <div class="node-info-header">
+          <span id="node-info-title">Node</span>
+          <button id="node-info-close" class="btn-icon" title="Close">✕</button>
+        </div>
+        <div id="node-info-body"></div>
+      </div>
+      <!-- vis.js canvas -->
+      <div id="graph-canvas"></div>
+      <!-- Shift-drag selection box -->
+      <div id="sel-box" class="sel-box hidden"></div>
+      <!-- Graph controls -->
+      <div id="graph-controls">
+        <select id="graph-layout-select" class="graph-select" title="Graph layout">
+          <option value="physics">Force-Directed</option>
+          <option value="hierarchical-UD">Hierarchical ↕</option>
+          <option value="hierarchical-LR">Hierarchical ↔</option>
+          <option value="hierarchical-DU">Hierarchical ↑</option>
+          <option value="hierarchical-RL">Hierarchical ←</option>
+        </select>
+        <select id="graph-shape-select" class="graph-select" title="Node shape">
+          <option value="dot">Dot</option>
+          <option value="circle">Circle</option>
+          <option value="box">Box</option>
+          <option value="ellipse">Ellipse</option>
+          <option value="database">Database</option>
+          <option value="diamond">Diamond</option>
+          <option value="star">Star</option>
+          <option value="triangle">Triangle</option>
+          <option value="square">Square</option>
+        </select>
+        <button class="gc-btn" id="btn-fit"     title="Fit view (F)">⊡</button>
+        <button class="gc-btn" id="btn-physics" title="Toggle physics">⚛</button>
+        <span   id="sel-count" class="sel-count"></span>
+        <button id="btn-del-nodes" class="btn btn-sm btn-danger hidden" title="Delete selected (Del)">✕ Delete</button>
+      </div>
+    </div>
+
+    <div id="h-divider" class="divider divider-h"></div>
+
+    <!-- Table area -->
+    <div id="table-area">
+      <div class="pane-header">
+        <span>Table View</span>
+        <div class="table-toolbar">
+          <button id="btn-col-action" class="btn btn-sm hidden" title="Run action on selected column">▶ Column action</button>
+          <button id="btn-del-col"    class="btn btn-sm btn-danger hidden" title="Delete column">✕ Column</button>
+          <button id="btn-expand-col" class="btn btn-sm btn-success hidden" title="Expand column values → new graph nodes">⤢ Expand to nodes</button>
+          <button id="btn-copy-col"   class="btn btn-sm hidden" title="Copy all column values to clipboard">📋 Copy column</button>
+          <button id="btn-export-csv" class="btn btn-sm" title="Download table as CSV">⬇ CSV</button>
+          <button id="btn-export-json" class="btn btn-sm" title="Download table as JSON">⬇ JSON</button>
+        </div>
+      </div>
+      <div id="table-scroll">
+        <table id="main-table">
+          <thead id="table-head"></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /center-col -->
+</div><!-- /layout -->
+
+<!-- ── Command Palette ─────────────────────────────────────────────────── -->
+<div id="palette-overlay" class="hidden">
+  <div id="palette">
+    <div class="palette-search-row">
+      <span class="palette-search-icon">⚡</span>
+      <input id="palette-input" type="text" placeholder="Search actions… (↑↓ navigate, Enter select, Esc close)" autocomplete="off"/>
+      <span id="palette-context" class="palette-context palette-empty-ctx"></span>
+    </div>
+    <div id="palette-list"></div>
+  </div>
+</div>
+
+<!-- ── Import Modal ──────────────────────────────────────────────────────── -->
+<div id="import-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <span>Import Text</span>
+      <button class="modal-close btn-icon">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="import-text"
+        placeholder="Paste or type text to parse…&#10;&#10;Supports: IPs, domains, URLs, hashes (MD5/SHA), CVEs,&#10;MITRE ATT&amp;CK IDs, emails, JSON, Base64, AS numbers, etc.&#10;&#10;Ctrl+Enter to submit" rows="11"></textarea>
+      <div class="modal-options">
+        <label class="checkbox-label">
+          <input type="checkbox" id="import-add-mode"/>
+          Add to existing graph (don't replace)
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="btn-import-json-sel" class="btn" title="Open JSON field selector">🌲 JSON Selector</button>
+      <button id="btn-import-submit"   class="btn btn-primary">Parse → Graph</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Action Params Modal ───────────────────────────────────────────────── -->
+<div id="params-modal" class="modal-overlay hidden">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <span id="params-modal-title">Action Parameters</span>
+      <button class="modal-close btn-icon">✕</button>
+    </div>
+    <div class="modal-body" id="params-modal-body"></div>
+    <div class="modal-footer">
+      <button id="btn-params-cancel" class="btn">Cancel</button>
+      <button id="btn-params-run"    class="btn btn-primary">▶ Run</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── JSON Selector Modal ───────────────────────────────────────────────── -->
+<div id="json-modal" class="modal-overlay hidden">
+  <div class="modal modal-xl">
+    <div class="modal-header">
+      <div style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
+        <span>JSON Field Selector — click fields to add jq paths</span>
+        <span id="json-modal-source" style="font-size:11px;font-weight:400;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace"></span>
+      </div>
+      <button class="modal-close btn-icon">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="json-sel-layout">
+        <div id="json-tree-pane" class="json-tree-pane"></div>
+        <div id="json-sel-right">
+          <div class="json-sel-label">Selected jq paths (click tag to remove)</div>
+          <div id="json-selected-paths" class="json-tags"></div>
+          <div class="json-sel-label" style="margin-top:1rem">Preview (first match per path)</div>
+          <pre id="json-preview" class="json-preview"></pre>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="btn-json-clear"   class="btn">Clear selection</button>
+      <button id="btn-json-confirm" class="btn btn-primary">Extract → Nodes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Full Text Modal ───────────────────────────────────────────────────── -->
+<div id="fulltext-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="fulltext-title">Full Value</span>
+      <button class="modal-close btn-icon">✕</button>
+    </div>
+    <div class="modal-body">
+      <pre id="fulltext-body" class="fulltext-pre"></pre>
+    </div>
+    <div class="modal-footer">
+      <button id="btn-fulltext-copy" class="btn btn-primary">📋 Copy to clipboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Datatype Selection Modal ──────────────────────────────────────────── -->
+<div id="datatype-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <span>Select Data Types to Parse</span>
+      <button class="modal-close btn-icon">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">
+        Select which data types should be extracted from the metadata:
+      </div>
+      <div id="datatype-list" class="datatype-list"></div>
+      <div class="modal-options" style="margin-top:12px;">
+        <label class="checkbox-label">
+          <input type="checkbox" id="datatype-delete-original" checked/>
+          Delete original node after creating new nodes
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="btn-datatype-cancel" class="btn">Cancel</button>
+      <button id="btn-datatype-confirm" class="btn btn-primary">Create Nodes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Context Menu ──────────────────────────────────────────────────────── -->
+<ul id="ctx-menu" class="ctx-menu hidden"></ul>
+
+<!-- ── Scripts ──────────────────────────────────────────────────────────── -->
+<script src="/static/js/utils.js"></script>
+<script src="/static/js/filters.js"></script>
+<script src="/static/js/modals.js"></script>
+<script src="/static/js/actions.js"></script>
+<script src="/static/js/graph.js"></script>
+<script src="/static/js/table.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
