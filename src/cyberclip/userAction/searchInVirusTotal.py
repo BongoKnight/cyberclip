@@ -10,9 +10,8 @@ import json
 
 DEFAULT_PARAMS = {
                 "Relationships":{
-                    "type":"fixedlist",
-                    "choices":["contacted_urls","contacted_domains","contacted_ips","dropped_files","bundled_files","itw_urls","submissions","execution_parents"],
-                    "value":[]
+                    "type":"tags",
+                    "value":["submissions","contacted_urls","contacted_domains","contacted_ips","dropped_files","bundled_files","itw_urls","submissions","execution_parents"]
                     },
                 }
 
@@ -21,10 +20,13 @@ class searchInVirusTotalAction(actionInterface):
 
 A parameter could be passed :
 
-    - `Relationships` a list of relationships to query, be carreful each additionnal relationship consume an API credit. For each observable results will be added under `$.data.<relationship_name>` key and thus specific fields of relationship could be retrievedwith `$.relationships.relationship_name.<path>` thanks to the `Analysis fields` parameter
+    - `Relationships` a list of relationships to query. For each relationship, the full relationship object content is fetched.
+      Be careful: each additional relationship consumes an API credit.
+      Available relationships: tags, contacted_urls, contacted_domains, contacted_ips, dropped_files, bundled_files, itw_urls, submissions, execution_parents
+      Full relationship data will be stored under `$.data.<relationship_name>` key for each observable.
 
 
-A configuration is neeeded : 
+A configuration is needed : 
 
 ```yaml
 VirusTotal:
@@ -46,42 +48,81 @@ VirusTotal:
 
         Queries the VirusTotal API for each observable (IP, domain, or file hash)
         and retrieves analysis results including optional relationship data.
+        For each relationship, fetches the complete objects instead of just descriptors.
 
         Returns:
             dict[str, Any]: Keys are observable strings, values are VirusTotal
-                API response JSON objects.
+                API response JSON objects with full relationship content.
         """
         self.observables = self.get_observables()
         self.results = {}
-        
-        relationships = ",".join(self.get_param_value("Relationships")) if self.get_param_value("Relationships") else ""
+
+        relationships = self.get_param_value("Relationships") if self.get_param_value("Relationships") else []
+
         for obs_type in self.supportedType:
             if obs_type=="ip" and (observables:=self.observables.get(obs_type,[])):
                 for ip in observables:
-                    url = f"https://www.virustotal.com/api/v3/ip_addresses/{ip}?relationships={relationships}"
+                    url = f"https://www.virustotal.com/api/v3/ip_addresses/{ip}"
                     try:
                         response = requests.get(url, headers=self.headers)
                         self.results[ip] = response.json()
+                        # Fetch full relationship content
+                        self._fetch_relationships(ip, "ip_addresses", relationships)
                     except:
                         self.results[ip] = {}
+
             if obs_type=="domain" and (observables:=self.observables.get(obs_type,[])):
                 for domain in observables:
-                    url = f"https://www.virustotal.com/api/v3/domains/{domain}?relationships={relationships}"
+                    url = f"https://www.virustotal.com/api/v3/domains/{domain}"
                     try:
                         response = requests.get(url, headers=self.headers)
                         self.results[domain] = response.json()
+                        # Fetch full relationship content
+                        self._fetch_relationships(domain, "domains", relationships)
                     except:
-                        self.results[domain] = {}                   
+                        self.results[domain] = {}
+
             if obs_type in ["md5","sha1","sha256"] and (observables:=self.observables.get(obs_type,[])):
                 for file_hash in observables:
-                    url = f"https://www.virustotal.com/api/v3/files/{file_hash}?relationships={relationships}"
+                    url = f"https://www.virustotal.com/api/v3/files/{file_hash}"
                     try:
                         response = requests.get(url, headers=self.headers)
                         self.results[file_hash] = response.json()
+                        # Fetch full relationship content
+                        self._fetch_relationships(file_hash, "files", relationships)
                     except:
                         self.results[file_hash] = {}
 
-        return self.results
+        return list(self.results.values())
+
+    def _fetch_relationships(self, observable, collection, relationships):
+        """Fetch full relationship content for an observable.
+
+        Args:
+            observable: The observable identifier (IP, domain, or hash)
+            collection: The API collection name (ip_addresses, domains, or files)
+            relationships: List of relationship names to fetch
+        """
+        if not relationships:
+            return
+
+        if observable not in self.results:
+            self.results[observable] = {}
+
+        if "data" not in self.results[observable]:
+            self.results[observable]["data"] = {}
+
+        for relationship in relationships:
+            url = f"https://www.virustotal.com/api/v3/{collection}/{observable}/{relationship}"
+            try:
+                response = requests.get(url, headers=self.headers)
+                if response.status_code == 200:
+                    rel_data = response.json()
+                    # Store the full relationship data
+                    self.results[observable]["data"][relationship] = rel_data.get("data", [])
+            except Exception as e:
+                # Silently skip failed relationship fetches
+                pass
     
     def __str__(self):
         """Return human-readable representation of VirusTotal results.
@@ -92,7 +133,7 @@ VirusTotal:
             str: Formatted JSON containing all VirusTotal lookup results.
         """
         self.execute()
-        return json.dumps(self.results, indent=3)
+        return json.dumps(list(self.results.values()), indent=3)
 
 if __name__=='__main__':
     from userTypeParser.MD5Parser import md5Parser
