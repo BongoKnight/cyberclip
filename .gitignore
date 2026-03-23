@@ -32,3 +32,5 @@ cyberclip.egg-info/*
 !/docs/static
 !/docs/*.md
 uv.lock
+.vscode
+.github
