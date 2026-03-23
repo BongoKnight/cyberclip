@@ -59,10 +59,10 @@ C:\Users\%USERNAME%\pipx\venvs\cyberclip\Lib\site-packages\cyberclip
 ```
 DATALAKE_EMAIL=
 DATALAKE_PASSWORD=
-DEEPL_API-KEY=
-SHODAN_API-KEY=
-URLSCAN_API-KEY=
-VIRUSTOTAL_API-KEY=
+DEEPL_API_KEY=
+SHODAN_API_KEY=
+URLSCAN_API_KEY=
+VIRUSTOTAL_API_KEY=
 ```
 
 ## Create custom actions/parser

@@ -66,8 +66,12 @@ all = [
 ]
 
 [tool.setuptools.package-data]
-"cyberclip.data" = ["*.bak"]
-
+cyberclip = [
+    "templates/**/*",
+    "static/**/*",
+    "data/**/*",
+    "data/.gitkeep",
+]
 [project.scripts]
 # Main unified entry point with interface selector
 cyberclip = "cyberclip.__main__:main"

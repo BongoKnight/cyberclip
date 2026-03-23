@@ -1,10 +1,12 @@
 image: python:3.12
 
-before_script:
-  - pip install mkdocs mkdocs-gen-files mkdocs-material mkdocs-autorefs mkdocstrings-python
+.python-before: &python-before
+  before_script:
+    - pip install mkdocs mkdocs-gen-files mkdocs-material mkdocs-autorefs mkdocstrings-python
 
 test:
   stage: test
+  <<: *python-before
   script:
   - mkdocs build --strict --verbose --site-dir test
   artifacts:
@@ -16,11 +18,37 @@ test:
 
 pages:
   stage: deploy
+  <<: *python-before
   script:
   - mkdocs build --strict --verbose --site-dir public
   artifacts:
     paths:
     - public
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
+docker-container:
+  stage: deploy
+  image: quay.io/buildah/stable:latest
+  services:
+    - name: docker:dind
+  tags:
+    - graas-dind
+  variables:
+    CONTAINER_BUILD_IMAGE: $CI_REGISTRY_IMAGE:latest 
+  script:
+    - buildah pull $CONTAINER_BUILD_IMAGE || true
+    - >
+      buildah bud
+      --pull-always
+      --layers
+      --cache-from $CI_REGISTRY_IMAGE/cache
+      --cache-to $CI_REGISTRY_IMAGE/cache
+      --tag $CONTAINER_BUILD_IMAGE
+      --isolation=chroot 
+      --storage-driver=vfs
+      .
+    - buildah push --storage-driver=vfs $CONTAINER_BUILD_IMAGE $CONTAINER_BUILD_IMAGE
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
