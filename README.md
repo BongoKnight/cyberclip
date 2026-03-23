@@ -12,10 +12,10 @@ Variables that allows Cyberclip to authenticate itself against third-party API s
 ```bash 
 DATALAKE_EMAIL="<DATALAKE EMAIL>"
 DATALAKE_PASSWORD="<DATALAKE PASSWORD>"
-DEEPL_API-KEY="<DEEPL API-KEY>"
-SHODAN_API-KEY="<SHODAN API KEY>"
-URLSCAN_API-KEY="<URLSCAN API KEY>"
-VIRUSTOTAL_API-KEY="<VIRUS TOTAL API KEY>"
+DEEPL_API_KEY="<DEEPL API_KEY>"
+SHODAN_API_KEY="<SHODAN API KEY>"
+URLSCAN_API_KEY="<URLSCAN API KEY>"
+VIRUSTOTAL_API_KEY="<VIRUS TOTAL API KEY>"
 ```
 
 # Installation
@@ -81,7 +81,7 @@ pipx install "cyberclip[all] @ git+https://github.com/BongoKnight/cyberclip"
 git clone https://github.com/BongoKnight/cyberclip
 cd cyberclip
 docker build -t cyberclip .
-docker run -d -p 8000:8000 cyberclip
+docker run --env-file .env -p 8000:8000 cyberclip web --host 0.0.0.0 --port 8000
 ```
 
 # Generate documentation

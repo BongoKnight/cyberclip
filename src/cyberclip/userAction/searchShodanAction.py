@@ -3,14 +3,13 @@ try:
 except:
     from actionInterface import actionInterface
 
-import shodan
-from pathlib import Path
-import yaml
-from yaml.loader import SafeLoader
 import json
 import time
 
+import shodan
+
 """A action module, to open search observables contained in a text in Shodan."""
+
 
 class searchInShodanAction(actionInterface):
     r"""Search IP addresses using the Shodan API.
@@ -26,7 +25,7 @@ class searchInShodanAction(actionInterface):
         Requires the following in ``.env``::
 
             Shodan:
-            - api-key: <your Shodan API key>
+            - API_KEY: <your Shodan API key>
 
     Network Activity:
         Makes requests to: api.shodan.io
@@ -49,18 +48,28 @@ class searchInShodanAction(actionInterface):
     Note:
         Free accounts have rate limits. Enable "Free account" parameter to
         automatically wait 1 second between requests.
-    """    
-    def __init__(self, parsers ={}, supportedType = {"ip"}, complex_param={"Allow bulk search":{"type":"boolean","value":False}, "Free account":{"type":"boolean","value":False}}):
-        super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
+    """
+
+    def __init__(
+        self,
+        parsers={},
+        supportedType={"ip"},
+        complex_param={
+            "Allow bulk search": {"type": "boolean", "value": False},
+            "Free account": {"type": "boolean", "value": False},
+        },
+    ):
+        super().__init__(
+            parsers=parsers, supportedType=supportedType, complex_param=complex_param
+        )
         self.description = "Shodan: Search IP"
         self.indicators = "🔑"
         self.load_conf("Shodan")
-        if self.conf.get("api-key",""):
-            self.api = shodan.Shodan(self.conf.get("api-key",""))
+        if self.conf.get("API_KEY", ""):
+            self.api = shodan.Shodan(self.conf.get("API_KEY", ""))
         else:
             self.api = None
 
-        
     def execute(self) -> object:
         """Execute Shodan lookups on all parsed IP observables.
 
@@ -87,7 +96,7 @@ class searchInShodanAction(actionInterface):
                     for info in data:
                         self.results[info["ip_str"]] = info
         return self.results
-    
+
     def __str__(self):
         """Return human-readable representation of Shodan results.
 
@@ -97,12 +106,15 @@ class searchInShodanAction(actionInterface):
             str: JSON-formatted Shodan data, one IP per line.
         """
         self.execute()
-        return "\n".join(f"{json.dumps(v)}" for k,v in self.results.items())
+        return "\n".join(f"{json.dumps(v)}" for k, v in self.results.items())
 
-if __name__=='__main__':
+
+if __name__ == "__main__":
     from userTypeParser.IPParser import ipv4Parser
 
-    data = "127.0.0.1, 206.168.89.216, aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, test@domain.com"
+    data = (
+        "127.0.0.1, 206.168.89.216, aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, test@domain.com"
+    )
     parser = ipv4Parser(data)
-    a = str(searchInShodanAction({"ip":parser},["ip"]))
+    a = str(searchInShodanAction({"ip": parser}, ["ip"]))
     print(a, parser.extract())

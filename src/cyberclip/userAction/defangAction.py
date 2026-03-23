@@ -4,6 +4,7 @@ except:
     from actionInterface import actionInterface
 import re
 
+
 class defangAction(actionInterface):
     r"""Defang URLs, domains, and IP addresses for safe display.
 
@@ -15,23 +16,25 @@ class defangAction(actionInterface):
         ip, url, domain
 
     Example:
-        >>> from userTypeParser.URLParser import URLParser
-        >>> parser = URLParser("http://malicious.example.com/payload")
-        >>> action = defangAction({"url": parser})
-        >>> print(action)
+        ```python
+        from userTypeParser.URLParser import URLParser
+        parser = URLParser("http://malicious.example.com/payload")
+        action = defangAction({"url": parser})
+        print(action)
         hxxp://malicious[.]example[.]com/payload
 
-        >>> from userTypeParser.IPParser import ipv4Parser
-        >>> parser = ipv4Parser("192.168.1.1")
-        >>> action = defangAction({"ip": parser})
-        >>> print(action)
+        from userTypeParser.IPParser import ipv4Parser
+        parser = ipv4Parser("192.168.1.1")
+        action = defangAction({"ip": parser})
+        print(action)
         192[.]168[.]1[.]1
+        ```
     """
 
-    def __init__(self, parsers = {}, supportedType = {"ip","url","domain"}):
-        super().__init__(parsers = parsers, supportedType = supportedType)
+    def __init__(self, parsers={}, supportedType={"ip", "url", "domain"}):
+        super().__init__(parsers=parsers, supportedType=supportedType)
         self.description = "IoC: Defang"
-        
+
     def execute(self) -> list:
         """Execute defanging on all parsed IP/URL/domain observables.
 
@@ -46,8 +49,8 @@ class defangAction(actionInterface):
         for parsertype in self.supportedType:
             observables += self.get_observables().get(parsertype, [])
         for observable in set(observables):
-            defanged = observable.replace(".","[.]")
-            defanged = re.sub("^http","hxxp", defanged)
+            defanged = observable.replace(".", "[.]")
+            defanged = re.sub("^http", "hxxp", defanged)
             self.results[observable] = defanged
         return self.results
 
@@ -60,7 +63,8 @@ class defangAction(actionInterface):
             str: Defanged observables, one per line.
         """
         self.execute()
-        return  "\r\n".join(self.results.values())
+        return "\r\n".join(self.results.values())
+
 
 class fangAction(actionInterface):
     r"""Refang (restore) defanged URLs, domains, and IP addresses.
@@ -72,24 +76,26 @@ class fangAction(actionInterface):
         ip, url, domain
 
     Example:
-        >>> from userTypeParser.URLParser import URLParser
-        >>> parser = URLParser("hxxp://malicious[.]example[.]com/payload")
-        >>> action = fangAction({"url": parser})
-        >>> print(action)
+        ```python
+        from userTypeParser.URLParser import URLParser
+        parser = URLParser("hxxp://malicious[.]example[.]com/payload")
+        action = fangAction({"url": parser})
+        print(action)
         http://malicious.example.com/payload
 
-        >>> from userTypeParser.IPParser import ipv4Parser
-        >>> parser = ipv4Parser("192[.]168[.]1[.]1")
-        >>> action = fangAction({"ip": parser})
-        >>> print(action)
+        from userTypeParser.IPParser import ipv4Parser
+        parser = ipv4Parser("192[.]168[.]1[.]1")
+        action = fangAction({"ip": parser})
+        print(action)
         192.168.1.1
+        ```
     """
 
-    def __init__(self, parsers = {}, supportedType = {"ip","url","domain"}):
-        super().__init__(parsers = parsers, supportedType = supportedType)
+    def __init__(self, parsers={}, supportedType={"ip", "url", "domain"}):
+        super().__init__(parsers=parsers, supportedType=supportedType)
         self.description = "IoC: Refang"
-        
-    def execute(self) :
+
+    def execute(self):
         """Execute refanging on all parsed IP/URL/domain observables.
 
         Applies refanging transformations to restore IoCs to active format.
@@ -103,9 +109,9 @@ class fangAction(actionInterface):
         for parsertype in self.supportedType:
             observables += self.get_observables().get(parsertype, [])
         for observable in set(observables):
-            fanged = observable.replace("[.]",".")
-            fanged = re.sub(r"(\[:/?/?\])","://", fanged)
-            fanged = re.sub("^hxxp","http", fanged)
+            fanged = observable.replace("[.]", ".")
+            fanged = re.sub(r"(\[:/?/?\])", "://", fanged)
+            fanged = re.sub("^hxxp", "http", fanged)
             self.results[observable] = fanged
 
     def __str__(self):
@@ -117,11 +123,13 @@ class fangAction(actionInterface):
             str: Refanged observables, one per line.
         """
         self.execute()
-        return  "\r\n".join(self.results.values())
+        return "\r\n".join(self.results.values())
 
-if __name__=='__main__':
+
+if __name__ == "__main__":
     from userTypeParser.domainParser import domainParser
+
     data = "b\ngoogle.com\na"
     text_parser = domainParser(data)
-    a = str(defangAction({'domain':text_parser},["domain"]))
+    a = str(defangAction({"domain": text_parser}, ["domain"]))
     print(a)

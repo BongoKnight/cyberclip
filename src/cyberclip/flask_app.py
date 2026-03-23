@@ -3,11 +3,16 @@ CyberClip Graph UI – Flask backend
 Run from inside the cyberclip package directory:
     python flask_server.py
 """
-import sys, os, asyncio, json, re, traceback
+
+import asyncio
+import os
+import sys
+import traceback
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 try:
-    from flask import Flask, request, jsonify, render_template
+    from flask import Flask, jsonify, render_template, request
 except ImportError:
     print("❌ CyberClip Web Interface requires Flask.")
     print("\nTo install web dependencies, run:")
@@ -23,10 +28,15 @@ except ImportError:
     from clipParser import clipParser
     from utilities import clean_tsv
 
-app = Flask(__name__, static_folder="static", template_folder="templates")
+app = Flask(
+    __name__,
+    template_folder=os.path.join(os.path.dirname(__file__), "templates"),
+    static_folder=os.path.join(os.path.dirname(__file__), "static"),
+)
 
 # ── Global parser (loaded once) ──────────────────────────────────────────────
 _parser: clipParser | None = None
+
 
 def get_parser() -> clipParser:
     global _parser
@@ -38,14 +48,18 @@ def get_parser() -> clipParser:
 
 def _serialize_action(name: str, action) -> dict:
     return {
-        "name":          name,
-        "description":   action.description if hasattr(action, "description") else name,
-        "supportedType": sorted(list(action.supportedType)) if action.supportedType else [],
-        "indicators":    getattr(action, "indicators", ""),
+        "name": name,
+        "description": action.description if hasattr(action, "description") else name,
+        "supportedType": (
+            sorted(list(action.supportedType)) if action.supportedType else []
+        ),
+        "indicators": getattr(action, "indicators", ""),
         "complex_param": action.complex_param if action.complex_param else {},
     }
 
+
 # ── Routes ────────────────────────────────────────────────────────────────────
+
 
 @app.route("/")
 def index():
@@ -58,7 +72,7 @@ def api_actions():
     p = get_parser()
     actions = sorted(
         [_serialize_action(n, a) for n, a in p.actions.items()],
-        key=lambda x: x["description"].lower()
+        key=lambda x: x["description"].lower(),
     )
     return jsonify(actions)
 
@@ -78,7 +92,8 @@ def api_parse():
     nid = [0]
 
     def new_id():
-        i = nid[0]; nid[0] += 1
+        i = nid[0]
+        nid[0] += 1
         return f"n{i}"
 
     for ptype, values in results["matches"].items():
@@ -92,19 +107,23 @@ def api_parse():
             if key not in seen:
                 nid_ = new_id()
                 seen[key] = nid_
-                nodes.append({
-                    "id":       nid_,
-                    "label":    val_str[:45] + ("…" if len(val_str) > 45 else ""),
-                    "value":    val_str,
-                    "type":     ptype,
-                    "metadata": {},
-                })
+                nodes.append(
+                    {
+                        "id": nid_,
+                        "label": val_str[:45] + ("…" if len(val_str) > 45 else ""),
+                        "value": val_str,
+                        "type": ptype,
+                        "metadata": {},
+                    }
+                )
 
-    return jsonify({
-        "nodes":   nodes,
-        "edges":   edges,
-        "types":   list(results["detectedType"]),
-    })
+    return jsonify(
+        {
+            "nodes": nodes,
+            "edges": edges,
+            "types": list(results["detectedType"]),
+        }
+    )
 
 
 @app.route("/api/parse_bulk", methods=["POST"])
@@ -135,7 +154,8 @@ def api_parse_bulk():
         nid = [0]
 
         def new_id():
-            i = nid[0]; nid[0] += 1
+            i = nid[0]
+            nid[0] += 1
             return f"n{i}"
 
         for ptype, pvalues in parsed["matches"].items():
@@ -149,18 +169,17 @@ def api_parse_bulk():
                 if key not in seen:
                     nid_ = new_id()
                     seen[key] = nid_
-                    nodes.append({
-                        "id":       nid_,
-                        "label":    val_str[:45] + ("…" if len(val_str) > 45 else ""),
-                        "value":    val_str,
-                        "type":     ptype,
-                        "metadata": {},
-                    })
+                    nodes.append(
+                        {
+                            "id": nid_,
+                            "label": val_str[:45] + ("…" if len(val_str) > 45 else ""),
+                            "value": val_str,
+                            "type": ptype,
+                            "metadata": {},
+                        }
+                    )
 
-        results.append({
-            "nodes": nodes,
-            "types": list(parsed["detectedType"])
-        })
+        results.append({"nodes": nodes, "types": list(parsed["detectedType"])})
 
     return jsonify({"results": results})
 
@@ -168,8 +187,8 @@ def api_parse_bulk():
 @app.route("/api/execute", methods=["POST"])
 def api_execute():
     """Execute a single action on text."""
-    data        = request.get_json(force=True)
-    text        = data.get("text", "")
+    data = request.get_json(force=True)
+    text = data.get("text", "")
     action_name = data.get("action", "")
     complex_param = data.get("complex_param", {})
 
@@ -198,9 +217,9 @@ def api_execute_bulk():
     Mirrors App.py logic: apply clean_tsv then split tabs into sub-columns.
     If column_name provided, merges duplicate columns.
     """
-    data          = request.get_json(force=True)
-    values        = data.get("values", [])
-    action_name   = data.get("action", "")
+    data = request.get_json(force=True)
+    values = data.get("values", [])
+    action_name = data.get("action", "")
     complex_param = data.get("complex_param", {})
 
     if not values or not action_name:
@@ -223,15 +242,17 @@ def api_execute_bulk():
 
         # Mirror App.py: clean TSV prefix, split into sub-columns
         cleaned = [clean_tsv(str(r), str(orig)) for r, orig in zip(raw_results, values)]
-        split   = [r.split("\t") for r in cleaned]
+        split = [r.split("\t") for r in cleaned]
         max_cols = max((len(r) for r in split), default=1)
-        padded   = [r + [""] * (max_cols - len(r)) for r in split]
+        padded = [r + [""] * (max_cols - len(r)) for r in split]
 
-        return jsonify({
-            "results":     padded,
-            "num_columns": max_cols,
-            "action_name": action_name,
-        })
+        return jsonify(
+            {
+                "results": padded,
+                "num_columns": max_cols,
+                "action_name": action_name,
+            }
+        )
     except Exception as e:
         return jsonify({"error": str(e), "detail": traceback.format_exc()}), 500
 
@@ -248,7 +269,7 @@ def api_actions_for():
     p.parseData(text)
     applicable = sorted(
         [_serialize_action(n, a) for n, a in p.actions.items() if a.parsers],
-        key=lambda x: x["description"].lower()
+        key=lambda x: x["description"].lower(),
     )
     return jsonify({"actions": applicable})
 
@@ -264,12 +285,12 @@ def main(host="127.0.0.1", port=5001, debug=False):
     Returns:
         int: Exit code (always 0)
     """
-    print(f"🌐 CyberClip Web Interface")
-    print(f"📡 Loading parsers and actions...")
+    print("🌐 CyberClip Web Interface")
+    print("📡 Loading parsers and actions...")
     get_parser()  # preload
-    print(f"✓ Ready")
+    print("✓ Ready")
     print(f"🔗 Serving at http://{host}:{port}")
-    print(f"   Press Ctrl+C to stop")
+    print("   Press Ctrl+C to stop")
 
     try:
         app.run(host=host, port=port, debug=debug, use_reloader=False)
@@ -281,9 +302,14 @@ def main(host="127.0.0.1", port=5001, debug=False):
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser(description="CyberClip Web Interface")
-    parser.add_argument("--host", default="127.0.0.1", help="Host address (default: 127.0.0.1)")
-    parser.add_argument("--port", type=int, default=5001, help="Port number (default: 5001)")
+    parser.add_argument(
+        "--host", default="127.0.0.1", help="Host address (default: 127.0.0.1)"
+    )
+    parser.add_argument(
+        "--port", type=int, default=5001, help="Port number (default: 5001)"
+    )
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
     args = parser.parse_args()
 

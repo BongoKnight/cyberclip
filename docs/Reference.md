@@ -296,5 +296,5 @@ class DNSLookupAction(actionInterface,
 
 - [CreateNewParser.md](CreateNewParser.md) - Tutorial for creating custom parsers
 - [CreateNewAction.md](CreateNewAction.md) - Tutorial for creating custom actions
-- [ParserInterface API](../reference/userTypeParser/ParserInterface.md) - Base parser class documentation
-- [actionInterface API](../reference/userAction/actionInterface.md) - Base action class documentation
+<!-- - [ParserInterface API](../reference/userTypeParser/ParserInterface.md) - Base parser class documentation
+- [actionInterface API](../reference/userAction/actionInterface.md) - Base action class documentation -->

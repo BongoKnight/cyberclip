@@ -2,13 +2,14 @@ try:
     from userAction.actionInterface import actionInterface
 except:
     from actionInterface import actionInterface
-import urllib.parse
-import requests
 import json
 import urllib
-import time
+import urllib.parse
+
+import requests
 
 BASE_SEARCH_URL = "https://urlscan.io/api/v1/search/"
+
 
 class SearchInUrlScanAction(actionInterface):
     r"""Search for IPs, domains, and analytics IDs on URLScan.io.
@@ -23,29 +24,30 @@ class SearchInUrlScanAction(actionInterface):
         Requires the following in ``.env``::
 
             UrlScan:
-            - api-key: <your URLScan.io API key>
+            - API_KEY: <your URLScan.io API key>
 
     Network Activity:
         Makes requests to: urlscan.io/api/v1/search
 
     Example:
-        >>> from userTypeParser.domainParser import domainParser
-        >>> parser = domainParser("example.com")
-        >>> action = SearchInUrlScanAction({"domain": parser})
-        >>> results = action.execute()
-        >>> print(results["example.com"]["total"])
+        ```python
+        from userTypeParser.domainParser import domainParser
+        parser = domainParser("example.com")
+        action = SearchInUrlScanAction({"domain": parser})
+        results = action.execute()
+        print(results["example.com"]["total"])
         42
+        ```
     """
 
-    def __init__(self, parsers = {}, supportedType = {"ip","domain","analytics"}):
-        super().__init__(parsers = parsers, supportedType = supportedType)
+    def __init__(self, parsers={}, supportedType={"ip", "domain", "analytics"}):
+        super().__init__(parsers=parsers, supportedType=supportedType)
         self.description = "UrlScan: Search IoC"
         self.indicators = "🔑"
         self.load_conf("UrlScan")
-        API_KEY = self.conf.get("api-key","")
+        API_KEY = self.conf.get("API_KEY", "")
         self.headers = {"accept": "application/json", "API-Key": API_KEY}
 
-        
     def execute(self) -> object:
         """Execute URLScan searches on all parsed observables.
 
@@ -63,11 +65,10 @@ class SearchInUrlScanAction(actionInterface):
             try:
                 query_url = BASE_SEARCH_URL + f"?q={observable}&size=20"
                 response = requests.get(query_url, headers=self.headers)
-                self.results.update({observable:response.json()})
+                self.results.update({observable: response.json()})
             except Exception as e:
-                self.results.update({observable:str(e)})
+                self.results.update({observable: str(e)})
         return self.results
-
 
     def __str__(self):
         """Return human-readable representation of search results.
@@ -81,7 +82,11 @@ class SearchInUrlScanAction(actionInterface):
         return "\r\n".join(json.dumps(value) for value in self.results.values())
 
 
-DEFAULT_QUERY_PARAMETERS = {"Query":{"type":"text","value":"*"}, "Max results":{"type":"text","value":"20"}}
+DEFAULT_QUERY_PARAMETERS = {
+    "Query": {"type": "text", "value": "*"},
+    "Max results": {"type": "text", "value": "20"},
+}
+
 
 class QueryUrlScanAction(actionInterface):
     r"""Query URLScan.io with custom search queries.
@@ -96,7 +101,7 @@ class QueryUrlScanAction(actionInterface):
         Requires the following in ``.env``::
 
             UrlScan:
-            - api-key: <your URLScan.io API key>
+            - API_KEY: <your URLScan.io API key>
 
     Network Activity:
         Makes requests to: urlscan.io/api/v1/search
@@ -121,15 +126,18 @@ class QueryUrlScanAction(actionInterface):
         Query syntax: https://urlscan.io/docs/search/
     """
 
-    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param=DEFAULT_QUERY_PARAMETERS):
-        super().__init__(parsers=parsers, supportedType=supportedType, complex_param=complex_param)
+    def __init__(
+        self, parsers={}, supportedType={"text"}, complex_param=DEFAULT_QUERY_PARAMETERS
+    ):
+        super().__init__(
+            parsers=parsers, supportedType=supportedType, complex_param=complex_param
+        )
         self.description = "UrlScan: Query"
         self.indicators = "🔑"
         self.load_conf("UrlScan")
-        API_KEY = self.conf.get("api-key","")
+        API_KEY = self.conf.get("API_KEY", "")
         self.headers = {"accept": "application/json", "API-Key": API_KEY}
 
-        
     def execute(self):
         """Execute custom URLScan query.
 
@@ -141,14 +149,17 @@ class QueryUrlScanAction(actionInterface):
         self.results = {}
         try:
             query = self.get_param_value("Query")
-            limit = int(self.get_param_value("Max results")) if  str(self.get_param_value("Max results")).isdecimal() else 20
+            limit = (
+                int(self.get_param_value("Max results"))
+                if str(self.get_param_value("Max results")).isdecimal()
+                else 20
+            )
             query_url = BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size={limit}"
             response = requests.get(query_url, headers=self.headers)
             self.results = response.json()
         except Exception as e:
-            self.results = {"error":str(e)}
+            self.results = {"error": str(e)}
         return self.results
-
 
     def __str__(self):
         """Return human-readable representation of query results.
@@ -160,6 +171,7 @@ class QueryUrlScanAction(actionInterface):
         """
         self.execute()
         return json.dumps(self.results)
+
 
 class ResultFromUrlScanAction(actionInterface):
     r"""Retrieve full scan results from URLScan.io result URLs.
@@ -174,7 +186,7 @@ class ResultFromUrlScanAction(actionInterface):
         Requires the following in ``.env``::
 
             UrlScan:
-            - api-key: <your URLScan.io API key>
+            - API_KEY: <your URLScan.io API key>
 
     Network Activity:
         Makes requests to: urlscan.io/api/v1/result/*
@@ -189,15 +201,14 @@ class ResultFromUrlScanAction(actionInterface):
         example.com
     """
 
-    def __init__(self, parsers = {}, supportedType = {"url"}):
+    def __init__(self, parsers={}, supportedType={"url"}):
         super().__init__(parsers=parsers, supportedType=supportedType)
         self.description = "UrlScan: Get full results"
         self.indicators = "🔑"
         self.load_conf("UrlScan")
-        API_KEY = self.conf.get("api-key","")
+        API_KEY = self.conf.get("API_KEY", "")
         self.headers = {"accept": "application/json", "API-Key": API_KEY}
 
-        
     def execute(self):
         """Execute result fetching on all parsed URLScan result URLs.
 
@@ -209,18 +220,17 @@ class ResultFromUrlScanAction(actionInterface):
         """
         self.results = {}
         try:
-            result_urls = self.get_observables().get("url",[])
+            result_urls = self.get_observables().get("url", [])
             for url in result_urls:
                 if url.startswith("https://urlscan.io/api/v1/result/"):
                     try:
                         response = requests.get(url, headers=self.headers)
                         self.results[url] = response.json()
                     except Exception as e:
-                        self.results = {"error":str(e)}
+                        self.results = {"error": str(e)}
         except:
             pass
         return self.results
-
 
     def __str__(self):
         """Return human-readable representation of scan results.
@@ -231,13 +241,14 @@ class ResultFromUrlScanAction(actionInterface):
             str: JSON array of all scan results.
         """
         self.execute()
-        return json.dumps([response for response  in self.results.values()])
+        return json.dumps([response for response in self.results.values()])
 
 
-if __name__=='__main__':
+if __name__ == "__main__":
     from userTypeParser.domainParser import domainParser
+
     data = "urlscan.io"
     parser = domainParser(data)
-    a = str(SearchInUrlScanAction({"domain":parser},["domain"]))
+    a = str(SearchInUrlScanAction({"domain": parser}, ["domain"]))
     b = str(QueryUrlScanAction())
     print(b, parser.objects)
