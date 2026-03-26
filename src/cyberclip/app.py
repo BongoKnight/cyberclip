@@ -21,6 +21,7 @@ try:
     from cyberclip.clipboardHandler import get_clipboard_text
     from cyberclip.clipParser import clipParser
     from cyberclip.tui.ActionPannel import ActionCommands, ActionPannel
+    from cyberclip.tui.ConfigScreen import ActionConfigScreen
     from cyberclip.tui.ContentView import ContentView
     from cyberclip.tui.DataTypePannel import DataLoader
     from cyberclip.tui.ModalParamScreen import ParamScreen
@@ -34,6 +35,7 @@ except:
     from clipboardHandler import get_clipboard_text
     from clipParser import clipParser
     from tui.ActionPannel import ActionCommands, ActionPannel
+    from tui.ConfigScreen import ActionConfigScreen
     from tui.ContentView import ContentView
     from tui.DataTypePannel import DataLoader
     from tui.ModalParamScreen import ParamScreen
@@ -66,6 +68,7 @@ class ClipBrowser(App):
         ("ctrl+s", "save", "Save actual view."),
         ("ctrl+q", "quit", "Quit"),
         ("ctrl+f", "select_action_filter", "Filter"),
+        ("ctrl+e", "open_action_config", "Enabled actions"),
         ("ctrl+b", "copy", "Copy actual content to clipboard."),
         Binding("ctrl+r", "reset", "Reset content view to clipboard content.", False),
     ]
@@ -193,6 +196,20 @@ class ClipBrowser(App):
     def action_select_action_filter(self):
         filter = self.query_one("#action-filter").focus()
         filter.value = ""
+
+    def action_open_action_config(self):
+        self.push_screen(ActionConfigScreen())
+
+    def refresh_actions_from_config(self):
+        self.parser.load_all()
+        self.recipe_parser.load_all()
+        self.parser.parseData(self.text)
+        if self.active_tab == ClipBrowser.APP_TITLE:
+            self.contentview.update_text(self.text, force=True)
+        self.notify(
+            f"Reloaded actions: {len(self.parser.actions.keys())}",
+            timeout=3,
+        )
 
     @property
     def contentview(self):
