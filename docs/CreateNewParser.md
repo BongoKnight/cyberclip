@@ -71,14 +71,16 @@ class MacAddressParser(ParserInterface):
         No. MAC addresses are not typically defanged.
 
     Example:
-        >>> parser = MacAddressParser("No MAC here")
-        >>> parser.contains()
+        ```python
+        parser = MacAddressParser("No MAC here")
+        parser.contains()
         False
-        >>> parser = MacAddressParser("Device MAC: 00:1A:2B:3C:4D:5E")
-        >>> parser.contains()
+        parser = MacAddressParser("Device MAC: 00:1A:2B:3C:4D:5E")
+        parser.contains()
         True
-        >>> parser.extract()
+        parser.extract()
         ['00:1A:2B:3C:4D:5E']
+        ```
     """
 
     def __init__(self, text: str, parsertype="mac"):
@@ -290,14 +292,16 @@ class MacAddressParser(ParserInterface):
         No. MAC addresses are not typically defanged.
 
     Example:
-        >>> parser = MacAddressParser("No MAC here")
-        >>> parser.contains()
+        ```python
+        parser = MacAddressParser("No MAC here")
+        parser.contains()
         False
-        >>> parser = MacAddressParser("Device MAC: 00:1A:2B:3C:4D:5E")
-        >>> parser.contains()
+        parser = MacAddressParser("Device MAC: 00:1A:2B:3C:4D:5E")
+        parser.contains()
         True
-        >>> parser.extract()
+        parser.extract()
         ['00:1A:2B:3C:4D:5E']
+        ```
     """
 
     def __init__(self, text: str, parsertype="mac"):
@@ -359,6 +363,6 @@ Now that you've created your parser:
 
 For more information, see:
 
-- [ParserInterface API Reference](../reference/userTypeParser/ParserInterface.md)
-- [Action Interface Documentation](../reference/userAction/actionInterface.md)
+<!-- - [ParserInterface API Reference](../reference/userTypeParser/ParserInterface.md)
+- [Action Interface Documentation](../reference/userAction/actionInterface.md) -->
 - [Reference Documentation](Reference.md) for parser type registry
