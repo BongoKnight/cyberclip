@@ -18,7 +18,7 @@ class SearchInUrlScanAction(actionInterface):
         self.description = "UrlScan: Search IoC"
         self.indicators = "🔑"
         self.load_conf("UrlScan")
-        API_KEY = self.conf.get("api-key", "")
+        API_KEY = self.conf.get("api_key", "")
         self.headers = {"accept": "application/json"}
         if API_KEY:
             self.headers["API-Key"] = API_KEY
@@ -73,7 +73,7 @@ class QueryUrlScanAction(actionInterface):
         self.description = "UrlScan: Query"
         self.indicators = "🔑"
         self.load_conf("UrlScan")
-        API_KEY = self.conf.get("api-key", "")
+        API_KEY = self.conf.get("api_key", "")
         self.headers = {"accept": "application/json"}
         if API_KEY:
             self.headers["API-Key"] = API_KEY
@@ -218,7 +218,7 @@ class ResultFromUrlScanAction(actionInterface):
         Requires the following in ``.env``::
 
             UrlScan:
-            - api-key: <your URLScan.io API key>
+            - api_key: <your URLScan.io API key>
 
     Network Activity:
         Makes requests to: urlscan.io/api/v1/result/*
@@ -238,7 +238,7 @@ class ResultFromUrlScanAction(actionInterface):
         self.description = "UrlScan: Get full results"
         self.indicators = "🔑"
         self.load_conf("UrlScan")
-        API_KEY = self.conf.get("api-key", "")
+        API_KEY = self.conf.get("api_key", "")
         self.headers = {"accept": "application/json", "API-Key": API_KEY}
 
     def execute(self):

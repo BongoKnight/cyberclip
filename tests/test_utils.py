@@ -1,4 +1,25 @@
+import importlib
+
 from cyberclip.utilities import find_delimiter
+from cyberclip.userAction.actionInterface import actionInterface
+
+
+def test_load_conf_normalizes_key_separators(monkeypatch):
+    def fake_dotenv_values(path):
+        return {
+            "MODAT_API-KEY": "hyphen-token",
+            "URLSCAN_API_KEY": "underscore-token",
+        }
+
+    action_interface_module = importlib.import_module(
+        "cyberclip.userAction.actionInterface"
+    )
+    monkeypatch.setattr(action_interface_module, "dotenv_values", fake_dotenv_values)
+
+    action = actionInterface()
+
+    assert action.load_conf("Modat") == {"api_key": "hyphen-token"}
+    assert action.load_conf("UrlScan") == {"api_key": "underscore-token"}
 
 
 class TestFindDelimiter:

@@ -74,7 +74,7 @@ class _ModatMixin:
 
     def _build_headers(self) -> dict[str, str]:
         headers = {"accept": "application/json"}
-        api_key = self.conf.get("api-key") or self.conf.get("api_key") or ""
+        api_key = self.conf.get("api_key", "")
         if api_key:
             headers["Authorization"] = api_key
         return headers

@@ -59,7 +59,7 @@ class searchInVirusTotalAction(actionInterface):
         self.indicators = "🔑"
         self.lines = []
         self.load_conf("VirusTotal")
-        API_KEY = self.conf.get("API_KEY", "")
+        API_KEY = self.conf.get("api_key", "")
         self.headers = {"accept": "application/json", "x-apikey": API_KEY}
 
     def execute(self):

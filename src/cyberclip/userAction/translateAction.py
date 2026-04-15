@@ -143,7 +143,7 @@ class translateWithDeeplAction(actionInterface):
         self.indicators = "🔑"
         self.lines = []
         self.load_conf("Deepl")
-        API_KEY = self.conf.get("API_KEY", "")
+        API_KEY = self.conf.get("api_key", "")
         freeAPI = self.get_param_value("Free API")
         if freeAPI:
             self.base_url = "https://api-free.deepl.com/v2"

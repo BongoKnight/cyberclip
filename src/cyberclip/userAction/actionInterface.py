@@ -1,6 +1,5 @@
 import os
 import sys
-import re
 from dotenv import dotenv_values
 from pathlib import Path
 
@@ -97,8 +96,11 @@ class actionInterface:
         try:
             env = dotenv_values(Path(__file__).parent / path)
             for key, value in env.items():
-                if key.lower().startswith(conf_name.lower()):
-                    key_name = re.sub(f"^{conf_name.lower()}_", "", key.lower()).lower()
+                normalized_key = key.lower().replace("-", "_")
+                normalized_conf_name = conf_name.lower().replace("-", "_")
+                prefix = f"{normalized_conf_name}_"
+                if normalized_key.startswith(prefix):
+                    key_name = normalized_key.removeprefix(prefix)
                     conf[key_name] = value
             self.conf = dict(conf)
         except Exception as e:
