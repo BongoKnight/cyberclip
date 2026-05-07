@@ -40,7 +40,7 @@ class SearchInUrlScanAction(actionInterface):
                 self.results.update({observable: str(e)})
         return self.results
 
-    def __str__(self):
+    def __str__(self) -> str:
         self.execute()
         return "\r\n".join(json.dumps(value) for value in self.results.values())
 
@@ -141,7 +141,7 @@ class QueryUrlScanAction(actionInterface):
         self._dom_cache[scan_id] = dom
         return dom
 
-    def execute(self):
+    def execute(self) -> dict[str, dict | str]:
         self.results = {}
         try:
             query = self.get_param_value("Query")
@@ -199,7 +199,7 @@ class QueryUrlScanAction(actionInterface):
             self.results = {"error": str(e)}
         return self.results
 
-    def __str__(self):
+    def __str__(self) -> str:
         self.execute()
         return json.dumps(self.results)
 
@@ -228,7 +228,7 @@ class ResultFromUrlScanAction(actionInterface):
         >>> parser = URLParser(url)
         >>> action = ResultFromUrlScanAction({"url": parser})
         >>> results = action.execute()
-        >>> print(results[url]["page"]["domain"])
+        >>> print(results.get(url, {}).get("page", {}).get("domain"))
         example.com
     """
 
@@ -240,7 +240,7 @@ class ResultFromUrlScanAction(actionInterface):
         API_KEY = self.conf.get("api_key", "")
         self.headers = {"accept": "application/json", "API-Key": API_KEY}
 
-    def execute(self):
+    def execute(self) -> dict[str, dict | str]:
         """Execute result fetching on all parsed URLScan result URLs.
 
         Fetches full scan data from each valid result URL.
@@ -263,7 +263,7 @@ class ResultFromUrlScanAction(actionInterface):
             pass
         return self.results
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of scan results.
 
         Calls :meth:`execute` and formats output as JSON array.

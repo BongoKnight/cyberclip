@@ -12,7 +12,7 @@ title: "Getting started"
 
 ## With uv (recommended)
 
-```
+```bash
 # For trying
 uv tool run git+https://github.com/BongoKnight/cyberclip
 # if you have some errors you can try to enforce python version or to `uv cache clean`
@@ -26,7 +26,7 @@ cyberclip
 
 ## With pipx
 
-```
+```bash
 python -m pip install pipx
 python -m pipx install "cyberclip @ git+https://github.com/BongoKnight/cyberclip"
 ```
@@ -36,7 +36,7 @@ python -m pipx install "cyberclip @ git+https://github.com/BongoKnight/cyberclip
 
 ## With Docker
 
-```
+```bash
 git clone https://github.com/BongoKnight/cyberclip
 cd cyberclip
 docker build -t cyberclip .
@@ -56,7 +56,7 @@ C:\Users\%USERNAME%\pipx\venvs\cyberclip\Lib\site-packages\cyberclip
 
 .env file is used to store API KEY needed for various services:
 
-```
+```bash
 DATALAKE_EMAIL=
 DATALAKE_PASSWORD=
 DEEPL_API_KEY=

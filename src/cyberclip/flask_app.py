@@ -274,7 +274,7 @@ def api_actions_for():
     return jsonify({"actions": applicable})
 
 
-def main(host="127.0.0.1", port=5001, debug=False):
+def main(host: str = "127.0.0.1", port: int = 5001, debug: bool = False) -> int:
     """Main entry point for CyberClip web interface.
 
     Args:

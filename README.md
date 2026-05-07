@@ -87,8 +87,8 @@ docker run --env-file .env -p 8000:8000 cyberclip web --host 0.0.0.0 --port 8000
 # Generate documentation
 
 ```python
-pip install mkdocs mkdocs-gen-files mkdocs-material mkdocs-autorefs mkdocstrings-python
-mkdocs gh-deploy
+pip install properdocs mkdocs-gen-files mkdocs-material mkdocs-autorefs mkdocstrings-python
+properdocs gh-deploy
 ```
 
 

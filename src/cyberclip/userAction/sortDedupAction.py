@@ -39,7 +39,7 @@ class sortDedupAction(actionInterface):
             return "\n".join([i for i in lines if i!=""])
         return ""
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of sorted results.
 
         Returns:
@@ -56,7 +56,7 @@ class sortAction(actionInterface):
     Supported Types:
         text
 
-    Parameters:
+    Action Options:
         Numeric sort (bool): Sort by leading numbers instead of alphabetically.
             Default: False
         Reverse sort (bool): Reverse the sort order (Z-A or high-low).
@@ -66,7 +66,7 @@ class sortAction(actionInterface):
         >>> from userTypeParser.TextParser import TextParser
         >>> parser = TextParser("10 items\n2 items\n100 items")
         >>> action = sortAction({"text": parser})
-        >>> action.complex_param["Numeric sort"]["value"] = True
+        >>> action.complex_param.get("Numeric sort").update({"value": True})
         >>> print(action)
         2 items
         10 items
@@ -91,7 +91,7 @@ class sortAction(actionInterface):
             if self.get_param_value("Reverse sort"):
                 self.lines.sort(reverse=True)
         
-    def __str__(self):
+    def __str__(self) -> str:
         self.execute()
         return "\r\n".join(self.lines)
     

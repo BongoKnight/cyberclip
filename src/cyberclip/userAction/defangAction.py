@@ -54,7 +54,7 @@ class defangAction(actionInterface):
             self.results[observable] = defanged
         return self.results
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of defanged IoCs.
 
         Calls :meth:`execute` and formats output as one defanged IoC per line.
@@ -95,7 +95,7 @@ class fangAction(actionInterface):
         super().__init__(parsers=parsers, supportedType=supportedType)
         self.description = "IoC: Refang"
 
-    def execute(self):
+    def execute(self) -> dict[str, str]:
         """Execute refanging on all parsed IP/URL/domain observables.
 
         Applies refanging transformations to restore IoCs to active format.
@@ -113,8 +113,9 @@ class fangAction(actionInterface):
             fanged = re.sub(r"(\[:/?/?\])", "://", fanged)
             fanged = re.sub("^hxxp", "http", fanged)
             self.results[observable] = fanged
+        return self.results
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of refanged IoCs.
 
         Calls :meth:`execute` and formats output as one refanged IoC per line.

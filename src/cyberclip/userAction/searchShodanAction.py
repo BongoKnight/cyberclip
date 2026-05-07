@@ -30,7 +30,7 @@ class searchInShodanAction(actionInterface):
     Network Activity:
         Makes requests to: api.shodan.io
 
-    Parameters:
+    Action Options:
         Allow bulk search (boolean): Use bulk search API (requires paid plan).
             Default: False
         Free account (boolean): Add 1-second delay between requests to avoid
@@ -42,7 +42,7 @@ class searchInShodanAction(actionInterface):
         >>> parser = ipv4Parser("8.8.8.8")
         >>> action = searchInShodanAction({"ip": parser})
         >>> results = action.execute()
-        >>> print(results["8.8.8.8"]["org"])
+        >>> print(results.get("8.8.8.8", {}).get("org"))
         Google LLC
 
     Note:
@@ -97,7 +97,7 @@ class searchInShodanAction(actionInterface):
                         self.results[info["ip_str"]] = info
         return self.results
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of Shodan results.
 
         Calls :meth:`execute` and formats output as JSON per IP.

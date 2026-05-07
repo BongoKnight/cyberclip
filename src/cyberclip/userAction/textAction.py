@@ -18,7 +18,7 @@ class appendEachLineAction(actionInterface):
     Supported Types:
         text
 
-    Parameters:
+    Action Options:
         Text to add (text): String to append to each line. Supports \t for tabs.
             Default: "" (empty string)
 
@@ -26,7 +26,7 @@ class appendEachLineAction(actionInterface):
         >>> from userTypeParser.TextParser import TextParser
         >>> parser = TextParser("line1\nline2\nline3")
         >>> action = appendEachLineAction({"text": parser})
-        >>> action.complex_param["Text to add"]["value"] = " END"
+        >>> action.complex_param.get("Text to add").update({"value": " END"})
         >>> print(action)
         line1 END
         line2 END
@@ -48,7 +48,7 @@ class appendEachLineAction(actionInterface):
             return "\r\n".join([line + self.get_param_value("Text to add").replace("\\t","\t") for line in text])
         return ""
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of results.
 
         Returns:
@@ -64,7 +64,7 @@ class prependAction(actionInterface):
     Supported Types:
         text
 
-    Parameters:
+    Action Options:
         Text to add (text): String to prepend. Supports \t for tabs.
             Default: "" (empty string)
 
@@ -72,7 +72,7 @@ class prependAction(actionInterface):
         >>> from userTypeParser.TextParser import TextParser
         >>> parser = TextParser("data\ndata")
         >>> action = prependAction({"text": parser})
-        >>> action.complex_param["Text to add"]["value"] = "HEADER\n"
+        >>> action.complex_param.get("Text to add").update({"value": "HEADER\n"})
         >>> print(action)
         HEADER
         data
@@ -96,7 +96,7 @@ class prependAction(actionInterface):
         return ""
 
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Add a line of text at the beginning of a text."""
         return  self.execute()
 
@@ -109,7 +109,7 @@ class prependEachLineAction(actionInterface):
     Supported Types:
         text
 
-    Parameters:
+    Action Options:
         Text to prepend (text): String to prepend to each line. Supports \t for tabs.
             Default: "" (empty string)
 
@@ -117,7 +117,7 @@ class prependEachLineAction(actionInterface):
         >>> from userTypeParser.TextParser import TextParser
         >>> parser = TextParser("line1\nline2")
         >>> action = prependEachLineAction({"text": parser})
-        >>> action.complex_param["Text to prepend"]["value"] = "> "
+        >>> action.complex_param.get("Text to prepend").update({"value": "> "})
         >>> print(action)
         > line1
         > line2
@@ -138,7 +138,7 @@ class prependEachLineAction(actionInterface):
         return "\r\n".join([self.get_param_value("Text to prepend").replace("\\t","\t") + line for line in text])
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         return  self.execute()
 
 class toLowerCaseAction(actionInterface):
@@ -201,7 +201,7 @@ class toUperCaseAction(actionInterface):
         text = self.observables.get("text","")[0].upper()
         return text
 
-    def __str__(self):
+    def __str__(self) -> str:
         return  self.execute()
 
 class countAction(actionInterface):
@@ -235,7 +235,7 @@ class countAction(actionInterface):
         return {}
 
     
-    def __str__(self):
+    def __str__(self) -> str:
         counts = self.execute()
         return  "\n".join([f"{count}\t{line}" for line, count in counts.items()])
 
@@ -247,7 +247,7 @@ class findReplaceAction(actionInterface):
     Supported Types:
         text
 
-    Parameters:
+    Action Options:
         Search (text): Regular expression pattern to find.
             Default: "" (empty string)
         Replace (text): Replacement string (supports regex groups like \1, \2).
@@ -278,7 +278,7 @@ class findReplaceAction(actionInterface):
         return ""
 
     
-    def __str__(self):
+    def __str__(self) -> str:
         return  self.execute()
 
 class ReplaceDelimiterAction(actionInterface):
@@ -290,7 +290,7 @@ class ReplaceDelimiterAction(actionInterface):
     Supported Types:
         text
 
-    Parameters:
+    Action Options:
         Search (list): Delimiter to search for.
             Choices: Comma, Line return (CRLF), Line return (LF), Colon, Tab
             Default: Line return (CRLF)
@@ -302,8 +302,8 @@ class ReplaceDelimiterAction(actionInterface):
         >>> from userTypeParser.TextParser import TextParser
         >>> parser = TextParser("apple,banana,cherry")
         >>> action = ReplaceDelimiterAction({"text": parser})
-        >>> action.complex_param["Search"]["value"] = "Comma"
-        >>> action.complex_param["Replace"]["value"] = "Line return (LF)"
+        >>> action.complex_param.get("Search").update({"value": "Comma"})
+        >>> action.complex_param.get("Replace").update({"value": "Line return (LF)"})
         >>> print(action)
         apple
         banana
@@ -338,7 +338,7 @@ class ReplaceDelimiterAction(actionInterface):
             return re.sub(search_regex, replace_regex, text, flags= re.MULTILINE)
         return ""
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of delimiter replacement.
 
         Calls :meth:`execute` and returns the modified text.
@@ -357,7 +357,7 @@ class regexFilterAction(actionInterface):
     Supported Types:
         text
 
-    Parameters:
+    Action Options:
         Regex (text): Regular expression pattern to match.
             Default: "" (empty string)
 
@@ -365,7 +365,7 @@ class regexFilterAction(actionInterface):
         >>> from userTypeParser.TextParser import TextParser
         >>> parser = TextParser("error: failed\ninfo: success\nerror: timeout")
         >>> action = regexFilterAction({"text": parser})
-        >>> action.complex_param["Regex"]["value"] = r"^error:"
+        >>> action.complex_param.get("Regex").update({"value": r"^error:"})
         >>> print(action)
         error: failed
         error: timeout
@@ -383,7 +383,7 @@ class regexFilterAction(actionInterface):
         return "\n".join([i for i in lines if re.search(self.get_param_value("Regex"), i)])
 
     
-    def __str__(self):
+    def __str__(self) -> str:
         return  self.execute()
 
 class reverseRegexFilterAction(actionInterface):
@@ -394,7 +394,7 @@ class reverseRegexFilterAction(actionInterface):
     Supported Types:
         text
 
-    Parameters:
+    Action Options:
         Regex (text): Regular expression pattern to exclude.
             Default: "" (empty string)
 
@@ -402,7 +402,7 @@ class reverseRegexFilterAction(actionInterface):
         >>> from userTypeParser.TextParser import TextParser
         >>> parser = TextParser("error: failed\ninfo: success\nerror: timeout")
         >>> action = reverseRegexFilterAction({"text": parser})
-        >>> action.complex_param["Regex"]["value"] = r"^error:"
+        >>> action.complex_param.get("Regex").update({"value": r"^error:"})
         >>> print(action)
         info: success
     """
@@ -418,7 +418,7 @@ class reverseRegexFilterAction(actionInterface):
             lines = self.observables.get("text")[0].splitlines()
         return "\n".join([i for i in lines if not re.search(self.get_param_value("Regex"), i)])
 
-    def __str__(self):
+    def __str__(self) -> str:
         return  self.execute()
 
 class extractRegexGroupAction(actionInterface):
@@ -430,7 +430,7 @@ class extractRegexGroupAction(actionInterface):
     Supported Types:
         text
 
-    Parameters:
+    Action Options:
         Regex (text): Regular expression with capturing groups.
             Example: r"(\w+)@(\w+\.\w+)" extracts username and domain
             Default: "" (empty string)
@@ -439,7 +439,7 @@ class extractRegexGroupAction(actionInterface):
         >>> from userTypeParser.TextParser import TextParser
         >>> parser = TextParser("user@example.com admin@test.org")
         >>> action = extractRegexGroupAction({"text": parser})
-        >>> action.complex_param["Regex"]["value"] = r"(\w+)@(\w+\.\w+)"
+        >>> action.complex_param.get("Regex").update({"value": r"(\w+)@(\w+\.\w+)"})
         >>> print(action)
         user	example.com
         admin	test.org
@@ -467,7 +467,7 @@ class extractRegexGroupAction(actionInterface):
         else:
             return ""
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of extracted groups.
 
         Calls :meth:`execute` and returns the extracted groups.
@@ -520,7 +520,7 @@ class timestampToDateAction(actionInterface):
                     return str(e)
         return "Invalid timestamp."
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of converted timestamps.
 
         Calls :meth:`execute` and returns the date strings.
@@ -565,7 +565,7 @@ class fromHexAction(actionInterface):
                 return "Invalid hexadecimal: " + str(e)
         return "No text found."
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of decoded hex.
 
         Calls :meth:`execute` and returns the decoded text.
@@ -609,7 +609,7 @@ class UrlUnquoteAction(actionInterface):
                 return "Invalid URL encoding: " + str(e)
         return "No text found."
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of decoded URL text.
 
         Calls :meth:`execute` and returns the decoded text.
@@ -654,7 +654,7 @@ class UrlQuoteAction(actionInterface):
                 return "Invalid URL encoding: " + str(e)
         return "No text found."
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of encoded URL text.
 
         Calls :meth:`execute` and returns the encoded text.
@@ -698,7 +698,7 @@ class HtmlUnquoteAction(actionInterface):
                 return "Invalid HTML encoding: " + str(e)
         return "No text found."
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of decoded HTML.
 
         Calls :meth:`execute` and returns the decoded text.
@@ -742,7 +742,7 @@ class HtmlQuoteAction(actionInterface):
                 return "Invalid HTML encoding: " + str(e)
         return "No text found."
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of encoded HTML.
 
         Calls :meth:`execute` and returns the encoded text.
@@ -787,7 +787,7 @@ class toHexAction(actionInterface):
                 return str(e)
         return "No text found."
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of hex-encoded text.
 
         Calls :meth:`execute` and returns the hex string.
@@ -806,7 +806,7 @@ class toplLinesAction(actionInterface):
     Supported Types:
         text
 
-    Parameters:
+    Action Options:
         Number of lines (text): Maximum number of lines to keep.
             Default: 10
 
@@ -814,7 +814,7 @@ class toplLinesAction(actionInterface):
         >>> from userTypeParser.TextParser import TextParser
         >>> parser = TextParser("line1\nline2\nline3\nline4\nline5")
         >>> action = toplLinesAction({"text": parser})
-        >>> action.complex_param["Number of lines"]["value"] = "3"
+        >>> action.complex_param.get("Number of lines").update({"value": "3"})
         >>> print(action)
         line1
         line2
@@ -839,7 +839,7 @@ class toplLinesAction(actionInterface):
             return "\n".join([i for i in lines[:min(int(nb), len(lines))]])
         return ""
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of truncated text.
 
         Calls :meth:`execute` and returns the first N lines.
@@ -858,7 +858,7 @@ class saveInFileAction(actionInterface):
     Supported Types:
         text
 
-    Parameters:
+    Action Options:
         Save as (save): File path where text will be saved.
             Default: ./tmp.txt
 
@@ -866,7 +866,7 @@ class saveInFileAction(actionInterface):
         >>> from userTypeParser.TextParser import TextParser
         >>> parser = TextParser("Hello, World!")
         >>> action = saveInFileAction({"text": parser})
-        >>> action.complex_param["Save as"]["value"] = "/tmp/output.txt"
+        >>> action.complex_param.get("Save as").update({"value": "/tmp/output.txt"})
         >>> result = action.execute()
         >>> print(result)
         Hello, World!
@@ -896,7 +896,7 @@ class saveInFileAction(actionInterface):
             return text
         return ""
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of saved text.
 
         Calls :meth:`execute` and returns the text that was saved.

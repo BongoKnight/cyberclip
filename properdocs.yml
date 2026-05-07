@@ -55,6 +55,9 @@ plugins:
           merge_init_into_class: true
           docstring_options:
             ignore_init_summary: true
+            warn_unknown_params: true
+            warn_missing_types: true
+            warnings: true
           show_source: false
           show_docstring_modules: true
           docstring_style: google

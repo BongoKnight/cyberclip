@@ -47,7 +47,7 @@ class JSONExtractActionv2(actionInterface):
     Supported Types:
         json, yaml
 
-    Parameters:
+    Action Options:
         Selectors (json): List of jq-style path selectors to extract.
             Examples: ".a", ".d[].a", ".[] | select(.c>2)"
             Default: []
@@ -60,7 +60,7 @@ class JSONExtractActionv2(actionInterface):
         >>> data = '{"a":"elem1","b":"elem2","c":3,"d":[{"a":"elem3","c":5}]}'
         >>> parser = JSONParser(data)
         >>> action = JSONExtractActionv2({"json": parser})
-        >>> action.complex_param["Selectors"]["value"] = [".a", ".d[].a"]
+        >>> action.complex_param.get("Selectors").update({"value": [".a", ".d[].a"]})
         >>> print(action)
         elem1
         elem3
@@ -197,7 +197,7 @@ class JSONExtractActionv2(actionInterface):
 
         return self.results
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of extracted data.
 
         Calls :meth:`execute` and formats output based on "Get only values" parameter.
@@ -259,7 +259,7 @@ class JSONBeautifierAction(actionInterface):
         self.observables = self.get_observables()
         self.results = self.observables.get("json")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of beautified JSON.
 
         Calls :meth:`execute` and formats output with 4-space indentation.
@@ -283,7 +283,7 @@ class JSONExtractAction(actionInterface):
     Supported Types:
         json, yaml
 
-    Parameters:
+    Action Options:
         Selectors (json): List of jq-style path selectors to extract.
             Examples: ".a", ".d[].a", ".[] | select(.c>2)"
             Default: []
@@ -296,7 +296,7 @@ class JSONExtractAction(actionInterface):
         >>> data = '{"a":"elem1","b":"elem2","c":3,"d":[{"a":"elem3","c":5},{"a":"elem5","c":2}]}'
         >>> parser = JSONParser(data)
         >>> action = JSONExtractAction({"json": parser})
-        >>> action.complex_param["Selectors"]["value"] = [".a", ".d[].a"]
+        >>> action.complex_param.get("Selectors").update({"value": [".a", ".d[].a"]})
         >>> print(action)
         elem1
         elem3
@@ -361,7 +361,7 @@ class JSONExtractAction(actionInterface):
                 self.filter_json(_json)
         return self.results
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of extracted data.
 
         Calls :meth:`execute` and formats output based on "Get only values" parameter.
@@ -448,7 +448,7 @@ class JSONSchemeAction(actionInterface):
                 self.get_json_paths(_json)
         return self.json_paths
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of JSON schema.
 
         Calls :meth:`execute` and formats output as one path per line.
@@ -508,7 +508,7 @@ class JSONFlattenAction(actionInterface):
             self.results[str(json)] = flatten(json)
         return self.results
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of flattened JSON.
 
         Calls :meth:`execute` and formats output as Python dictionaries.

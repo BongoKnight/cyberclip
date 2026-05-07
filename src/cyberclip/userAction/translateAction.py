@@ -108,7 +108,7 @@ class translateWithDeeplAction(actionInterface):
     Network Activity:
         Makes requests to: api.deepl.com or api-free.deepl.com
 
-    Parameters:
+    Action Options:
         Source (list): Source language code.
             Choices: AR, BG, CS, DA, DE, EL, EN, ES, ET, FI, FR, HU, ID, IT,
                      JA, KO, LT, LV, NB, NL, PL, PT, RO, RU, SK, SL, SV, TR,
@@ -126,7 +126,7 @@ class translateWithDeeplAction(actionInterface):
         >>> from userTypeParser.TextParser import TextParser
         >>> parser = TextParser("Hello, World!")
         >>> action = translateWithDeeplAction({"text": parser})
-        >>> action.complex_param["Target"]["value"] = "DE"
+        >>> action.complex_param.get("Target").update({"value": "DE"})
         >>> print(action)
         Hallo, Welt!
 
@@ -188,7 +188,7 @@ class translateWithDeeplAction(actionInterface):
             self.results = str(e)
         return self.results
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of translation results.
 
         Calls :meth:`execute` and returns translated text with quota.

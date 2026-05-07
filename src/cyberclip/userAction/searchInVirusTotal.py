@@ -62,7 +62,7 @@ class searchInVirusTotalAction(actionInterface):
         API_KEY = self.conf.get("api_key", "")
         self.headers = {"accept": "application/json", "x-apikey": API_KEY}
 
-    def execute(self):
+    def execute(self) -> list[dict]:
         """Execute VirusTotal lookups for all parsed observables.
 
         Queries the VirusTotal API for each observable (IP, domain, or file hash)
@@ -122,7 +122,12 @@ class searchInVirusTotalAction(actionInterface):
 
         return list(self.results.values())
 
-    def _fetch_relationships(self, observable, collection, relationships):
+    def _fetch_relationships(
+        self,
+        observable: str,
+        collection: str,
+        relationships: list[str],
+    ) -> None:
         """Fetch full relationship content for an observable.
 
         Args:
@@ -153,7 +158,7 @@ class searchInVirusTotalAction(actionInterface):
                 # Silently skip failed relationship fetches
                 pass
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of VirusTotal results.
 
         Calls :meth:`execute` and formats output as indented JSON.
