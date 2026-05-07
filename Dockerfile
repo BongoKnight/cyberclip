@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 FROM python:3.12-slim AS final
 
 # Add non-root user
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup --home /app appuser
 
 # Pull packages
 COPY --from=builder /venv /venv

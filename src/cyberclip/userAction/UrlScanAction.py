@@ -2,10 +2,9 @@ try:
     from userAction.actionInterface import actionInterface
 except:
     from actionInterface import actionInterface
-import urllib.parse
-import requests
 import json
 import urllib
+import requests
 
 BASE_SEARCH_URL = "https://urlscan.io/api/v1/search/"
 
