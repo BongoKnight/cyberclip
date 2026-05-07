@@ -9,6 +9,7 @@ def test_load_conf_normalizes_key_separators(monkeypatch):
         return {
             "MODAT_API-KEY": "hyphen-token",
             "URLSCAN_API_KEY": "underscore-token",
+            "SHODAN_API-KEY": "shodan-token",
         }
 
     action_interface_module = importlib.import_module(
@@ -20,6 +21,7 @@ def test_load_conf_normalizes_key_separators(monkeypatch):
 
     assert action.load_conf("Modat") == {"api_key": "hyphen-token"}
     assert action.load_conf("UrlScan") == {"api_key": "underscore-token"}
+    assert action.load_conf("Shodan") == {"api_key": "shodan-token"}
 
 
 class TestFindDelimiter:

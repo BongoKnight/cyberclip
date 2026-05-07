@@ -1,6 +1,6 @@
 from textual import events
 from textual.widgets import Static, Label, SelectionList
-from textual.containers import Horizontal
+from textual.containers import Vertical
 from textual.app import ComposeResult
 from textual.reactive import var
 from textual import on
@@ -11,13 +11,19 @@ class SelectionInput(Static):
     label = var("")
     DEFAULT_CSS = """
     SelectionInput{
-        height: 1fr;
-        max-height: 10;
+        height: auto;
+        margin-bottom: 1;
+    }
+    SelectionInput > Vertical {
+        height: auto;
+    }
+    SelectionInput Label {
+        height: 1;
     }
     SelectionList {
         padding: 1;
         border: solid $primary;
-        max-height: 10;
+        height: 10;
         margin: 0;
     }
     """
@@ -31,7 +37,7 @@ class SelectionInput(Static):
         self.query_one(SelectionList).border_title = self.label
 
     def compose(self) -> ComposeResult:
-        yield Horizontal(
+        yield Vertical(
             Label(self.label, markup=False),
             SelectionList[str](*[(str(choice), choice, str(choice) in self.default) for choice in self.choices])
             )
