@@ -18,10 +18,12 @@ import re
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
+import yaml
+
 
 class clipParser:
 
-    def __init__(self, include="", exclude=""):
+    def __init__(self, include="", exclude="", actions_config_path=None):
         logging.basicConfig(
             level=logging.DEBUG,
             format="%(asctime)s %(levelname)s %(funcName)s %(message)s",
@@ -33,6 +35,11 @@ class clipParser:
         self.parsers = dict()
         self.include = include
         self.exclude = exclude
+        self.actions_config_path = actions_config_path or (
+            Path(__file__).parent / "data" / "actions.yml"
+        )
+        self.enabled_action_names = None
+        self.disabled_action_names = set()
         self.data = ""
         self.results = {}
         self.matches = {}
@@ -48,6 +55,41 @@ class clipParser:
         ]
         # self.log.addHandler(RichHandler(rich_tracebacks=True, markup=True, level=logging.INFO))
         self.log.info("ClipParser created.")
+
+    def load_actions_config(self):
+        self.enabled_action_names = None
+        self.disabled_action_names = set()
+        config_path = Path(self.actions_config_path)
+
+        if not config_path.exists():
+            return
+
+        try:
+            with open(config_path, encoding="utf8") as f:
+                config = yaml.safe_load(f) or {}
+        except Exception as e:
+            self.log.error(f"Error while loading action config from {config_path}: {e}")
+            return
+
+        enabled = config.get("enabled")
+        disabled = config.get("disabled", [])
+
+        if isinstance(enabled, list):
+            enabled_names = {str(name) for name in enabled if str(name).strip()}
+            if enabled_names:
+                self.enabled_action_names = enabled_names
+        if isinstance(disabled, list):
+            self.disabled_action_names = {
+                str(name) for name in disabled if str(name).strip()
+            }
+
+    def is_action_enabled(self, action_instance):
+        action_name = getattr(action_instance, "description", "")
+        if not action_name:
+            return False
+        if self.enabled_action_names is not None:
+            return action_name in self.enabled_action_names
+        return action_name not in self.disabled_action_names
 
     def moduleLoader(self, module_instance, module_name, include=".", exclude=""):
         """
@@ -83,6 +125,7 @@ class clipParser:
         self.log.debug("Initiate parser and action loading.")
         self.parsers = dict()
         self.actions = dict()
+        self.load_actions_config()
         data = ""
         self.parserModuleImport = self.moduleLoader(userTypeParser, "userTypeParser")
         self.privateParserModuleImport = self.moduleLoader(
@@ -133,7 +176,9 @@ class clipParser:
                     instance = self.create_instance(
                         classes, className, parsers=self.parsers
                     )
-                    if hasattr(instance, "description"):
+                    if hasattr(instance, "description") and self.is_action_enabled(
+                        instance
+                    ):
                         # Adding action in a dict of all parsers relative to the input
                         self.actions.update({instance.description: instance})
 

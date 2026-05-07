@@ -1,7 +1,12 @@
 import pandas as pd
 from io import StringIO
-from userTypeParser.ParserInterface import ParserInterface
-from utilities import find_delimiter
+
+try:
+    from userTypeParser.ParserInterface import ParserInterface
+    from utilities import find_delimiter
+except ImportError:
+    from ParserInterface import ParserInterface
+    from cyberclip.utilities import find_delimiter
 
 
 class csvParser(ParserInterface):
@@ -25,6 +30,7 @@ class csvParser(ParserInterface):
         >>> parser.extract()
         ['col1,col2,col3\\nval1,val2,val3\\n']
     """
+
     def __init__(self, text: str, parsertype="csv"):
         self.text = text
         self.parsertype = "csv"
@@ -37,13 +43,17 @@ class csvParser(ParserInterface):
             bool: True if the text can be parsed as CSV with at least one column.
         """
         try:
-            df = pd.read_csv(StringIO(self.text), sep=find_delimiter(self.text), skip_blank_lines=False)
+            df = pd.read_csv(
+                StringIO(self.text),
+                sep=find_delimiter(self.text),
+                skip_blank_lines=False,
+            )
             self.objects = df
             if len(df.columns) >= 1:
                 return True
             else:
                 return False
-        except :
+        except:
             return False
 
     def extract(self) -> list[str]:
@@ -53,9 +63,9 @@ class csvParser(ParserInterface):
             list[str]: A list containing the CSV data as a string.
         """
         return [str(self.objects.to_csv(sep=find_delimiter(self.text)))]
-        
-        
-if __name__=="__main__":
+
+
+if __name__ == "__main__":
     a = csvParser("ccdf ")
     b = csvParser("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     print(a.extract(), a.contains())

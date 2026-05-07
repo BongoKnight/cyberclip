@@ -1,8 +1,11 @@
 import re
+import ipaddress
+
 try:
     from userTypeParser.ParserInterface import ParserInterface
 except:
     from ParserInterface import ParserInterface
+
 
 class ipv4Parser(ParserInterface):
     r"""Parse and extract IPv4 addresses from text.
@@ -25,6 +28,7 @@ class ipv4Parser(ParserInterface):
         >>> parser.extract()
         ['192.168.1.1', '10.0.0.1']
     """
+
     def __init__(self, text: str, parsertype="ip"):
         self.text = text
         self.parsertype = "ip"
@@ -36,9 +40,9 @@ class ipv4Parser(ParserInterface):
         Returns:
             bool: True if at least one IPv4 address is found in the text.
         """
-        if re.search(r"\b([0-9]{1,3}(\.|\[\.\])){3}[0-9]{1,3}\b",self.text) :
+        if re.search(r"\b([0-9]{1,3}(\.|\[\.\])){3}[0-9]{1,3}\b", self.text):
             return True
-        else :
+        else:
             return False
 
     def extract(self) -> list[str]:
@@ -50,7 +54,7 @@ class ipv4Parser(ParserInterface):
             list[str]: A list of extracted IPv4 address values.
         """
         ipsIter = re.finditer(r"\b([0-9]{1,3}(\.|\[\.\])){3}[0-9]{1,3}\b", self.text)
-        ips = [ip.group().replace("[.]",".") for ip in ipsIter]
+        ips = [ip.group().replace("[.]", ".") for ip in ipsIter]
         self.objects = ips
         return ips
 
@@ -89,9 +93,9 @@ class CIDRParser(ParserInterface):
         Returns:
             bool: True if at least one CIDR notation is found in the text.
         """
-        if re.search(r"\b([0-9]{1,3}(\.|\[\.\])){3}[0-9]{1,3}\/\d{1,2}\b",self.text) :
+        if re.search(r"\b([0-9]{1,3}(\.|\[\.\])){3}[0-9]{1,3}\/\d{1,2}\b", self.text):
             return True
-        else :
+        else:
             return False
 
     def extract(self) -> list[str]:
@@ -102,10 +106,13 @@ class CIDRParser(ParserInterface):
         Returns:
             list[str]: A list of extracted CIDR notation values.
         """
-        ipsIter = re.finditer(r"\b([0-9]{1,3}(\.|\[\.\])){3}[0-9]{1,3}\/\d{1,2}\b", self.text)
-        ips = [ip.group().replace("[.]",".") for ip in ipsIter]
+        ipsIter = re.finditer(
+            r"\b([0-9]{1,3}(\.|\[\.\])){3}[0-9]{1,3}\/\d{1,2}\b", self.text
+        )
+        ips = [ip.group().replace("[.]", ".") for ip in ipsIter]
         self.objects = ips
         return ips
+
 
 class ipv6Parser(ParserInterface):
     r"""Parse and extract IPv6 addresses from text.
@@ -128,37 +135,42 @@ class ipv6Parser(ParserInterface):
         >>> parser.extract()
         ['2001:0db8::1', 'fe80::1']
     """
+
     def __init__(self, text: str, parsertype="ipv6"):
         self.text = text
         self.parsertype = "ipv6"
         self.objects = []
 
-    def contains(self) -> bool:
-        """Check whether the text contains at least one IPv6 address.
+    def contains(self):
+        return len(self.extract()) > 0
 
-        Returns:
-            bool: True if at least one IPv6 address is found in the text.
-        """
-        if re.search(r"(\b|^)(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(\b|$)",self.text) :
-            return True
-        else :
-            return False
+    def extract(self):
+        candidates = re.findall(r"[0-9A-Fa-f:]{2,}", self.text)
 
-    def extract(self) -> list[str]:
-        """Extract all IPv6 address instances from the text.
+        ips = []
+        for cand in candidates:
+            cand = cand.strip().strip("[](){}<>,;\"'")
+            if ":" not in cand:
+                continue
+            try:
+                ip_obj = ipaddress.ip_address(cand)
+                if isinstance(ip_obj, ipaddress.IPv6Address):
+                    ips.append(str(ip_obj))
+            except ValueError:
+                continue
 
-        Defanged notation is normalized to standard format. Whitespace is stripped from matches.
+        seen = set()
+        unique = []
+        for ip in ips:
+            if ip not in seen:
+                seen.add(ip)
+                unique.append(ip)
 
-        Returns:
-            list[str]: A list of extracted IPv6 address values.
-        """
-        ipsIter = re.finditer(r"(\b|^)(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(\b|$)", self.text)
-        ips = [ip.group().replace("[.]",".") for ip in ipsIter]
-        ips = [re.sub(r"([\s\r\n\t]|^|$)", r'', ip) for ip in ips]
-        self.objects = ips
-        return ips
-        
-if __name__=="__main__":
+        self.objects = unique
+        return unique
+
+
+if __name__ == "__main__":
     a = ipv4Parser("1212.1.2.3")
     b = ipv4Parser("1.2.3[.]4")
     c = ipv6Parser("2001:41D0:1:2E4e::1")

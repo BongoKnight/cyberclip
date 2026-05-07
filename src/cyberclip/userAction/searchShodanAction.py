@@ -65,8 +65,8 @@ class searchInShodanAction(actionInterface):
         self.description = "Shodan: Search IP"
         self.indicators = "🔑"
         self.load_conf("Shodan")
-        if self.conf.get("API_KEY", ""):
-            self.api = shodan.Shodan(self.conf.get("API_KEY", ""))
+        if self.conf.get("api_key", ""):
+            self.api = shodan.Shodan(self.conf.get("api_key", ""))
         else:
             self.api = None
 

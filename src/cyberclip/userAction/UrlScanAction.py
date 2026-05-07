@@ -2,82 +2,46 @@ try:
     from userAction.actionInterface import actionInterface
 except:
     from actionInterface import actionInterface
+import urllib.parse
+import requests
 import json
 import urllib
-import urllib.parse
-
-import requests
 
 BASE_SEARCH_URL = "https://urlscan.io/api/v1/search/"
 
 
 class SearchInUrlScanAction(actionInterface):
-    r"""Search for IPs, domains, and analytics IDs on URLScan.io.
-
-    Queries the URLScan.io search API to find scans containing the specified
-    observables. Returns up to 20 results per observable.
-
-    Supported Types:
-        ip, domain, analytics
-
-    Configuration:
-        Requires the following in ``.env``::
-
-            UrlScan:
-            - API_KEY: <your URLScan.io API key>
-
-    Network Activity:
-        Makes requests to: urlscan.io/api/v1/search
-
-    Example:
-        ```python
-        from userTypeParser.domainParser import domainParser
-        parser = domainParser("example.com")
-        action = SearchInUrlScanAction({"domain": parser})
-        results = action.execute()
-        print(results["example.com"]["total"])
-        42
-        ```
-    """
+    """An action module to search IP and domains on URLScan. This action runs a search query per observable and returns up to 20 results for each IP, domain, or analytics value."""
 
     def __init__(self, parsers={}, supportedType={"ip", "domain", "analytics"}):
         super().__init__(parsers=parsers, supportedType=supportedType)
         self.description = "UrlScan: Search IoC"
         self.indicators = "🔑"
         self.load_conf("UrlScan")
-        API_KEY = self.conf.get("API_KEY", "")
-        self.headers = {"accept": "application/json", "API-Key": API_KEY}
+        API_KEY = self.conf.get("api_key", "")
+        self.headers = {"accept": "application/json"}
+        if API_KEY:
+            self.headers["API-Key"] = API_KEY
 
     def execute(self) -> object:
-        """Execute URLScan searches on all parsed observables.
-
-        Queries URLScan API for each IP, domain, or analytics ID.
-
-        Returns:
-            dict[str, dict | str]: Keys are observables, values are URLScan
-                search result JSON or error messages.
-        """
         self.results = {}
         observables = []
+        self.observables = self.get_observables()
         for parsertype in self.supportedType:
-            observables += self.get_observables().get(parsertype, [])
+            observables += self.observables.get(parsertype, [])
         for observable in set(observables):
             try:
-                query_url = BASE_SEARCH_URL + f"?q={observable}&size=20"
-                response = requests.get(query_url, headers=self.headers)
+                query_url = (
+                    BASE_SEARCH_URL + f"?q={urllib.parse.quote(observable)}&size=20"
+                )
+                response = requests.get(query_url, headers=self.headers, timeout=15)
+                response.raise_for_status()
                 self.results.update({observable: response.json()})
             except Exception as e:
                 self.results.update({observable: str(e)})
         return self.results
 
     def __str__(self):
-        """Return human-readable representation of search results.
-
-        Calls :meth:`execute` and formats output as JSON per observable.
-
-        Returns:
-            str: JSON-formatted search results, one per line.
-        """
         self.execute()
         return "\r\n".join(json.dumps(value) for value in self.results.values())
 
@@ -85,45 +49,19 @@ class SearchInUrlScanAction(actionInterface):
 DEFAULT_QUERY_PARAMETERS = {
     "Query": {"type": "text", "value": "*"},
     "Max results": {"type": "text", "value": "20"},
+    "Result mode": {"type": "bool", "value": False},
+    "Include DOM": {"type": "bool", "value": False},
 }
 
 
 class QueryUrlScanAction(actionInterface):
-    r"""Query URLScan.io with custom search queries.
+    """An action module to query the URLScan API. An API key may be required depending on the query and rate limits.
 
-    Performs custom search queries against the URLScan.io database using their
-    search syntax. Supports filtering by domain, IP, page content, and more.
+    Use this action to retrieve either standard search results or detailed results for matching scans.
 
-    Supported Types:
-        text
-
-    Configuration:
-        Requires the following in ``.env``::
-
-            UrlScan:
-            - API_KEY: <your URLScan.io API key>
-
-    Network Activity:
-        Makes requests to: urlscan.io/api/v1/search
-
-    Parameters:
-        Query (text): URLScan search query.
-            Examples: "domain:example.com", "page.ip:8.8.8.8", "*"
-            Default: *
-        Max results (text): Maximum number of results to return.
-            Default: 20
-
-    Example:
-        >>> from userTypeParser.TextParser import TextParser
-        >>> parser = TextParser("domain:example.com")
-        >>> action = QueryUrlScanAction({"text": parser})
-        >>> action.complex_param["Query"]["value"] = "domain:example.com"
-        >>> results = action.execute()
-        >>> print(results["total"])
-        42
-
-    Note:
-        Query syntax: https://urlscan.io/docs/search/
+    Options:
+    - Result mode: return detailed scan results instead of search results
+    - Include DOM: also fetch the DOM snapshot for each matching scan
     """
 
     def __init__(
@@ -135,17 +73,76 @@ class QueryUrlScanAction(actionInterface):
         self.description = "UrlScan: Query"
         self.indicators = "🔑"
         self.load_conf("UrlScan")
-        API_KEY = self.conf.get("API_KEY", "")
-        self.headers = {"accept": "application/json", "API-Key": API_KEY}
+        API_KEY = self.conf.get("api_key", "")
+        self.headers = {"accept": "application/json"}
+        if API_KEY:
+            self.headers["API-Key"] = API_KEY
+        self._dom_cache = {}
+        self._result_cache = {}
+
+    def _extract_scan_ids(self, search_json):
+
+        its = search_json.get("results", [])
+        scan_ids = []
+
+        for it in its:
+
+            sid = None
+
+            result_url = it.get("result")
+
+            if result_url and "/api/v1/result/" in result_url:
+                sid = result_url.split("/api/v1/result/")[1].strip("/")
+
+            if not sid:
+                sid = it.get("_id")
+
+            if not sid:
+                task = it.get("task", {})
+                if isinstance(task, dict):
+                    sid = task.get("uuid")
+
+            if sid:
+                scan_ids.append(sid)
+
+        # remove duplicates while preserving order
+        seen = set()
+        unique_scan_ids = []
+
+        for sid in scan_ids:
+            if sid not in seen:
+                seen.add(sid)
+                unique_scan_ids.append(sid)
+
+        return unique_scan_ids
+
+    def _fetch_result(self, scan_id):
+        if scan_id in self._result_cache:
+            return self._result_cache[scan_id]
+
+        url = f"https://urlscan.io/api/v1/result/{scan_id}/"
+
+        r = requests.get(url, headers=self.headers, timeout=15)
+        r.raise_for_status()
+
+        data = r.json()
+
+        self._result_cache[scan_id] = data
+
+        return data
+
+    def _fetch_dom(self, scan_id: str) -> str:
+        """Fetch DOM snapshot text for a given urlscan scanId."""
+        if scan_id in self._dom_cache:
+            return self._dom_cache[scan_id]
+        dom_url = f"https://urlscan.io/dom/{scan_id}/"
+        r = requests.get(dom_url, headers=self.headers, timeout=15)
+        r.raise_for_status()
+        dom = r.text
+        self._dom_cache[scan_id] = dom
+        return dom
 
     def execute(self):
-        """Execute custom URLScan query.
-
-        Sends configured query to URLScan API with result limit.
-
-        Returns:
-            dict: URLScan search result JSON or error dict.
-        """
         self.results = {}
         try:
             query = self.get_param_value("Query")
@@ -154,21 +151,56 @@ class QueryUrlScanAction(actionInterface):
                 if str(self.get_param_value("Max results")).isdecimal()
                 else 20
             )
-            query_url = BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size={limit}"
-            response = requests.get(query_url, headers=self.headers)
-            self.results = response.json()
+            result_mode = bool(self.get_param_value("Result mode"))
+            include_dom = bool(self.get_param_value("Include DOM"))
+            if not (result_mode):
+                query_url = (
+                    BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size={limit}"
+                )
+                response = requests.get(query_url, headers=self.headers, timeout=15)
+                response.raise_for_status()
+                self.results = response.json()
+                if include_dom:
+                    scan_ids = self._extract_scan_ids(self.results)
+                    dom_map = {}
+                    for sid in scan_ids[:limit]:
+                        try:
+                            dom_map[sid] = self._fetch_dom(sid)
+                        except Exception as e:
+                            dom_map[sid] = f"ERROR: {e}"
+                    self.results["_dom"] = dom_map
+
+            else:
+                search_url = (
+                    BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size={limit}"
+                )
+                search_response = requests.get(
+                    search_url, headers=self.headers, timeout=15
+                )
+                search_response.raise_for_status()
+                search_json = search_response.json()
+                scan_ids = self._extract_scan_ids(search_json)
+                results = []
+
+                for sid in scan_ids[:limit]:
+                    try:
+                        entry = {"scanId": sid, "result": self._fetch_result(sid)}
+                        if include_dom:
+                            try:
+                                entry["dom"] = self._fetch_dom(sid)
+                            except Exception as e:
+                                entry["dom_error"] = str(e)
+                        results.append(entry)
+                    except Exception as e:
+                        results.append({"scanId": sid, "error": str(e)})
+
+                self.results = results
+
         except Exception as e:
             self.results = {"error": str(e)}
         return self.results
 
     def __str__(self):
-        """Return human-readable representation of query results.
-
-        Calls :meth:`execute` and formats output as indented JSON.
-
-        Returns:
-            str: JSON-formatted query results.
-        """
         self.execute()
         return json.dumps(self.results)
 
@@ -186,7 +218,7 @@ class ResultFromUrlScanAction(actionInterface):
         Requires the following in ``.env``::
 
             UrlScan:
-            - API_KEY: <your URLScan.io API key>
+            - api_key: <your URLScan.io API key>
 
     Network Activity:
         Makes requests to: urlscan.io/api/v1/result/*
@@ -206,7 +238,7 @@ class ResultFromUrlScanAction(actionInterface):
         self.description = "UrlScan: Get full results"
         self.indicators = "🔑"
         self.load_conf("UrlScan")
-        API_KEY = self.conf.get("API_KEY", "")
+        API_KEY = self.conf.get("api_key", "")
         self.headers = {"accept": "application/json", "API-Key": API_KEY}
 
     def execute(self):
