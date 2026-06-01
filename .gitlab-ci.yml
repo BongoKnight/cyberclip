@@ -36,6 +36,7 @@ docker-container:
   variables:
     CONTAINER_BUILD_IMAGE: $CI_REGISTRY_IMAGE:latest 
   script:
+    - buildah login -u "$CI_REGISTRY_USER" --password $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - buildah pull $CONTAINER_BUILD_IMAGE || true
     - >
       buildah bud
