@@ -21,6 +21,8 @@ RUN addgroup --system appgroup && adduser --system --ingroup appgroup --home /ap
 # Pull packages
 COPY --from=builder /venv /venv
 RUN chown -R appuser:appgroup /venv/lib/python3.12/site-packages/cyberclip/data
+RUN touch /venv/lib/python3.12/site-packages/cyberclip/log.log \
+    && chown appuser:appgroup /venv/lib/python3.12/site-packages/cyberclip/log.log
 
 ENV PATH="/venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
