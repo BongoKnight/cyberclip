@@ -1,7 +1,8 @@
 import os
 import sys
-from dotenv import dotenv_values
 from pathlib import Path
+
+from dotenv import dotenv_values
 
 script_dir = os.path.dirname(__file__)
 parser_dir = os.path.join(script_dir, "..")
@@ -106,8 +107,11 @@ class actionInterface:
     def load_conf(self, conf_name, path="../.env"):
         conf = {}
         try:
-            env = dotenv_values(Path(__file__).parent / path)
-            for key, value in env.items():
+            dotenv_vars = dotenv_values(Path(__file__).parent / path)
+            env_vars = dict(os.environ)
+            merged = {**env_vars, **dotenv_vars}
+
+            for key, value in merged.items():
                 normalized_key = key.lower().replace("-", "_")
                 normalized_conf_name = conf_name.lower().replace("-", "_")
                 prefix = f"{normalized_conf_name}_"
@@ -115,7 +119,7 @@ class actionInterface:
                     key_name = normalized_key.removeprefix(prefix)
                     conf[key_name] = value
             self.conf = dict(conf)
-        except Exception as e:
+        except Exception:
             print("Error while loading config from .env")
         return self.conf
 
