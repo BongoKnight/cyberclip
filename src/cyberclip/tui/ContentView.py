@@ -1,11 +1,11 @@
 import re
 from functools import partial
 
-from textual import events, work, on
-from textual.reactive import var, reactive
-from textual.containers import Vertical, ScrollableContainer
-from textual.widgets import Static, Button, Input, Switch, Label, Select, TextArea
+from textual import events, on, work
 from textual.app import ComposeResult
+from textual.containers import ScrollableContainer, Vertical
+from textual.reactive import reactive, var
+from textual.widgets import Button, Input, Label, Select, Static, Switch, TextArea
 
 try:
     from cyberclip.tui.ContentToolbar import ContentToolbar
@@ -59,11 +59,11 @@ class ContentView(Static):
     def update_text(self, new_text: str, force=False) -> None:
         """Called when the text attribute changes."""
         try:
-            from cyberclip.tui.DataTypePannel import DataTypeButton, DataLoader
-            from cyberclip.tui.ActionPannel import ActionPannel, ActionButton
+            from cyberclip.tui.ActionPannel import ActionButton, ActionPannel
+            from cyberclip.tui.DataTypePannel import DataLoader, DataTypeButton
         except ImportError:
-            from tui.DataTypePannel import DataTypeButton, DataLoader
-            from tui.ActionPannel import ActionPannel, ActionButton
+            from tui.ActionPannel import ActionButton, ActionPannel
+            from tui.DataTypePannel import DataLoader, DataTypeButton
 
         textArea = self.query_one(TextArea)
         textArea.replace(
@@ -76,13 +76,14 @@ class ContentView(Static):
         )
         parser_types = list(self.app.parser.detectedType)
         parser_types.sort()
-        # Update detected type buttons
+
         buttons = self.parent.query(DataTypeButton)
         if buttons:
             for button in buttons:
                 button.remove()
         for type_of_data in parser_types:
             self.parent.query_one(DataLoader).add_dataType(type_of_data, active=True)
+
         existing_action = set()
         valid_action_names = set(self.app.parser.actions.keys())
         for action_name, action in self.app.parser.actions.items():
@@ -94,9 +95,7 @@ class ContentView(Static):
             if action_button.action_name not in valid_action_names:
                 action_button.remove()
 
-        # Add inexisting action buttons
         actions = list(self.app.parser.actions.items())
-        # Sort action by name
         actions.sort(key=lambda tup: tup[0])
         for action_name, action in actions:
             if action_name not in existing_action:
@@ -105,8 +104,6 @@ class ContentView(Static):
         for action in self.parent.query(ActionButton):
             action.actionnable.supportedType = set(action.action_supported_type)
             action.actionnable.parsers = self.app.parser.parsers
+
         self.parent.query_one(ActionPannel).refresh_recipe_buttons()
-        # for action in self.app.parser.actions.values():
-        #     action.parsers = self.app.parser.parsers
-        # Filter action on existing active datatype
         self.app.call_after_refresh(self.filter_action)

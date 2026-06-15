@@ -17,7 +17,7 @@ class extractAction(actionInterface):
         domain, analytics, md5, sha1, sha256, ja3, ja4, url, ip, cve,
         mittre, ipv6, phone, email, text
 
-    Parameters:
+    Action Options:
         Extract (tags): Observable types to extract. Use "all" for everything
             or specify types like ["ip", "domain", "md5"].
             Default: ["all"]
@@ -60,7 +60,7 @@ class extractAction(actionInterface):
                 self.observables.update({parser_name:parser.extract()})
         return self.observables
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of extracted observables.
 
         Calls :meth:`execute` and formats output based on Extract parameter.

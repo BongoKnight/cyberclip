@@ -1,7 +1,7 @@
 import importlib
 
-from cyberclip.utilities import find_delimiter
 from cyberclip.userAction.actionInterface import actionInterface
+from cyberclip.utilities import find_delimiter
 
 
 def test_load_conf_normalizes_key_separators(monkeypatch):

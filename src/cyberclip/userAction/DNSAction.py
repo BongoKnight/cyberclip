@@ -22,7 +22,7 @@ class DNSAction(actionInterface):
     Network Activity:
         Makes DNS queries to configured DNS resolvers.
 
-    Parameters:
+    Action Options:
         Records (tags): DNS record types to query for domains.
             Common values: A, AAAA, MX, TXT, SOA, NS, CNAME, SPF, DMARC
             Default: ["A", "TXT", "SOA", "NS", "MX"]
@@ -78,7 +78,7 @@ class DNSAction(actionInterface):
                 self.dns_results.update({domain:dns_records})
         return self.dns_results
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of DNS results.
 
         Calls :meth:`execute` and formats output as TSV (tab-separated values).

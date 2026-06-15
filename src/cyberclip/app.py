@@ -18,6 +18,11 @@ from textual.widgets import Footer, TabbedContent, TabPane, TextArea
 try:
     from cyberclip.clipboardHandler import get_clipboard_text
     from cyberclip.clipParser import clipParser
+    from cyberclip.data_paths import (
+        get_package_data_dir,
+        get_recipes_path,
+        load_yaml_list,
+    )
     from cyberclip.tui.ActionPannel import ActionCommands, ActionPannel
     from cyberclip.tui.ConfigScreen import ActionConfigScreen
     from cyberclip.tui.ContentView import ContentView
@@ -28,15 +33,11 @@ try:
     from cyberclip.userAction.actionInterface import actionInterface
     from cyberclip.userTypeParser import CSVParser
     from cyberclip.userTypeParser.ParserInterface import ParserInterface
-    from cyberclip.data_paths import (
-        get_package_data_dir,
-        get_recipes_path,
-        load_yaml_list,
-    )
     from cyberclip.utilities import clean_tsv, find_delimiter
-except:
+except ImportError:
     from clipboardHandler import get_clipboard_text
     from clipParser import clipParser
+    from data_paths import get_package_data_dir, get_recipes_path, load_yaml_list
     from tui.ActionPannel import ActionCommands, ActionPannel
     from tui.ConfigScreen import ActionConfigScreen
     from tui.ContentView import ContentView
@@ -47,7 +48,6 @@ except:
     from userAction.actionInterface import actionInterface
     from userTypeParser import CSVParser
     from userTypeParser.ParserInterface import ParserInterface
-    from data_paths import get_package_data_dir, get_recipes_path, load_yaml_list
     from utilities import clean_tsv, find_delimiter
 
 
@@ -117,7 +117,6 @@ class ClipBrowser(App):
 
     parser = var(clipParser())
     recipe_parser = var(clipParser())
-    # graph = var(nx.DiGraph())
     active_node = var({})
     text = reactive("Waiting for Update...", init=False)
     active_tab: str = ""
@@ -178,8 +177,6 @@ class ClipBrowser(App):
                 yield FiltrableDataFrame(pd.DataFrame(), id="main-table")
             with TabPane("Recipes", id="recipes"):
                 yield RecipesPannel()
-            # with TabPane("Graph View", id="graphview"):
-            #     yield GraphPannel()
         yield Footer()
         self.register_theme(self.orange_theme)
         self.register_theme(self.orange_theme_light)
@@ -278,7 +275,7 @@ class ClipBrowser(App):
                 self.push_screen(
                     param_screen, callback=partial(self.handle_param, actionnable)
                 )
-            except:
+            except Exception:
                 self.notify(
                     f"Error while executing action : {traceback.format_exc()}",
                     severity="error",
@@ -298,21 +295,6 @@ class ClipBrowser(App):
                 self.text = await self.parser.apply_actionable(
                     actionnable, self.query_one(TextArea).text
                 )
-
-                # # Add executed action to graph view
-                # previous_node = self.active_node
-                # _node = {
-                #         "label": actionnable.description,
-                #         "supported":actionnable.supportedType,
-                #         "params":actionnable.complex_param
-                #         }
-                # action_node = add_node(self.graph, _node, "action", previous_node)
-                # text_node = {"text":self.text, "detected":self.parser.detectedType}
-                # self.active_node = add_node(self.graph, text_node, "text", action_node)
-                # if not self.graph.get_edge_data(previous_node.get("id"),action_node.get("id")):
-                #     self.graph.add_edge(previous_node.get("id"), action_node.get("id"))
-                #     self.graph.add_edge(action_node.get("id"), self.active_node.get("id"))
-
             except Exception as e:
                 self.notify(
                     "Error applying action..." + str(e) + traceback.format_exc(),

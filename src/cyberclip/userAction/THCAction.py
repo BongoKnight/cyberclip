@@ -17,7 +17,7 @@ class SubdomainTHCDNSAction(actionInterface):
     Network Activity:
         Makes requests to: ip.thc.org/api/v1/subdomains/download
 
-    Parameters:
+    Action Options:
         Limit (text): Maximum number of subdomains to retrieve per domain.
             Default: 100
 
@@ -26,7 +26,7 @@ class SubdomainTHCDNSAction(actionInterface):
         >>> parser = domainParser("example.com")
         >>> action = SubdomainTHCDNSAction({"domain": parser})
         >>> results = action.execute()
-        >>> print(results["example.com"][:3])
+        >>> print(results.get("example.com"))
         ['www.example.com', 'mail.example.com', 'ftp.example.com']
 
     Note:
@@ -63,7 +63,7 @@ class SubdomainTHCDNSAction(actionInterface):
         return self.results
 
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of subdomain results.
 
         Calls :meth:`execute` and formats output as one subdomain per line.
@@ -89,7 +89,7 @@ class THCCNAMEAction(actionInterface):
     Network Activity:
         Makes requests to: ip.thc.org/api/v1/cnames/download
 
-    Parameters:
+    Action Options:
         Limit (text): Maximum number of CNAME records to retrieve per domain.
             Default: 100
 
@@ -98,7 +98,7 @@ class THCCNAMEAction(actionInterface):
         >>> parser = domainParser("example.com")
         >>> action = THCCNAMEAction({"domain": parser})
         >>> results = action.execute()
-        >>> print(results["example.com"][:2])
+        >>> print(results.get("example.com"))
         ['alias1.example.com,target1.example.com', 'alias2.example.com,target2.example.com']
 
     Note:
@@ -134,7 +134,7 @@ class THCCNAMEAction(actionInterface):
         return self.results
 
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of CNAME results.
 
         Calls :meth:`execute` and formats output as one CNAME per line.
@@ -160,7 +160,7 @@ class THCReverseDNSAction(actionInterface):
     Network Activity:
         Makes requests to: ip.thc.org/api/v1/download
 
-    Parameters:
+    Action Options:
         Limit (text): Maximum number of domains to retrieve per IP/CIDR.
             Default: 100
 
@@ -169,7 +169,7 @@ class THCReverseDNSAction(actionInterface):
         >>> parser = ipv4Parser("8.8.8.8")
         >>> action = THCReverseDNSAction({"ip": parser})
         >>> results = action.execute()
-        >>> print(results["8.8.8.8"][:2])
+        >>> print(results.get("8.8.8.8"))
         ['dns.google', 'google-public-dns-a.google.com']
 
     Note:
@@ -214,7 +214,7 @@ class THCReverseDNSAction(actionInterface):
         return self.results
 
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of reverse DNS results.
 
         Calls :meth:`execute` and formats output as one domain per line.

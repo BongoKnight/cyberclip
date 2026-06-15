@@ -2,25 +2,24 @@ image: python:3.12
 
 .python-before: &python-before
   before_script:
-    - pip install mkdocs mkdocs-gen-files mkdocs-material mkdocs-autorefs mkdocstrings-python
+    - pip install properdocs mkdocs-gen-files mkdocs-material mkdocs-autorefs mkdocstrings-python
 
 test:
   stage: test
   <<: *python-before
   script:
-  - mkdocs build --strict --verbose --site-dir test
+  - properdocs build --strict --verbose --site-dir test
   artifacts:
     paths:
     - test
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
-
 pages:
   stage: deploy
   <<: *python-before
   script:
-  - mkdocs build --strict --verbose --site-dir public
+  - properdocs build --strict --verbose --site-dir public
   artifacts:
     paths:
     - public
@@ -37,6 +36,7 @@ docker-container:
   variables:
     CONTAINER_BUILD_IMAGE: $CI_REGISTRY_IMAGE:latest 
   script:
+    - buildah login -u "$CI_REGISTRY_USER" --password $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - buildah pull $CONTAINER_BUILD_IMAGE || true
     - >
       buildah bud
@@ -51,4 +51,3 @@ docker-container:
     - buildah push --storage-driver=vfs $CONTAINER_BUILD_IMAGE $CONTAINER_BUILD_IMAGE
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-

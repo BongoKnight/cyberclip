@@ -1,7 +1,8 @@
 import os
 import sys
-from dotenv import dotenv_values
 from pathlib import Path
+
+from dotenv import dotenv_values
 
 script_dir = os.path.dirname(__file__)
 parser_dir = os.path.join(script_dir, "..")
@@ -43,7 +44,16 @@ class actionInterface:
 
     """
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        parsers: dict[str, ParserInterface] | None = None,
+        supportedType: set[str] | None = None,
+        description: str = "",
+        indicators: str = "",
+        complex_param: dict[str, dict] | None = None,
+        conf: dict | None = None,
+        **kwargs,
+    ):
         """Initialize the action interface.
 
         Args:
@@ -72,9 +82,12 @@ class actionInterface:
 
             conf (dict): Loaded configuration from ``.env`` file.
         """
-        self.supportedType: set[str] = set()
-        self.parsers: dict[str, ParserInterface] = {}
-        self.complex_param: dict[str, dict] = {}
+        self.supportedType: set[str] = set(supportedType or set())
+        self.parsers: dict[str, ParserInterface] = parsers or {}
+        self.complex_param: dict[str, dict] = complex_param or {}
+        self.description: str = description
+        self.indicators: str = indicators
+        self.conf: dict = conf or {}
         for k, v in kwargs.items():
             setattr(self, k, v)
 
@@ -94,8 +107,11 @@ class actionInterface:
     def load_conf(self, conf_name, path="../.env"):
         conf = {}
         try:
-            env = dotenv_values(Path(__file__).parent / path)
-            for key, value in env.items():
+            dotenv_vars = dotenv_values(Path(__file__).parent / path)
+            env_vars = dict(os.environ)
+            merged = {**env_vars, **dotenv_vars}
+
+            for key, value in merged.items():
                 normalized_key = key.lower().replace("-", "_")
                 normalized_conf_name = conf_name.lower().replace("-", "_")
                 prefix = f"{normalized_conf_name}_"
@@ -103,7 +119,7 @@ class actionInterface:
                     key_name = normalized_key.removeprefix(prefix)
                     conf[key_name] = value
             self.conf = dict(conf)
-        except Exception as e:
+        except Exception:
             print("Error while loading config from .env")
         return self.conf
 
@@ -135,10 +151,9 @@ class actionInterface:
         config = self.complex_param.get(config_name)
         if isinstance(config, dict):
             return config.get("value", "")
-        elif isinstance(config, str):
+        if isinstance(config, str):
             return config
-        else:
-            return ""
+        return ""
 
     def execute(self) -> dict[str, dict]:
         """Execute the action
@@ -153,7 +168,7 @@ class actionInterface:
         """
         return self.results
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a textual representation of the action results. By default returns
         the `str` representation of `self.results`. However you could make some pretty printing here,
         such as Markdown, TSV or any other string representation that fulfill your needs.

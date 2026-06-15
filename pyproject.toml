@@ -53,7 +53,7 @@ gui = [
 # Web interface (Flask-based)
 web = [
   "flask>=2.0.0",
-  "textual_serve"
+  "gunicorn>=25.3.0",
 ]
 
 # All optional features
@@ -62,7 +62,7 @@ all = [
   "keyboard>=0.13.0",
   "win11toast>=0.34; platform_system=='Windows'",
   "flask>=2.0.0",
-  "textual_serve"
+  "gunicorn>=25.3.0",
 ]
 
 [tool.setuptools.package-data]

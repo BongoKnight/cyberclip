@@ -25,7 +25,7 @@ class UrlToHtmlAction(actionInterface):
         >>> parser = URLParser("https://example.com")
         >>> action = UrlToHtmlAction({"url": parser})
         >>> results = action.execute()
-        >>> print(results["https://example.com"][:50])
+        >>> print(results.get("https://example.com"))
         <!doctype html>
         <html>
         <head>
@@ -60,7 +60,7 @@ class UrlToHtmlAction(actionInterface):
         return self.results
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of HTML content.
 
         Calls :meth:`execute` and formats output as concatenated HTML.
@@ -83,7 +83,7 @@ class GetCertificatesAction(actionInterface):
     Network Activity:
         Makes SSL/TLS connections to provided hosts.
 
-    Parameters:
+    Action Options:
         Port (text): TCP port number for SSL/TLS connection.
             Default: 443
 
@@ -92,7 +92,7 @@ class GetCertificatesAction(actionInterface):
         >>> parser = domainParser("example.com")
         >>> action = GetCertificatesAction({"domain": parser})
         >>> results = action.execute()
-        >>> print(results["example.com"][:100])
+        >>> print(results.get("example.com"))
         {"subject": ((("commonName", "example.com"),),), "issuer": ...
     """
     CONF = {"Port":{"type":"text", "value":"443"}}
@@ -128,7 +128,7 @@ class GetCertificatesAction(actionInterface):
                 self.results[observable] = f"Error while getting the certificate : {e}, {port}"
         return self.results
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of certificates.
 
         Calls :meth:`execute` and formats output as TSV with JSON certificates.
@@ -207,7 +207,7 @@ class UrlToFaviconHashAction(actionInterface):
         return hash
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of favicon hashes.
 
         Calls :meth:`execute` and formats output as TSV with hash values.

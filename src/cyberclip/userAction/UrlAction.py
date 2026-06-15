@@ -17,7 +17,7 @@ class baseUrlAction(actionInterface):
     Supported Types:
         url, domain, ip, ipv6
 
-    Parameters:
+    Action Options:
         HTTPS (bool): Use HTTPS scheme instead of HTTP.
             Default: True
 
@@ -51,17 +51,17 @@ class baseUrlAction(actionInterface):
         self.observables = self.get_observables()
         https = self.get_param_value("HTTPS")
         if self.observables.get("url"):
-            self.results.update({url:f"http{"s"*https}://{urlparse(url).netloc}" for url in self.observables.get("url")})
+            self.results.update({url: f"http{'s' * https}://{urlparse(url).netloc}" for url in self.observables.get("url")})
         if self.observables.get("domain"):
-            self.results.update({domain:f"http{"s"*https}://{domain}" for domain in self.observables.get("domain")})
+            self.results.update({domain: f"http{'s' * https}://{domain}" for domain in self.observables.get("domain")})
         if self.observables.get("ip"):
-            self.results.update({ip:f"http{"s"*https}://{ip}" for ip in self.observables.get("ip")})
+            self.results.update({ip: f"http{'s' * https}://{ip}" for ip in self.observables.get("ip")})
         if self.observables.get("ipv6"):
-            self.results.update({ip:f"http{"s"*https}://{ip}" for ip in self.observables.get("ipv6")})
+            self.results.update({ip: f"http{'s' * https}://{ip}" for ip in self.observables.get("ipv6")})
         return self.results
 
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of base URLs.
 
         Calls :meth:`execute` and formats output as one URL per line.
@@ -82,7 +82,7 @@ class QueryUrlAction(actionInterface):
     Supported Types:
         url
 
-    Parameters:
+    Action Options:
         Method (list): HTTP request method.
             Choices: GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH
             Default: GET
@@ -153,7 +153,7 @@ class QueryUrlAction(actionInterface):
         return self.results
 
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of HTTP responses.
 
         Calls :meth:`execute` and formats output as TSV with JSON responses.
@@ -206,7 +206,7 @@ class ParseUrlAction(actionInterface):
         return self.results
 
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return human-readable representation of parsed URLs.
 
         Calls :meth:`execute` and formats output as TSV with component JSON.

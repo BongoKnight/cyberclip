@@ -12,10 +12,11 @@ Variables that allows Cyberclip to authenticate itself against third-party API s
 ```bash 
 DATALAKE_EMAIL="<DATALAKE EMAIL>"
 DATALAKE_PASSWORD="<DATALAKE PASSWORD>"
-DEEPL_API_KEY="<DEEPL API_KEY>"
+DEEPL_API-KEY="<DEEPL API_KEY>"
+MODAT_API-KEY="<MODAT API_KEY>"
 SHODAN_API_KEY="<SHODAN API KEY>"
-URLSCAN_API_KEY="<URLSCAN API KEY>"
-VIRUSTOTAL_API_KEY="<VIRUS TOTAL API KEY>"
+URLSCAN_API-KEY="<URLSCAN API KEY>"
+VIRUSTOTAL_API-KEY="<VIRUS TOTAL API KEY>"
 ```
 
 # Installation
@@ -87,8 +88,8 @@ docker run --env-file .env -p 8000:8000 cyberclip web --host 0.0.0.0 --port 8000
 # Generate documentation
 
 ```python
-pip install mkdocs mkdocs-gen-files mkdocs-material mkdocs-autorefs mkdocstrings-python
-mkdocs gh-deploy
+pip install properdocs mkdocs-gen-files mkdocs-material mkdocs-autorefs mkdocstrings-python
+properdocs gh-deploy
 ```
 
 

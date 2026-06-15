@@ -1,5 +1,5 @@
 # Build stage
-FROM python:3.12-slim AS builder
+FROM dockerproxy.repos.tech.orange/python:3.12-slim AS builder
 
 WORKDIR /build
 
@@ -13,14 +13,16 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir ".[all]"
 
 # Production image
-FROM python:3.12-slim AS final
+FROM dockerproxy.repos.tech.orange/python:3.12-slim AS final
 
 # Add non-root user
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup --home /app appuser
 
 # Pull packages
 COPY --from=builder /venv /venv
 RUN chown -R appuser:appgroup /venv/lib/python3.12/site-packages/cyberclip/data
+RUN touch /venv/lib/python3.12/site-packages/cyberclip/log.log \
+    && chown appuser:appgroup /venv/lib/python3.12/site-packages/cyberclip/log.log
 
 ENV PATH="/venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
