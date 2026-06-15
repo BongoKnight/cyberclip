@@ -20,6 +20,11 @@ from pathlib import Path
 
 import yaml
 
+try:
+    from cyberclip.data_paths import get_actions_config_path
+except ImportError:
+    from data_paths import get_actions_config_path
+
 
 class clipParser:
 
@@ -35,9 +40,7 @@ class clipParser:
         self.parsers = dict()
         self.include = include
         self.exclude = exclude
-        self.actions_config_path = actions_config_path or (
-            Path(__file__).parent / "data" / "actions.yml"
-        )
+        self.actions_config_path = actions_config_path or get_actions_config_path()
         self.enabled_action_names = None
         self.disabled_action_names = set()
         self.data = ""

@@ -1,41 +1,42 @@
 import yaml
-from functools import partial
 from dataclasses import dataclass
-from pathlib import Path
 
-from textual import on, work
+from textual import on
 from textual.app import App
 from textual.screen import ModalScreen
 from textual.message import Message
 from textual.reactive import var, reactive
-from textual.containers import  Horizontal, Vertical, VerticalScroll
+from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.widgets import Static, Button, Input, Label, TextArea, Switch, Select
 from textual.app import ComposeResult
 
-
 try:
+    from cyberclip.data_paths import get_recipes_path, save_yaml_list
     from userAction.actionInterface import actionInterface
     from userTypeParser.ParserInterface import ParserInterface
 except:
+    from data_paths import get_recipes_path, save_yaml_list
     from cyberclip.userAction.actionInterface import actionInterface
     from cyberclip.userTypeParser.ParserInterface import ParserInterface
+
 
 # eq and frozen allow for this class to be hashable, which is needed to be included as return option of a Select widget
 @dataclass(eq=True, frozen=True)
 class ActionnableDescriptor:
-    actionnable : ParserInterface | actionInterface
-    description : str
+    actionnable: ParserInterface | actionInterface
+    description: str
     type: str
+
 
 @dataclass
 class RecipeStep:
-    step_dict: dict 
-    actionnable : ActionnableDescriptor = None
+    step_dict: dict
+    actionnable: ActionnableDescriptor = None
 
     @property
     def actionnableName(self):
         return self.step_dict.get("actionnableName", "")
-    
+
     @actionnableName.setter
     def actionnableName(self, value):
         assert type(value) == str
@@ -44,50 +45,63 @@ class RecipeStep:
     @property
     def usePreset(self):
         return self.step_dict.get("usePreset", True)
-    
+
     @property
     def params(self):
         return self.step_dict.get("complex_param", {})
-    
+
     @params.setter
     def params(self, value):
         assert type(value) == dict
         self.step_dict["complex_param"] = value
 
-    def find_actionnable(self, app, actionnable_description: str) -> ActionnableDescriptor:
+    def find_actionnable(
+        self, app, actionnable_description: str
+    ) -> ActionnableDescriptor:
         for action in app.recipe_parser.actions.values():
             if action.description == actionnable_description:
-                self.actionnable = ActionnableDescriptor(action, action.description, type="action")
+                self.actionnable = ActionnableDescriptor(
+                    action, action.description, type="action"
+                )
                 return ActionnableDescriptor(action, action.description, type="action")
         for parser in app.recipe_parser.parsers.values():
             if f"Extract {parser.parsertype}" == actionnable_description:
-                self.actionnable = ActionnableDescriptor(parser, f"Extract {parser.parsertype}", "parser")
+                self.actionnable = ActionnableDescriptor(
+                    parser, f"Extract {parser.parsertype}", "parser"
+                )
                 return self.actionnable
+
     def to_dict(self):
-        return {"actionnableName":self.actionnableName, "usePreset":self.usePreset, "complex_param":self.params}
+        return {
+            "actionnableName": self.actionnableName,
+            "usePreset": self.usePreset,
+            "complex_param": self.params,
+        }
+
 
 @dataclass
 class Recipe:
-    recipe_dict: dict 
+    recipe_dict: dict
 
     @property
     def steps(self):
-        return [RecipeStep(step_dict=i) for i in self.recipe_dict.get("steps",[])]
-    
+        return [RecipeStep(step_dict=i) for i in self.recipe_dict.get("steps", [])]
+
     @property
     def description(self):
-        return self.recipe_dict.get("description","")
+        return self.recipe_dict.get("description", "")
 
     @property
     def name(self):
-        return self.recipe_dict.get("name","")
-    
+        return self.recipe_dict.get("name", "")
+
     def to_dict(self):
-        return {"name":self.name,
-                "description":self.description,
-                "steps":[step.to_dict() for step in self.steps]
-                }
-    
+        return {
+            "name": self.name,
+            "description": self.description,
+            "steps": [step.to_dict() for step in self.steps],
+        }
+
     @name.setter
     def name(self, value):
         assert type(value) == str
@@ -102,15 +116,15 @@ class Recipe:
     def steps(self, value):
         assert type(value) == list
         self.recipe_dict["steps"] = value
-    
 
     async def execute_recipe(self, app: App, text=None, step_index=0):
         # TODO always use handleParam
         from .ModalParamScreen import ParamScreen
+
         new_text = ""
         nb_step = len(self.steps)
         if text == None:
-             new_text = app.text
+            new_text = app.text
         else:
             new_text = text
         app.recipe_parser.parseData(new_text)
@@ -121,16 +135,27 @@ class Recipe:
                     if step.usePreset:
                         if step.params:
                             step.actionnable.actionnable.complex_param = step.params
-                        new_text = await app.recipe_parser.apply_actionable(step.actionnable.actionnable, new_text)
-                        return await self.execute_recipe(app, text=new_text, step_index=step_index+1)         
+                        new_text = await app.recipe_parser.apply_actionable(
+                            step.actionnable.actionnable, new_text
+                        )
+                        return await self.execute_recipe(
+                            app, text=new_text, step_index=step_index + 1
+                        )
                     else:
                         async with app.get_param(step.actionnable.actionnable):
-                           return await self.execute_recipe(app, text=app.text, step_index=step_index+1)
+                            return await self.execute_recipe(
+                                app, text=app.text, step_index=step_index + 1
+                            )
                 elif step.actionnable.type == "parser":
                     new_text = "\r\n".join(step.actionnable.actionnable.extract())
-                    return await self.execute_recipe(app, text=new_text, step_index=step_index+1)
+                    return await self.execute_recipe(
+                        app, text=new_text, step_index=step_index + 1
+                    )
             else:
-                app.notify(f"Error retrievig action : {step.actionnableName}", severity="warning")
+                app.notify(
+                    f"Error retrievig action : {step.actionnableName}",
+                    severity="warning",
+                )
         else:
             return new_text
 
@@ -152,8 +177,14 @@ class RecipesPannel(Static):
     """
 
     def compose(self) -> ComposeResult:
-        yield Horizontal(Button("Save recipes", variant="success", id="save_recipes"), Button("Create recipe", variant="primary", id="create_recipe"), id="recipes_actions")
-        yield Horizontal(VerticalScroll(id="recipes-container"), VerticalScroll(id="recipe-viewer"))
+        yield Horizontal(
+            Button("Save recipes", variant="success", id="save_recipes"),
+            Button("Create recipe", variant="primary", id="create_recipe"),
+            id="recipes_actions",
+        )
+        yield Horizontal(
+            VerticalScroll(id="recipes-container"), VerticalScroll(id="recipe-viewer")
+        )
 
     def refresh_recipes(self):
         recipes_container = self.query_one("#recipes-container", VerticalScroll)
@@ -167,11 +198,11 @@ class RecipesPannel(Static):
     @on(Button.Pressed, "#create_recipe")
     def create_recipe(self):
         recipes_container = self.query_one("#recipes-container", VerticalScroll)
+        new_recipe = Recipe({"name": "New recipe", "description": "", "steps": []})
+        self.app.recipes = [*self.app.recipes, new_recipe]
         new_button = RecipeButton()
         recipes_container.mount(new_button)
-        new_button.recipe = Recipe({"name":"New recipe","description":"", "steps":[]})
-
-
+        new_button.recipe = new_recipe
 
     @on(Button.Pressed, "#save_recipes")
     def save_recipes(self):
@@ -186,21 +217,32 @@ class RecipesPannel(Static):
             if not recipe_widget.recipe.description:
                 is_valid = False
                 all_valid = False
-                self.notify(f"⚠️ Recipe {recipe_widget.recipe.name} has no description.", severity="warning")
+                self.notify(
+                    f"⚠️ Recipe {recipe_widget.recipe.name} has no description.",
+                    severity="warning",
+                )
             for step in recipe_widget.recipe.steps:
                 if isinstance(step.params, str):
-                    self.notify(f"⚠️ Recipe {recipe_widget.recipe.name} contains an invalid step : {step.actionnableName}", severity="warning")
+                    self.notify(
+                        f"⚠️ Recipe {recipe_widget.recipe.name} contains an invalid step : {step.actionnableName}",
+                        severity="warning",
+                    )
                     is_valid = False
                     all_valid = False
             if is_valid:
                 recipes.append(recipe_widget.recipe.to_dict())
         if all_valid:
             self.app.recipes = [Recipe(recipe_dict=recipe) for recipe in recipes]
-            with open(Path(__file__).parent / '../data/recipes.yml', "w+", encoding="utf8") as f:
-                rules = yaml.dump(recipes)
-                f.write(rules)
-                self.notify("☑  Recipes saved!")
+            save_yaml_list(get_recipes_path(), recipes)
+            self.notify("Recipes saved!")
             self.refresh_recipes()
+            try:
+                from cyberclip.tui.ActionPannel import ActionPannel
+            except ImportError:
+                from tui.ActionPannel import ActionPannel
+            if action_panels := self.app.query(ActionPannel):
+                action_panels[0].refresh_recipe_buttons()
+                action_panels[0].filter_action()
 
 
 class RecipeButton(Button):
@@ -210,6 +252,7 @@ class RecipeButton(Button):
     }
     """
     recipe = reactive(Recipe(recipe_dict={}))
+
     def watch_recipe(self, recipe: Recipe):
         self.label = recipe.name
         self.refresh()
@@ -221,7 +264,6 @@ class RecipeButton(Button):
         recipe_widget = RecipeWidget()
         recipe_widget.button = self
         viewer.mount(recipe_widget)
-
 
 
 class StepWidget(Static):
@@ -244,17 +286,29 @@ class StepWidget(Static):
             super().__init__()
 
     def compose(self) -> ComposeResult:
-            params = ""
-            try:
-                params = yaml.dump(self.step.params)
-            except:
-                params = self.step.params
-            step_widget = VerticalScroll(Horizontal(Label("Use preset ? :", classes="title"), Switch(self.step.usePreset), Button("Change action", variant="primary", id="change"), Button("Delete step", variant="error", id="delete"), classes="name") ,TextArea(params, show_line_numbers=True, language="yaml") ,classes="step")
-            step_widget.border_title = self.step.actionnableName
-            yield step_widget
+        params = ""
+        try:
+            params = yaml.dump(self.step.params)
+        except:
+            params = self.step.params
+        step_widget = VerticalScroll(
+            Horizontal(
+                Label("Use preset ? :", classes="title"),
+                Switch(self.step.usePreset),
+                Button("Change action", variant="primary", id="change"),
+                Button("Delete step", variant="error", id="delete"),
+                classes="name",
+            ),
+            TextArea(params, show_line_numbers=True, language="yaml"),
+            classes="step",
+        )
+        step_widget.border_title = self.step.actionnableName
+        yield step_widget
 
     def on_mount(self):
-        self.step.actionnable = self.step.find_actionnable(self.app, self.step.actionnableName)
+        self.step.actionnable = self.step.find_actionnable(
+            self.app, self.step.actionnableName
+        )
 
     @on(TextArea.Changed)
     @on(Switch.Changed)
@@ -263,15 +317,13 @@ class StepWidget(Static):
         self.update_step()
         self.post_message(self.Changed())
 
-                
-
     def update_step(self):
         usePreset = self.query_one(Switch).value
         try:
             params = yaml.safe_load(self.query_one(TextArea).text)
         except Exception as e:
-            params =  self.query_one(TextArea).text
-        self.step.step_dict.update({"usePreset":usePreset, "complex_param":params})
+            params = self.query_one(TextArea).text
+        self.step.step_dict.update({"usePreset": usePreset, "complex_param": params})
 
     @on(Button.Pressed, "#delete")
     def delete_step(self):
@@ -282,7 +334,9 @@ class StepWidget(Static):
         def update_actionnable(actionnable: ActionnableDescriptor):
             if actionnable:
                 self.step.actionnableName = str(actionnable.description)
-                self.query_one(".step", VerticalScroll).border_title = self.step.actionnableName
+                self.query_one(".step", VerticalScroll).border_title = (
+                    self.step.actionnableName
+                )
                 self.actionnable = actionnable
                 if actionnable.type == "action":
                     self.step.params = actionnable.actionnable.complex_param
@@ -301,10 +355,9 @@ class StepWidget(Static):
         self.app.push_screen(select_screen, update_actionnable)
 
 
-
-
 class SelectActionnableScreen(ModalScreen):
     """Modal screen for selecting actionnable"""
+
     DEFAULT_CSS = """
     SelectActionnableScreen {
         align: center middle;
@@ -333,12 +386,11 @@ class SelectActionnableScreen(ModalScreen):
             Select([], allow_blank=True),
             Horizontal(
                 Button("Save params", variant="primary", id="save"),
-                Button("Cancel", variant="error", id="cancel"), id="submit"
+                Button("Cancel", variant="error", id="cancel"),
+                id="submit",
             ),
-            id="dialog"
+            id="dialog",
         )
-
-
 
     async def on_mount(self) -> None:
         self.query_one("#dialog").border_title = "Select an action"
@@ -347,18 +399,27 @@ class SelectActionnableScreen(ModalScreen):
         actionnables = actions + parsers
         actionnable_tupples = []
         for actionnable in actionnables:
-            if  "Action" in actionnable.__module__ :
-                actionnable_desc = ActionnableDescriptor(actionnable=actionnable, description=actionnable.description, type="action")
-            if  "Parser" in actionnable.__module__ :
-                actionnable_desc = ActionnableDescriptor(actionnable=actionnable, description=f"Extract {actionnable.parsertype}", type="parser")
+            if "Action" in actionnable.__module__:
+                actionnable_desc = ActionnableDescriptor(
+                    actionnable=actionnable,
+                    description=actionnable.description,
+                    type="action",
+                )
+            if "Parser" in actionnable.__module__:
+                actionnable_desc = ActionnableDescriptor(
+                    actionnable=actionnable,
+                    description=f"Extract {actionnable.parsertype}",
+                    type="parser",
+                )
             if actionnable_desc:
-                actionnable_tupples.append((actionnable_desc.description, actionnable_desc))
+                actionnable_tupples.append(
+                    (actionnable_desc.description, actionnable_desc)
+                )
         if actionnable_tupples:
-            actionnable_tupples.sort(key=lambda x : x[0])
+            actionnable_tupples.sort(key=lambda x: x[0])
         select = self.query_one(Select)
         select.set_options(actionnable_tupples)
         select._allow_blank = False
-
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "cancel":
@@ -366,6 +427,7 @@ class SelectActionnableScreen(ModalScreen):
         else:
             select = self.query_one(Select)
             self.dismiss(result=select.value if not select.is_blank() else None)
+
 
 class RecipeWidget(Static):
     DEFAULT_CSS = """
@@ -381,21 +443,43 @@ class RecipeWidget(Static):
     }
     """
     button = var(RecipeButton())
+
     def compose(self) -> ComposeResult:
-        yield Horizontal(Label("Name :", classes="title"), Input(self.button.recipe.name, placeholder="Enter recipe title...", id="recipename"), classes="name")
-        yield Horizontal(Label("Description :", classes="title"), Input(self.button.recipe.description, placeholder="Enter description...", id="recipedesc"), classes="name")
+        yield Horizontal(
+            Label("Name :", classes="title"),
+            Input(
+                self.button.recipe.name,
+                placeholder="Enter recipe title...",
+                id="recipename",
+            ),
+            classes="name",
+        )
+        yield Horizontal(
+            Label("Description :", classes="title"),
+            Input(
+                self.button.recipe.description,
+                placeholder="Enter description...",
+                id="recipedesc",
+            ),
+            classes="name",
+        )
         steps_widgets = []
         for step in self.button.recipe.steps:
             step_widget = StepWidget()
             step_widget.step = step
             steps_widgets.append(step_widget)
         yield VerticalScroll(*steps_widgets, id="stepslist")
-        yield Horizontal(Button("Add step", variant="primary", id="add_step"), Button("Delete recipe", variant="error", id="delete_recipe"), id="option")
-
+        yield Horizontal(
+            Button("Add step", variant="primary", id="add_step"),
+            Button("Delete recipe", variant="error", id="delete_recipe"),
+            id="option",
+        )
 
     @on(Button.Pressed, "#add_step")
     def add_step(self):
-        self.button.recipe.steps = [i.to_dict() for i in self.button.recipe.steps] + [{}]
+        self.button.recipe.steps = [i.to_dict() for i in self.button.recipe.steps] + [
+            {}
+        ]
         stepslist = self.query_one("#stepslist", VerticalScroll)
         stepslist.remove_children()
         for step in self.button.recipe.steps:
@@ -415,6 +499,7 @@ class RecipeWidget(Static):
     def update_recipe(self):
         self.button.recipe.name = self.query_one("#recipename", Input).value
         self.button.recipe.description = self.query_one("#recipedesc", Input).value
+        self.button.label = self.button.recipe.name
         steps = []
         steps_widgets = self.query(StepWidget)
         for step_widget in steps_widgets:

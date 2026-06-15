@@ -9,7 +9,7 @@ from textual.app import ComposeResult
 
 try:
     from cyberclip.tui.ContentToolbar import ContentToolbar
-except:
+except ImportError:
     from tui.ContentToolbar import ContentToolbar
 
 
@@ -49,14 +49,21 @@ class ContentView(Static):
             self.app.text = text
 
     def filter_action(self):
-        from tui.ActionPannel import ActionPannel, ActionButton
+        try:
+            from cyberclip.tui.ActionPannel import ActionPannel
+        except ImportError:
+            from tui.ActionPannel import ActionPannel
 
         self.app.query_one(ActionPannel).filter_action()
 
     def update_text(self, new_text: str, force=False) -> None:
         """Called when the text attribute changes."""
-        from tui.DataTypePannel import DataTypeButton, DataLoader
-        from tui.ActionPannel import ActionPannel, ActionButton
+        try:
+            from cyberclip.tui.DataTypePannel import DataTypeButton, DataLoader
+            from cyberclip.tui.ActionPannel import ActionPannel, ActionButton
+        except ImportError:
+            from tui.DataTypePannel import DataTypeButton, DataLoader
+            from tui.ActionPannel import ActionPannel, ActionButton
 
         textArea = self.query_one(TextArea)
         textArea.replace(
@@ -98,6 +105,7 @@ class ContentView(Static):
         for action in self.parent.query(ActionButton):
             action.actionnable.supportedType = set(action.action_supported_type)
             action.actionnable.parsers = self.app.parser.parsers
+        self.parent.query_one(ActionPannel).refresh_recipe_buttons()
         # for action in self.app.parser.actions.values():
         #     action.parsers = self.app.parser.parsers
         # Filter action on existing active datatype

@@ -3,10 +3,8 @@ import sys
 import traceback
 from functools import partial
 from io import StringIO
-from pathlib import Path
 
 import pandas as pd
-import yaml
 from textual import on, work
 from textual._path import CSSPathType
 from textual.app import App, ComposeResult
@@ -30,6 +28,11 @@ try:
     from cyberclip.userAction.actionInterface import actionInterface
     from cyberclip.userTypeParser import CSVParser
     from cyberclip.userTypeParser.ParserInterface import ParserInterface
+    from cyberclip.data_paths import (
+        get_package_data_dir,
+        get_recipes_path,
+        load_yaml_list,
+    )
     from cyberclip.utilities import clean_tsv, find_delimiter
 except:
     from clipboardHandler import get_clipboard_text
@@ -44,6 +47,7 @@ except:
     from userAction.actionInterface import actionInterface
     from userTypeParser import CSVParser
     from userTypeParser.ParserInterface import ParserInterface
+    from data_paths import get_package_data_dir, get_recipes_path, load_yaml_list
     from utilities import clean_tsv, find_delimiter
 
 
@@ -63,7 +67,7 @@ class ClipBrowser(App):
 
     APP_TITLE = "📝CyberClip👩‍💻"
     CSS_PATH = "app.scss"
-    COMMANDS = App.COMMANDS | {ActionCommands}
+    COMMANDS = {ActionCommands}
     BINDINGS = [
         ("ctrl+s", "save", "Save actual view."),
         ("ctrl+q", "quit", "Quit"),
@@ -118,13 +122,15 @@ class ClipBrowser(App):
     text = reactive("Waiting for Update...", init=False)
     active_tab: str = ""
     try:
-        file = Path(__file__).parent / "data/recipes.yml"
-        if not file.exists():
-            file.write_text("[]")
-        with open(
-            Path(__file__).parent / "data/recipes.yml", "r", encoding="utf8"
-        ) as f:
-            recipes = var([Recipe(recipe_dict=i) for i in yaml.safe_load(f.read())])
+        recipes = var(
+            [
+                Recipe(recipe_dict=i)
+                for i in load_yaml_list(
+                    get_recipes_path(),
+                    fallback_path=get_package_data_dir() / "recipes.yml",
+                )
+            ]
+        )
     except Exception as e:
         recipes = var([])
         print("Error loading recipes...", e)
@@ -240,6 +246,7 @@ class ClipBrowser(App):
                     )
         if self.active_tab == ClipBrowser.APP_TITLE:
             self.parser.parseData(self.text)
+            self.contentview.update_text(self.text, force=True)
         if self.active_tab == "Recipes":
             self.query_one(RecipesPannel).refresh_recipes()
             if querybuttons := self.query(RecipeButton):
