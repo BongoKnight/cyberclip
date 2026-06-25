@@ -1,9 +1,12 @@
 try:
     from userAction.actionInterface import actionInterface
-except:
+except Exception:
     from actionInterface import actionInterface
+
 import json
 import urllib
+import urllib.parse
+
 import requests
 
 BASE_SEARCH_URL = "https://urlscan.io/api/v1/search/"
@@ -80,14 +83,11 @@ class QueryUrlScanAction(actionInterface):
         self._result_cache = {}
 
     def _extract_scan_ids(self, search_json):
-
         its = search_json.get("results", [])
         scan_ids = []
 
         for it in its:
-
             sid = None
-
             result_url = it.get("result")
 
             if result_url and "/api/v1/result/" in result_url:
@@ -104,10 +104,8 @@ class QueryUrlScanAction(actionInterface):
             if sid:
                 scan_ids.append(sid)
 
-        # remove duplicates while preserving order
         seen = set()
         unique_scan_ids = []
-
         for sid in scan_ids:
             if sid not in seen:
                 seen.add(sid)
@@ -120,14 +118,11 @@ class QueryUrlScanAction(actionInterface):
             return self._result_cache[scan_id]
 
         url = f"https://urlscan.io/api/v1/result/{scan_id}/"
+        response = requests.get(url, headers=self.headers, timeout=15)
+        response.raise_for_status()
 
-        r = requests.get(url, headers=self.headers, timeout=15)
-        r.raise_for_status()
-
-        data = r.json()
-
+        data = response.json()
         self._result_cache[scan_id] = data
-
         return data
 
     def _fetch_dom(self, scan_id: str) -> str:
@@ -135,9 +130,9 @@ class QueryUrlScanAction(actionInterface):
         if scan_id in self._dom_cache:
             return self._dom_cache[scan_id]
         dom_url = f"https://urlscan.io/dom/{scan_id}/"
-        r = requests.get(dom_url, headers=self.headers, timeout=15)
-        r.raise_for_status()
-        dom = r.text
+        response = requests.get(dom_url, headers=self.headers, timeout=15)
+        response.raise_for_status()
+        dom = response.text
         self._dom_cache[scan_id] = dom
         return dom
 
@@ -152,7 +147,7 @@ class QueryUrlScanAction(actionInterface):
             )
             result_mode = bool(self.get_param_value("Result mode"))
             include_dom = bool(self.get_param_value("Include DOM"))
-            if not (result_mode):
+            if not result_mode:
                 query_url = (
                     BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size={limit}"
                 )
@@ -168,7 +163,6 @@ class QueryUrlScanAction(actionInterface):
                         except Exception as e:
                             dom_map[sid] = f"ERROR: {e}"
                     self.results["_dom"] = dom_map
-
             else:
                 search_url = (
                     BASE_SEARCH_URL + f"?q={urllib.parse.quote(query)}&size={limit}"
@@ -194,7 +188,6 @@ class QueryUrlScanAction(actionInterface):
                         results.append({"scanId": sid, "error": str(e)})
 
                 self.results = results
-
         except Exception as e:
             self.results = {"error": str(e)}
         return self.results
@@ -259,7 +252,7 @@ class ResultFromUrlScanAction(actionInterface):
                         self.results[url] = response.json()
                     except Exception as e:
                         self.results = {"error": str(e)}
-        except:
+        except Exception:
             pass
         return self.results
 

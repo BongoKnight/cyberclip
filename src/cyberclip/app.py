@@ -1,27 +1,16 @@
 import asyncio
-import asyncio
 import sys
 import traceback
 from functools import partial
-import traceback
-from functools import partial
 from io import StringIO
-from pathlib import Path
 
 import pandas as pd
-
-import pandas as pd
-import yaml
 from textual import on, work
 from textual._path import CSSPathType
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.app import App, ComposeResult
-from textual.binding import Binding
 from textual.containers import Grid
 from textual.driver import Driver
-from textual.reactive import reactive, var
-from textual.theme import Theme
 from textual.reactive import reactive, var
 from textual.theme import Theme
 from textual.widgets import Footer, TabbedContent, TabPane, TextArea
@@ -29,23 +18,26 @@ from textual.widgets import Footer, TabbedContent, TabPane, TextArea
 try:
     from cyberclip.clipboardHandler import get_clipboard_text
     from cyberclip.clipParser import clipParser
+    from cyberclip.data_paths import (
+        get_package_data_dir,
+        get_recipes_path,
+        load_yaml_list,
+    )
     from cyberclip.tui.ActionPannel import ActionCommands, ActionPannel
     from cyberclip.tui.ConfigScreen import ActionConfigScreen
     from cyberclip.tui.ContentView import ContentView
     from cyberclip.tui.DataTypePannel import DataLoader
     from cyberclip.tui.ModalParamScreen import ParamScreen
     from cyberclip.tui.RecipesPannel import Recipe, RecipeButton, RecipesPannel
-    from cyberclip.tui.ModalParamScreen import ParamScreen
-    from cyberclip.tui.RecipesPannel import Recipe, RecipeButton, RecipesPannel
     from cyberclip.tui.TableView import FiltrableDataFrame
     from cyberclip.userAction.actionInterface import actionInterface
     from cyberclip.userTypeParser import CSVParser
-    from cyberclip.userTypeParser import CSVParser
     from cyberclip.userTypeParser.ParserInterface import ParserInterface
     from cyberclip.utilities import clean_tsv, find_delimiter
-except:
+except ImportError:
     from clipboardHandler import get_clipboard_text
     from clipParser import clipParser
+    from data_paths import get_package_data_dir, get_recipes_path, load_yaml_list
     from tui.ActionPannel import ActionCommands, ActionPannel
     from tui.ConfigScreen import ActionConfigScreen
     from tui.ContentView import ContentView
@@ -75,7 +67,7 @@ class ClipBrowser(App):
 
     APP_TITLE = "📝CyberClip👩‍💻"
     CSS_PATH = "app.scss"
-    COMMANDS = App.COMMANDS | {ActionCommands}
+    COMMANDS = {ActionCommands}
     BINDINGS = [
         ("ctrl+s", "save", "Save actual view."),
         ("ctrl+q", "quit", "Quit"),
@@ -125,18 +117,19 @@ class ClipBrowser(App):
 
     parser = var(clipParser())
     recipe_parser = var(clipParser())
-    # graph = var(nx.DiGraph())
     active_node = var({})
     text = reactive("Waiting for Update...", init=False)
     active_tab: str = ""
     try:
-        file = Path(__file__).parent / "data/recipes.yml"
-        if not file.exists():
-            file.write_text("[]")
-        with open(
-            Path(__file__).parent / "data/recipes.yml", "r", encoding="utf8"
-        ) as f:
-            recipes = var([Recipe(recipe_dict=i) for i in yaml.safe_load(f.read())])
+        recipes = var(
+            [
+                Recipe(recipe_dict=i)
+                for i in load_yaml_list(
+                    get_recipes_path(),
+                    fallback_path=get_package_data_dir() / "recipes.yml",
+                )
+            ]
+        )
     except Exception as e:
         recipes = var([])
         print("Error loading recipes...", e)
@@ -184,8 +177,6 @@ class ClipBrowser(App):
                 yield FiltrableDataFrame(pd.DataFrame(), id="main-table")
             with TabPane("Recipes", id="recipes"):
                 yield RecipesPannel()
-            # with TabPane("Graph View", id="graphview"):
-            #     yield GraphPannel()
         yield Footer()
         self.register_theme(self.orange_theme)
         self.register_theme(self.orange_theme_light)
@@ -252,6 +243,7 @@ class ClipBrowser(App):
                     )
         if self.active_tab == ClipBrowser.APP_TITLE:
             self.parser.parseData(self.text)
+            self.contentview.update_text(self.text, force=True)
         if self.active_tab == "Recipes":
             self.query_one(RecipesPannel).refresh_recipes()
             if querybuttons := self.query(RecipeButton):
@@ -283,7 +275,7 @@ class ClipBrowser(App):
                 self.push_screen(
                     param_screen, callback=partial(self.handle_param, actionnable)
                 )
-            except:
+            except Exception:
                 self.notify(
                     f"Error while executing action : {traceback.format_exc()}",
                     severity="error",
@@ -303,21 +295,6 @@ class ClipBrowser(App):
                 self.text = await self.parser.apply_actionable(
                     actionnable, self.query_one(TextArea).text
                 )
-
-                # # Add executed action to graph view
-                # previous_node = self.active_node
-                # _node = {
-                #         "label": actionnable.description,
-                #         "supported":actionnable.supportedType,
-                #         "params":actionnable.complex_param
-                #         }
-                # action_node = add_node(self.graph, _node, "action", previous_node)
-                # text_node = {"text":self.text, "detected":self.parser.detectedType}
-                # self.active_node = add_node(self.graph, text_node, "text", action_node)
-                # if not self.graph.get_edge_data(previous_node.get("id"),action_node.get("id")):
-                #     self.graph.add_edge(previous_node.get("id"), action_node.get("id"))
-                #     self.graph.add_edge(action_node.get("id"), self.active_node.get("id"))
-
             except Exception as e:
                 self.notify(
                     "Error applying action..." + str(e) + traceback.format_exc(),

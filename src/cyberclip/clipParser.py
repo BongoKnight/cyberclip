@@ -20,6 +20,11 @@ from pathlib import Path
 
 import yaml
 
+try:
+    from cyberclip.data_paths import get_actions_config_path
+except ImportError:
+    from data_paths import get_actions_config_path
+
 
 class clipParser:
 
@@ -35,9 +40,7 @@ class clipParser:
         self.parsers = dict()
         self.include = include
         self.exclude = exclude
-        self.actions_config_path = actions_config_path or (
-            Path(__file__).parent / "data" / "actions.yml"
-        )
+        self.actions_config_path = actions_config_path or get_actions_config_path()
         self.enabled_action_names = None
         self.disabled_action_names = set()
         self.data = ""
@@ -53,7 +56,6 @@ class clipParser:
                 backupCount=1,
             )
         ]
-        # self.log.addHandler(RichHandler(rich_tracebacks=True, markup=True, level=logging.INFO))
         self.log.info("ClipParser created.")
 
     def load_actions_config(self):
@@ -107,8 +109,6 @@ class clipParser:
             if self.verify_filename(file):
                 module_mainname = file.split(".")[0]
                 modules.append(module_mainname)
-                # self.log.info(f"Importing {module_mainname} from {module_name}")
-                # import all parser parserModule from file
                 try:
                     modules_imports = __import__(f"{module_name}", fromlist=modules)
                 except Exception as e:
@@ -136,7 +136,6 @@ class clipParser:
             userAction.private, "userAction.private"
         )
 
-        # Load all parsers
         parserModules = dict(
             (name, m) for name, m in getmembers(self.parserModuleImport, ismodule)
         )
@@ -156,7 +155,6 @@ class clipParser:
                     instance = self.create_parser_instance(classes, className, data)
                     self.parsers.update({instance.parsertype: instance})
 
-        # Load all actions
         actionModules = dict(
             (name, m) for name, m in getmembers(self.ActionModuleImport, ismodule)
         )
@@ -179,7 +177,6 @@ class clipParser:
                     if hasattr(instance, "description") and self.is_action_enabled(
                         instance
                     ):
-                        # Adding action in a dict of all parsers relative to the input
                         self.actions.update({instance.description: instance})
 
     def parseData(self, data):
@@ -203,7 +200,6 @@ class clipParser:
                     self.detectedType.add(parsertype)
                     self.matches.update({parsertype: parser.extract()})
                 else:
-                    # Reset parser to avoid keeping old data in memory
                     parser.text = ""
                     parser.objects = {}
 
@@ -214,9 +210,8 @@ class clipParser:
                         parsertype in action.supportedType
                         and parsertype in self.detectedType
                     ):
-                        # self.log.debug(f"Add parser: {parser.__class__}")
                         action.parsers.update({parsertype: parser})
-            self.log.debug(f"Parsed data: {data[0:min(100,len(data))]}")
+            self.log.debug(f"Parsed data: {data[0:min(100, len(data))]}")
         self.results = {
             "matches": self.matches,
             "detectedType": self.detectedType,
@@ -243,10 +238,9 @@ class clipParser:
                 self.log.debug(f"Action result : {result}")
                 if isinstance(result, str):
                     return result
-                elif isinstance(result, dict) and (mergedresult := result.get(text)):
+                if isinstance(result, dict) and (mergedresult := result.get(text)):
                     return str(mergedresult)
-                else:
-                    return str(result)
+                return str(result)
         elif "Parser" in actionable.__module__:
             if parser := self.parsers.get(actionable.parsertype):
                 return ", ".join(parser.extract())
@@ -258,9 +252,8 @@ class clipParser:
             is_valid = False
         if "__init__" in file:
             is_valid = False
-        if self.exclude:
-            if re.search(self.exclude, file):
-                is_valid = False
+        if self.exclude and re.search(self.exclude, file):
+            is_valid = False
         if self.include:
             if not re.search(self.include, file):
                 is_valid = False

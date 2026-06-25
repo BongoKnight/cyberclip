@@ -151,10 +151,9 @@ class actionInterface:
         config = self.complex_param.get(config_name)
         if isinstance(config, dict):
             return config.get("value", "")
-        elif isinstance(config, str):
+        if isinstance(config, str):
             return config
-        else:
-            return ""
+        return ""
 
     def execute(self) -> dict[str, dict]:
         """Execute the action
