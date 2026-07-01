@@ -144,7 +144,7 @@ def test_query_shodan_requires_api_key():
     result = action.execute()
 
     assert result == {
-        "error": "Missing Shodan API key. Configure SHODAN_API_KEY in .env"
+        "error": "Missing Shodan API key. Configure SHODAN_API-KEY in .env"
     }
 
 
