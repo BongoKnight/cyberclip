@@ -57,7 +57,7 @@ QUERY_TEMPLATES = {
                     {"single": "behaviour_network:{obs}", "sep": " "}],
     },
     "modat": {
-        "ip":     [{"single": "{obs}", "agg": "ip={{{items}}}",     "item": "{obs}", "sep": " or "}],
+        "ip":     [{"single": "ip={obs}"}],
         "domain": [{"single": "domain={obs}"}],
     },
 }

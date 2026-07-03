@@ -292,11 +292,11 @@ class ReplaceDelimiterAction(actionInterface):
 
     Action Options:
         Search (list): Delimiter to search for.
-            Choices: Comma, Line return (CRLF), Line return (LF), Colon, Tab
-            Default: Line return (CRLF)
+            Choices: Comma, Line return (CRLF), Colon, Semi-Colon, Tab, Quoted list
+            Default: Line return
         Replace (list): Delimiter to replace with.
-            Choices: Comma, Line return (CRLF), Line return (LF), Colon, Tab
-            Default: Line return (CRLF)
+            Choices: Comma, Line return (CRLF), Line return (LF), Colon, Semi-Colon, Tab, Quoted list
+            Default: Comma
 
     Example:
         >>> from userTypeParser.TextParser import TextParser
@@ -311,14 +311,15 @@ class ReplaceDelimiterAction(actionInterface):
     """
 
     DELIMITER_MAP = {
-        "Comma": ",",
-        "Line return (CRLF)": "\r\n",
-        "Line return (LF)": "\n",
-        "Colon": ":",
-        "Tab": "\t"
+        "Comma": {"search":",", "replace":","},
+        "Line return": {"search":"\r?\n", "replace":"\r\n"},
+        "Quoted list":{"search":r"\"\s*,\s*\"", "replace":""},
+        "Colon": {"search":":", "replace":":"},
+        "Semi-Colon": {"search":";", "replace":";"},
+        "Tab": {"search":"\t", "replace":"\t"}
     }
 
-    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={"Search":{"type":"list", "value":"Line return (CRLF)","choices":["Comma","Line return (CRLF)","Line return (LF)","Colon","Tab"]},"Replace":{"type":"list","value":"Line return (CRLF)","choices":["Comma","Line return (CRLF)","Line return (LF)","Colon","Tab"]}}):
+    def __init__(self, parsers = {}, supportedType = {"text"}, complex_param={"Search":{"type":"list", "value":"Line return","choices":["Comma","Line return","Quoted list","Colon","Semi-Colon","Tab"]},"Replace":{"type":"list","value":"Comma","choices":["Comma","Line return","Quoted list","Colon","Semi-Colon","Tab"]}}):
         super().__init__(parsers = parsers, supportedType = supportedType, complex_param=complex_param)
         self.description = "Regex: Find and replace delimiter"
 
@@ -333,9 +334,20 @@ class ReplaceDelimiterAction(actionInterface):
             text = self.observables.get("text")[0]
             search_label = self.get_param_value('Search')
             replace_label = self.get_param_value('Replace')
-            search_regex = self.DELIMITER_MAP.get(search_label, search_label)
-            replace_regex = self.DELIMITER_MAP.get(replace_label, replace_label)
-            return re.sub(search_regex, replace_regex, text, flags= re.MULTILINE)
+            search_regex = self.DELIMITER_MAP.get(search_label, {}).get("search","")
+            replace_regex = self.DELIMITER_MAP.get(replace_label, {}).get("replace","")
+            if replace_label is not "Quoted list" and search_label is not "Quoted list":
+                return re.sub(search_regex, replace_regex, text, flags= re.MULTILINE)
+            elif replace_label is "Quoted list":
+                text = re.sub(search_regex, "\",\"", text, flags= re.MULTILINE)
+                text = f'"{text}"'
+                return text
+            elif search_label is "Quoted list":
+                text = re.sub("^\"|\"$", "", text, flags= re.MULTILINE)
+                text = re.sub(search_regex, replace_regex, text, flags= re.MULTILINE)
+                return text
+        
+        
         return ""
 
     def __str__(self) -> str:
