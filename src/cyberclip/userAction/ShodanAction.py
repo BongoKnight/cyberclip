@@ -42,7 +42,7 @@ class _ShodanMixin:
         api_key = self.conf.get("api_key", "")
         if not api_key:
             raise RuntimeError(
-                "Missing Shodan API key. Configure SHODAN_API_KEY in .env"
+                "Missing Shodan API key. Configure SHODAN_API-KEY in .env"
             )
         return api_key
 

@@ -59,8 +59,10 @@ C:\Users\%USERNAME%\pipx\venvs\cyberclip\Lib\site-packages\cyberclip
 ```bash
 DATALAKE_EMAIL=
 DATALAKE_PASSWORD=
+DATALAKE_BASE_URL=
 DEEPL_API-KEY=
-SHODAN_API_KEY=
+SHODAN_API-KEY=
+URLQUERY_API-KEY=
 URLSCAN_API-KEY=
 VIRUSTOTAL_API-KEY=
 ```
@@ -84,5 +86,5 @@ cd "C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python312\Lib\site-package
 
 # Requests and improvments
 
-- Feel free to open an issue if you think of other type of data to parse, or if you think of an action you would like to be applied to a specific type of data,
+- Feel free to open an issue if you have suggestions for other types of data to parse, or for an action you'd like to see applied to a specific type of data
 - Feel free to open an issue if you have some crash, I think I need to improve the error handling to avoid the crashing of the GUI 

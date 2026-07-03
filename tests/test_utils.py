@@ -7,6 +7,9 @@ from cyberclip.utilities import find_delimiter
 def test_load_conf_normalizes_key_separators(monkeypatch):
     def fake_dotenv_values(path):
         return {
+            "DATALAKE_BASE_URL": "https://datalake.example/api",
+            "DATALAKE_EMAIL": "user@example.com",
+            "DATALAKE_PASSWORD": "password",
             "MODAT_API-KEY": "hyphen-token",
             "URLSCAN_API_KEY": "underscore-token",
             "SHODAN_API-KEY": "shodan-token",
@@ -19,6 +22,11 @@ def test_load_conf_normalizes_key_separators(monkeypatch):
 
     action = actionInterface()
 
+    assert action.load_conf("Datalake") == {
+        "base_url": "https://datalake.example/api",
+        "email": "user@example.com",
+        "password": "password",
+    }
     assert action.load_conf("Modat") == {"api_key": "hyphen-token"}
     assert action.load_conf("UrlScan") == {"api_key": "underscore-token"}
     assert action.load_conf("Shodan") == {"api_key": "shodan-token"}
