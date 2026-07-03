@@ -330,7 +330,7 @@ class SearchInDatalakeAction(_DatalakeMixin, actionInterface):
     def __init__(self, parsers={}, supportedType=LOOKUP_SUPPORTED_TYPES):
         super().__init__(parsers=parsers, supportedType=supportedType)
         self.description = "Datalake: Search IoC"
-        self.indicators = "\U0001f511"
+        self.indicators = "🔑"
         self.load_conf("Datalake")
 
     def execute(self):
@@ -367,7 +367,7 @@ class QueryDatalakeAction(_DatalakeMixin, actionInterface):
             parsers=parsers, supportedType=supportedType, complex_param=complex_param
         )
         self.description = "Datalake: Query"
-        self.indicators = "\U0001f511"
+        self.indicators = "🔑"
         self.load_conf("Datalake")
 
     def execute(self):

@@ -17,7 +17,8 @@ def flatten(dictionary, parent_key=False, separator='.'):
     :param separator: The string used to separate flattened keys
     :return: A flattened dictionary
     """
-
+    if isinstance(dictionary, list):
+        dictionary = {"items":dictionary}
     items = []
     for key, value in dictionary.items():
         new_key = str(parent_key) + separator + key if parent_key else key
@@ -501,11 +502,11 @@ class JSONFlattenAction(actionInterface):
         self.observables = self.get_observables()
         json_objects = {}
         if self.observables.get("json"):
-            json_objects = [json.loads(json) for json in self.observables.get("json")]
+            json_objects = [json.loads(json_str) for json_str in self.observables.get("json")]
         if self.observables.get("yaml") and not self.observables.get("json"):
             json_objects = [yaml.safe_load(yaml_str) for yaml_str in self.observables.get("yaml")]
-        for json in json_objects:
-            self.results[str(json)] = flatten(json)
+        for json_object in json_objects:
+            self.results[str(json_object)] = flatten(json_object)
         return self.results
     
     def __str__(self) -> str:
