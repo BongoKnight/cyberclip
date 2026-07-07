@@ -12,6 +12,7 @@ def test_load_conf_normalizes_key_separators(monkeypatch):
             "DATALAKE_PASSWORD": "password",
             "MODAT_API-KEY": "hyphen-token",
             "URLSCAN_API_KEY": "underscore-token",
+            "URLQUERY_API_KEY": "urlquery-token",
             "SHODAN_API-KEY": "shodan-token",
         }
 
@@ -29,6 +30,7 @@ def test_load_conf_normalizes_key_separators(monkeypatch):
     }
     assert action.load_conf("Modat") == {"api_key": "hyphen-token"}
     assert action.load_conf("UrlScan") == {"api_key": "underscore-token"}
+    assert action.load_conf("UrlQuery") == {"api_key": "urlquery-token"}
     assert action.load_conf("Shodan") == {"api_key": "shodan-token"}
 
 
