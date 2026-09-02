@@ -133,3 +133,4 @@ class DataLoader(Static):
             yield Button("Parse clip", id="update-button", variant="success")
         yield Button("Parse text", id="text-update-button", variant="primary")
         yield VerticalScroll(id="data-type-container")
+        yield Button("Unselect/Select all", id="filter-button", variant="primary")

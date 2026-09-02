@@ -72,7 +72,7 @@ class SearchInUrlQueryAction(_UrlQueryMixin, actionInterface):
     def __init__(self, parsers={}, supportedType={"ip", "domain", "url"}):
         super().__init__(parsers=parsers, supportedType=supportedType)
         self.description = "UrlQuery: Search IoC"
-        self.indicators = "\U0001f511"
+        self.indicators = "🔑"
         self.load_conf("UrlQuery")
 
     def execute(self):
@@ -116,7 +116,7 @@ class QueryUrlQueryAction(_UrlQueryMixin, actionInterface):
             parsers=parsers, supportedType=supportedType, complex_param=complex_param
         )
         self.description = "UrlQuery: Query"
-        self.indicators = "\U0001f511"
+        self.indicators = "🔑"
         self.load_conf("UrlQuery")
 
     def _execute_single_query(self, query, limit, report_mode):
