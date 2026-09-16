@@ -60,6 +60,14 @@ QUERY_TEMPLATES = {
         "ip":     [{"single": "ip={obs}"}],
         "domain": [{"single": "domain={obs}"}],
     },
+    "iris":{
+        "ip": [
+            {"single": 'IP MATCHES "{obs}"',       "agg": "IP IN [{items}]",          "item": '"{obs}"', "sep": ", "},
+        ],
+        "domain": [
+            {"single": 'DOMAIN MATCHES "{obs}"',       "agg": "DOMAIN IN [{items}]",          "item": '"{obs}"', "sep": ", "},
+        ]
+    }
 }
 
 DEFAULT_PARAMS = {
